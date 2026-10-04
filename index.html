@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BEP Hazırlama Aracı – Lise (2026-2027)</title>
-<link rel="stylesheet" href="src/css/app.css?v=65cb590f3b">
+<link rel="stylesheet" href="src/css/app.css?v=602a5f7332">
 </head>
 <body>
 <!--GOVDE-BASI-->
@@ -18,7 +18,7 @@
     </div>
   </div>
   <div class="ust-eylemler">
-    <button type="button" id="btnYardim" class="dugme ikincil" title="Kullanım ve kaynaklar">? Yardım</button>
+    <button type="button" id="btnYardim" class="dugme ikincil" title="Kullanım ve kaynaklar" aria-label="Yardım">?<span class="uzun"> Yardım</span></button>
   </div>
 </header>
 
@@ -91,7 +91,7 @@
         </label>
         <label class="genis">Ders<select id="dersSec"></select></label>
         <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
-        <label class="genis">Plan (okul türü)<select id="planSec"></select></label>
+        <label class="genis">Plan kaynağı<select id="planSec"></select></label>
         <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir" autocomplete="off"></label>
       </div>
       <div id="saatUyari" class="uyari-kutusu" hidden></div>
@@ -116,6 +116,10 @@
       <p>Plan; resmî takvim (37 hafta + tatiller), seçilen dersin resmî çerçeve planı ve öğrencinin tanısına göre otomatik üretilir. Tüm hücreler düzenlenebilir.</p>
     </div>
     <div class="kart ayarlar-kart">
+      <div class="izgara">
+        <label>Destek Düzeyi<select data-alan="ayarlar.destek" id="destekSec"></select></label>
+        <label>KDA Ölçütü<select data-alan="ayarlar.olcut" id="olcutSec"></select></label>
+      </div>
       <div id="otomatikAyarlar" class="bilgi-kutusu"></div>
       <div class="izgara">
         <label class="genis">BEP Yazılı Sınav Haftaları <small>(dönem başına 2 sınav – OKY Md. 45/1-a)</small>
@@ -210,15 +214,15 @@
 <div id="bildirim" class="bildirim" role="status" aria-live="polite"></div>
 <div id="yazdirma-alani"></div>
 <!--GOVDE-SONU-->
-<script src="data/dersler.js?v=65cb590f3b"></script>
-<script src="src/js/kutuphane.js?v=65cb590f3b"></script>
-<script src="src/js/takvim.js?v=65cb590f3b"></script>
-<script src="src/js/uretici.js?v=65cb590f3b"></script>
-<script src="src/js/zip.js?v=65cb590f3b"></script>
-<script src="src/js/yazitipi.js?v=65cb590f3b"></script>
-<script src="src/js/belge.js?v=65cb590f3b"></script>
-<script src="src/js/docx.js?v=65cb590f3b"></script>
-<script src="src/js/onizleme.js?v=65cb590f3b"></script>
-<script src="src/js/app.js?v=65cb590f3b"></script>
+<script src="data/dersler.js?v=602a5f7332"></script>
+<script src="src/js/kutuphane.js?v=602a5f7332"></script>
+<script src="src/js/takvim.js?v=602a5f7332"></script>
+<script src="src/js/uretici.js?v=602a5f7332"></script>
+<script src="src/js/zip.js?v=602a5f7332"></script>
+<script src="src/js/yazitipi.js?v=602a5f7332"></script>
+<script src="src/js/belge.js?v=602a5f7332"></script>
+<script src="src/js/docx.js?v=602a5f7332"></script>
+<script src="src/js/onizleme.js?v=602a5f7332"></script>
+<script src="src/js/app.js?v=602a5f7332"></script>
 </body>
 </html>

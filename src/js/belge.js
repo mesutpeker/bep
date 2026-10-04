@@ -102,7 +102,6 @@
     if (ids.indexOf("diger") >= 0 && bep.ogrenci.yetersizlikMetni) ad.push(bep.ogrenci.yetersizlikMetni);
     return ad.join(", ") || "—";
   }
-  BEP.tanilarMetni = tanilar;
 
   function ustBaslikSatiri(okul) {
     if (okul.baslikSatiri2) return okul.baslikSatiri2;
