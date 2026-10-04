@@ -277,7 +277,7 @@
       $("#sinifSec").innerHTML = ""; $("#planSec").innerHTML = "";
     }
     var ctx = BEP.baglam(b);
-    $("#saatGir").placeholder = ctx.plan ? String(ctx.plan.saat) : "";
+    $("#saatGir").placeholder = ctx.plan ? String(BEP.okulTuruSaati(b) || ctx.plan.saat) : "";
     formuDoldur($('[data-panel="2"]'));
     planBilgiCiz(ctx);
     saatUyarisiGoster();
@@ -285,8 +285,11 @@
   function saatUyarisiGoster() {
     var b = bep(), kutu = $("#saatUyari");
     var mtal = b.okul.tur === "mtal" || b.okul.tur === "diger" || b.okul.tur === "aihl";
-    var ctx = BEP.baglam(b);
-    if (mtal && ctx.plan && b.ders.id !== "__ozel__" && !b.ders.saat) {
+    var ctx = BEP.baglam(b), okulSaat = BEP.okulTuruSaati(b);
+    if (okulSaat && !b.ders.saat) {
+      kutu.hidden = false;
+      kutu.textContent = "Okulunuzun haftalık ders çizelgesine göre bu ders " + ctx.plan.sinif + ". sınıfta haftalık " + okulSaat + " saattir; plan " + okulSaat + " saate göre hazırlanır (resmî çerçeve plan: haftalık " + ctx.plan.saat + " saat). Konu sıralaması aynen korunur.";
+    } else if (mtal && ctx.plan && b.ders.id !== "__ozel__" && !b.ders.saat) {
       kutu.hidden = false;
       kutu.textContent = "Resmî çerçeve planları Anadolu/Fen/Sosyal Bilimler liselerinin ders saatine göre hazırlanmıştır (bu plan: haftalık " + ctx.plan.saat + " saat). Okulunuzun haftalık ders çizelgesindeki saat farklıysa “Haftalık Ders Saati” alanına yazınız; konu sıralaması aynen korunur.";
     } else kutu.hidden = true;
@@ -575,7 +578,7 @@
       '<li><a href="https://orgm.meb.gov.tr/meb_iys_dosyalar/2022_09/20140845_BYREYSELLEYTYRYLMYY_EYYTYM_PROGRAMI_TUM_OYRETMENLER_YCYN_YOL_HARITASI.pdf" target="_blank" rel="noopener">ORGM – BEP: Tüm Öğretmenler İçin Yol Haritası</a> (KDA: birey + koşul + davranış + ölçüt)</li>' +
       '<li><a href="https://meslek.meb.gov.tr/dersbilgi" target="_blank" rel="noopener">MTEGM Ders Bilgi Formları (meslek dersleri)</a></li></ul>' +
       "<h2>Önemli notlar</h2><ul><li>2026-2027’de hazırlık, 9, 10 ve 11. sınıflarda Türkiye Yüzyılı Maarif Modeli programları; 12. sınıflarda önceki programlar uygulanmaktadır (OGM).</li>" +
-      "<li>Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler liseleri için yayımlanmıştır; MTAL ve diğer okullarda haftalık ders saatinizi 2. adımda düzeltebilirsiniz.</li>" +
+      "<li>Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler liseleri için yayımlanmıştır; MTAL ve diğer okullarda haftalık ders saatinizi 2. adımda düzeltebilirsiniz (MTAL’de Türk Dili ve Edebiyatı 10-12. sınıflarda otomatik olarak 4 saat alınır).</li>" +
       "<li>Üretilen amaçlar birer taslaktır; BEP geliştirme birimi tarafından öğrencinin performansına göre gözden geçirilmelidir.</li>" +
       "<li>Veriler yalnızca bu tarayıcıda saklanır. BEP özel nitelikli kişisel veri içerir (KVKK).</li></ul>";
     $("#yardimDiyalog").showModal();

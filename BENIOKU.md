@@ -58,7 +58,7 @@ BEP, özel nitelikli kişisel veri (sağlık/eğitsel tanı) içerir. Uygulama T
 ## Sınırlılıklar
 
 - Üretilen UDA/KDA ifadeleri **taslaktır**; BEP geliştirme birimi öğrencinin performansına göre gözden geçirmelidir.
-- Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler/İmam Hatip liseleri için yayımlanmıştır. MTAL ve diğer okullarda aynı dersin planı kullanılır; haftalık ders saatini 2. adımda düzeltin.
+- Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler/İmam Hatip liseleri için yayımlanmıştır. MTAL ve diğer okullarda aynı dersin planı kullanılır; haftalık ders saatini 2. adımda düzeltin. MTAL'de Türk Dili ve Edebiyatı 10, 11 ve 12. sınıflarda haftalık ders çizelgesine göre otomatik olarak 4 saat alınır.
 - Meslek alan/dal dersleri için MEB haftalık plan yayımlamadığından öğrenme birimleri elle girilir.
 - OGM planları "taslak" olarak yayımlanmıştır; MEB güncellerse veriyi aşağıdaki adımlarla yenileyin.
 - Word'de %75 gibi küçültülmüş çoklu sayfa görünümünde bazı satır sonları kesilmiş görünebilir; bu Word'ün ekran çiziminden kaynaklanır, %100 görünümde ve çıktıda metin eksiksizdir.

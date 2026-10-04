@@ -51,6 +51,20 @@
     return adaylar[0].id;
   };
 
+  /* Resmî çerçeve planları Anadolu/Fen/Sosyal Bilimler liselerinin saatine göredir.
+     Haftalık ders çizelgesinde saati farklı olan okul türleri için resmî haftalık saat. */
+  var OKUL_TURU_SAATLERI = {
+    // Mesleki ve Teknik Anadolu Lisesi haftalık ders çizelgesi (ortak dersler)
+    mtal: { "turk-dili-ve-edebiyati": { "10": 4, "11": 4, "12": 4 } }
+  };
+  BEP.okulTuruSaati = function (bep) {
+    var d = bep.ders || {};
+    if (!d.id || d.id === "__ozel__") return null;
+    var plan = BEP.planBul(BEP.dersBul(d.id), d.planId);
+    var t = OKUL_TURU_SAATLERI[bep.okul && bep.okul.tur];
+    return (plan && t && t[d.id] && t[d.id][plan.sinif]) || null;
+  };
+
   /* Elle girilen (meslek dersi vb.) ders için sentetik plan */
   BEP.ozelPlanOlustur = function (oz) {
     var uniteler = (oz.uniteler || []).filter(function (u) { return tr.bosluk(u.ad); });
@@ -120,7 +134,7 @@
       destek: ayar.destek || otomatikDestek(profiller),
       olcut: olcut.metin, ozne: ozne, ad: ad || "Öğrenci",
       dil: ders && ders.id === "ingilizce" ? "en" : "tr",
-      saat: parseInt(bep.ders && bep.ders.saat, 10) || (plan && plan.saat) || 2,
+      saat: parseInt(bep.ders && bep.ders.saat, 10) || (!ozel && BEP.okulTuruSaati(bep)) || (plan && plan.saat) || 2,
       sinavHaftalari: (ayar.sinavHaftalari || [8, 16, 25, 33]).map(Number)
     };
   };
@@ -610,6 +624,9 @@
   /* Planı etkileyen seçimlerin imzası: değiştiğinde arayüz "planı yenile" uyarısı gösterir */
   BEP.planImzasi = function (bep) {
     var o = bep.ogrenci || {}, d = bep.ders || {}, a = bep.ayarlar || {};
-    return JSON.stringify([d.id, d.planId, d.saat, d.id === "__ozel__" ? d.ozel : null, (o.yetersizlik || []).join(","), BEP.tr.ilkAd(o.ad), a.destek, a.olcut, a.ozne, (a.sinavHaftalari || []).join(",")]);
+    var imza = [d.id, d.planId, d.saat, d.id === "__ozel__" ? d.ozel : null, (o.yetersizlik || []).join(","), BEP.tr.ilkAd(o.ad), a.destek, a.olcut, a.ozne, (a.sinavHaftalari || []).join(",")];
+    var okulSaat = BEP.okulTuruSaati(bep);
+    if (okulSaat) imza.push("okul-saat:" + okulSaat); // yalnızca istisnada eklenir; mevcut planların imzası değişmez
+    return JSON.stringify(imza);
   };
 })(typeof window !== "undefined" ? window : globalThis);

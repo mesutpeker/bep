@@ -45,6 +45,24 @@ BEP.dersListesi().forEach(function (ders) {
     });
   });
 });
+// Okul türüne özgü resmî haftalık saat (MTAL'de Türk Dili ve Edebiyatı 10-12. sınıflarda 4 saat)
+[["mtal", "9", "", 5], ["mtal", "10", "", 4], ["mtal", "11", "", 4], ["mtal", "12", "", 4], ["anadolu", "10", "", 5], ["fen", "12", "", 5], ["mtal", "11", "3", 3]].forEach(function (k) {
+  toplam++;
+  var tde = BEP.dersBul("turk-dili-ve-edebiyati");
+  var bep = {
+    egitimYili: "2026-2027", okul: { il: "Ankara", ad: "Örnek Lisesi", tur: k[0] },
+    ogrenci: { ad: "Ece Deneme", sinif: k[1], yetersizlik: ["oog"], hizmet: "Tam Zamanlı Kaynaştırma / Bütünleştirme" },
+    ders: { id: tde.id, planId: BEP.planOner(tde, k[1], k[0]), saat: k[2] }, ayarlar: { duzen: "mufredat", olcut: "80", ozne: "ad", sinavHaftalari: [8, 16, 25, 33] }, kurul: {}
+  };
+  try {
+    var s = BEP.planiHazirla(bep);
+    if (s.hata) throw new Error(s.hata);
+    bep.performans = BEP.varsayilanPerformans(bep);
+    var saatler = bep.plan.satirlar.filter(function (r) { return r.tur === "hafta" && r.saat !== "—"; }).map(function (r) { return +r.saat; });
+    if (BEP.baglam(bep).saat !== k[3] || saatler.some(function (x) { return x !== k[3]; })) throw new Error("haftalık saat " + k[3] + " bekleniyordu: " + BEP.baglam(bep).saat);
+    if (JSON.stringify(BEP.belgeModeli(bep)).indexOf("(" + k[3] + " Saat)") < 0) throw new Error("belgede ders saati " + k[3] + " değil");
+  } catch (e) { hata++; console.log("HATA okul türü saati", k.join("/"), "->", e.message); }
+});
 console.log("Toplam senaryo:", toplam, "| Hata:", hata, "| Plan sayfa sayısı dağılımı:", JSON.stringify(sayfaDagilimi), "| 260+ karakter KDA:", uzunKda);
 if (enUzun) console.log("En uzun KDA (" + enUzun.length + "):", enUzun);
 process.exit(hata ? 1 : 0);
