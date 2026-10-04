@@ -37,7 +37,6 @@ h1, h2, h3 { margin: 0; color: var(--lacivert); }
 h1 { font-size: 1.45rem; }
 h2 { font-size: 1.05rem; margin-bottom: .75rem; }
 h2 small, legend small, label small { color: var(--yazi-3); font-weight: 400; }
-.gizli-etiket { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* Üst çubuk */
 .sabit-ust { position: sticky; top: 0; z-index: 30; }
@@ -110,14 +109,6 @@ details.ek-ayar { margin-top: .6rem; font-size: .88rem; }
 details.ek-ayar summary { cursor: pointer; color: var(--mavi); }
 details.ek-ayar label { margin-top: .5rem; }
 
-/* Öneri çipleri */
-.cipler { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .5rem; }
-.cip { font: inherit; font-size: .8rem; text-align: left; border: 1px dashed #9fb6d6; background: #f7faff; color: var(--lacivert); border-radius: 14px; padding: .25rem .65rem; cursor: pointer; max-width: 100%; }
-.cip:hover { background: var(--mavi-acik); border-style: solid; }
-.cip::before { content: "+ "; font-weight: 700; }
-.seviye-oneriler { display: grid; gap: .5rem; margin-bottom: .6rem; }
-.seviye-satiri { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; font-size: .82rem; }
-.seviye-satiri b { min-width: 170px; color: var(--lacivert); }
 
 /* Plan düzenleyici */
 .ayarlar-kart .izgara { align-items: end; }
@@ -143,17 +134,7 @@ table.plan .kda-araclar { display: flex; gap: .3rem; margin-top: .2rem; }
 table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border-radius: 6px; color: var(--yazi-2); }
 .sutun-genislik-unite { width: 15%; } .sutun-genislik-kda { width: 30%; }
 
-/* Uyarlama listeleri */
-.uyarlama-listesi { display: grid; gap: .5rem; }
-.uyarlama { display: grid; grid-template-columns: 26px 260px 1fr 34px; gap: .5rem; align-items: start; padding: .45rem; border: 1px solid var(--cizgi-2); border-radius: 8px; background: #fbfcfe; }
-.uyarlama.pasif { opacity: .55; }
-.uyarlama input[type=checkbox] { margin-top: .55rem; }
-.uyarlama textarea { min-height: 54px; }
-@media (max-width: 900px) { .uyarlama { grid-template-columns: 26px 1fr 34px; } .uyarlama textarea { grid-column: 2 / 4; } }
 .sil-dugme { border: 1px solid var(--cizgi); background: #fff; color: var(--kirmizi); border-radius: 6px; cursor: pointer; height: 32px; font-size: 1rem; }
-.izleme-satiri { display: grid; grid-template-columns: 70px 1fr 1fr; gap: .5rem; margin-bottom: .5rem; align-items: start; }
-.izleme-satiri b { color: var(--lacivert); padding-top: .5rem; }
-@media (max-width: 900px) { .izleme-satiri { grid-template-columns: 60px 1fr; } .izleme-satiri textarea:last-child { grid-column: 2; } }
 .ozel-unite { display: grid; grid-template-columns: 1fr 120px 34px; gap: .5rem; margin-bottom: .6rem; padding: .6rem; border: 1px solid var(--cizgi-2); border-radius: 8px; background: #fbfcfe; }
 .ozel-unite textarea { grid-column: 1 / -1; }
 
@@ -178,7 +159,6 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
 .diyalog { border: none; border-radius: 12px; padding: 1.25rem 1.4rem; max-width: 760px; width: calc(100% - 2rem); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
 .diyalog.genis-diyalog { max-width: 980px; }
 .diyalog::backdrop { background: rgba(15,23,42,.45); }
-.diyalog textarea { width: 100%; }
 .diyalog-alt { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1rem; }
 .bildirim { position: fixed; right: 1rem; bottom: 84px; z-index: 50; display: grid; gap: .5rem; }
 .bildirim div { background: var(--lacivert); color: #fff; padding: .6rem .9rem; border-radius: 8px; box-shadow: var(--golge); font-size: .9rem; max-width: 380px; animation: gir .2s ease-out; }
@@ -187,6 +167,33 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
 #yardimIcerik h2 { margin-top: 1rem; }
 #yardimIcerik li { margin-bottom: .3rem; }
 #yazdirma-alani { display: none; }
+
+/* Telefon: sabit başlık ve alt çubuk ekranın az yerini kaplasın */
+.kisa { display: none; }
+@media (max-width: 560px) {
+  .uzun { display: none; }
+  .kisa { display: inline; }
+  body { padding-bottom: 64px; }
+  .ust-cubuk { flex-wrap: nowrap; gap: .5rem; padding: .4rem .75rem; }
+  .logo { width: 32px; height: 32px; border-radius: 8px; font-size: .72rem; }
+  .marka { gap: .5rem; }
+  .marka strong { font-size: .95rem; }
+  .marka small { display: none; }
+  .ust-eylemler .dugme { padding: .3rem .65rem; }
+  .adimlar { gap: .25rem; padding: .4rem .75rem; }
+  .adimlar button { padding: .25rem; font-size: .85rem; }
+  .adimlar button:not(.aktif) span { display: none; }
+  .adimlar button.aktif { padding-right: .7rem; }
+  main { padding: .75rem; }
+  h1 { font-size: 1.2rem; }
+  .kart { padding: .8rem .85rem; }
+  .alt-gezinme { gap: .5rem; padding: .45rem .75rem; }
+  .alt-gezinme .dugme { padding: .45rem .75rem; }
+  .alt-gezinme .durum-metni { font-size: .78rem; text-align: center; }
+  .bildirim { left: .75rem; right: .75rem; bottom: 64px; }
+  .bildirim div { max-width: none; }
+  .sinav-girisleri input { width: 100%; }
+}
 
 @media print {
   body { background: #fff; padding: 0; }
@@ -208,7 +215,7 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
     </div>
   </div>
   <div class="ust-eylemler">
-    <button type="button" id="btnYardim" class="dugme ikincil" title="Kullanım ve kaynaklar">? Yardım</button>
+    <button type="button" id="btnYardim" class="dugme ikincil" title="Kullanım ve kaynaklar" aria-label="Yardım">?<span class="uzun"> Yardım</span></button>
   </div>
 </header>
 
@@ -281,7 +288,7 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
         </label>
         <label class="genis">Ders<select id="dersSec"></select></label>
         <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
-        <label class="genis">Plan (okul türü)<select id="planSec"></select></label>
+        <label class="genis">Plan kaynağı<select id="planSec"></select></label>
         <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir" autocomplete="off"></label>
       </div>
       <div id="saatUyari" class="uyari-kutusu" hidden></div>
@@ -306,6 +313,10 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
       <p>Plan; resmî takvim (37 hafta + tatiller), seçilen dersin resmî çerçeve planı ve öğrencinin tanısına göre otomatik üretilir. Tüm hücreler düzenlenebilir.</p>
     </div>
     <div class="kart ayarlar-kart">
+      <div class="izgara">
+        <label>Destek Düzeyi<select data-alan="ayarlar.destek" id="destekSec"></select></label>
+        <label>KDA Ölçütü<select data-alan="ayarlar.olcut" id="olcutSec"></select></label>
+      </div>
       <div id="otomatikAyarlar" class="bilgi-kutusu"></div>
       <div class="izgara">
         <label class="genis">BEP Yazılı Sınav Haftaları <small>(dönem başına 2 sınav – OKY Md. 45/1-a)</small>
@@ -2342,7 +2353,6 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     if (ids.indexOf("diger") >= 0 && bep.ogrenci.yetersizlikMetni) ad.push(bep.ogrenci.yetersizlikMetni);
     return ad.join(", ") || "—";
   }
-  BEP.tanilarMetni = tanilar;
 
   function ustBaslikSatiri(okul) {
     if (okul.baslikSatiri2) return okul.baslikSatiri2;
@@ -3083,7 +3093,10 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     try {
       oturumDeposu().setItem(DEPO, JSON.stringify({ kayitlar: durum.kayitlar, aktifId: durum.aktifId }));
       var s = new Date();
-      $("#kayitDurumu").textContent = "✓ Bu sekmede tutuluyor " + ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2) + " • sekme kapatılınca silinir";
+      var saat = ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2);
+      // Dar ekranda (telefon) kısa metin gösterilir
+      $("#kayitDurumu").innerHTML = '<span class="uzun">✓ Bu sekmede tutuluyor ' + saat + " • sekme kapatılınca silinir</span>" +
+        '<span class="kisa" title="Bilgiler bu sekmede tutulur; sekme kapatılınca silinir">✓ Kaydedildi ' + saat + "</span>";
     } catch (e) {
       $("#kayitDurumu").textContent = "⚠ Tarayıcı bu sayfada kayda izin vermiyor; bilgiler yalnızca sayfa açıkken korunur (yenilemeyin).";
     }
@@ -3091,8 +3104,8 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
   function kaydetGecikmeli() { clearTimeout(kayitZamanlayici); kayitZamanlayici = setTimeout(kaydet, 400); }
 
   /* ------------------------------------------------------------------ yeni kayıt */
-  // Arayüzde seçilmeyen, tanıya göre otomatik belirlenen ayarlar
-  var OTOMATIK_AYARLAR = { destek: "", olcut: "80", ozne: "ad", duzen: "mufredat" };
+  // Arayüzde seçilmeyen sabit ayarlar (destek düzeyi ve ölçüt 3. adımda seçilebilir)
+  var OTOMATIK_AYARLAR = { ozne: "ad", duzen: "mufredat" };
   // Artık toplanmayan kişisel alanlar (veri en aza indirme) ve arayüzden kaldırılan bölümler
   var KALDIRILAN_OGRENCI_ALANLARI = ["tc", "cinsiyet", "dogumTarihi", "dogumYeri", "alan", "ramKurum", "ramTarih", "ramNo", "okulDisiDestek"];
 
@@ -3144,6 +3157,9 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     if (!Array.isArray(b.ogrenci.yetersizlik)) b.ogrenci.yetersizlik = [];
     b.ayarlar = b.ayarlar || {};
     for (var k in OTOMATIK_AYARLAR) b.ayarlar[k] = OTOMATIK_AYARLAR[k];
+    // "" = tanıya göre otomatik destek düzeyi
+    if (!BEP.DESTEK_DUZEYLERI.some(function (d) { return d.id === b.ayarlar.destek; })) b.ayarlar.destek = "";
+    if (!BEP.OLCUTLER.some(function (o) { return o.id === b.ayarlar.olcut; })) b.ayarlar.olcut = "80";
     if (!Array.isArray(b.ayarlar.sinavHaftalari)) b.ayarlar.sinavHaftalari = [8, 16, 25, 33];
     if (!Array.isArray(b.izleme)) b.izleme = [];
     if (b.plan && (typeof b.plan !== "object" || !Array.isArray(b.plan.satirlar))) b.plan = null;
@@ -3193,6 +3209,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     kaydetGecikmeli();
     if (/^okul\.|^kurul\.(baskan|baskanUnvan|rehberOgretmen|tarih)$|^tasdik\.|^ders\.ogretmen$/.test(alan)) ustBaslikGoster();
     if (alan === "ders.saat") { saatUyarisiGoster(); planEtiketleriniGuncelle(); }
+    if (/^ayarlar\.(destek|olcut)$/.test(alan) && durum.adim === 3) { ayarSecimleriCiz(); planDurumuGuncelle(); }
     if (alan === "okul.tur" && b.ders.id && b.ders.id !== "__ozel__") {
       var d = BEP.dersBul(b.ders.id), sinif = (BEP.planBul(d, b.ders.planId) || {}).sinif;
       var oneri = BEP.planOner(d, sinif, b.okul.tur);
@@ -3398,13 +3415,15 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
   /* ------------------------------------------------------------------ ADIM 3 – yıllık plan */
   function ayarSecimleriCiz() {
     var b = bep(), ctx = BEP.baglam(b);
-    var destek = BEP.DESTEK_DUZEYLERI.filter(function (d) { return d.id === ctx.destek; })[0] || {};
-    var olcut = BEP.OLCUTLER.filter(function (o) { return o.id === b.ayarlar.olcut; })[0] || {};
+    var destekBul = function (id) { return BEP.DESTEK_DUZEYLERI.filter(function (d) { return d.id === id; })[0] || {}; };
+    var destek = destekBul(ctx.destek), oto = destekBul(BEP.otomatikDestek(b));
     var duzen = BEP.PLAN_DUZENLERI[b.ayarlar.duzen] || {};
-    $("#otomatikAyarlar").innerHTML = "<b>Tanıya göre otomatik ayarlar:</b> " +
-      "Destek düzeyi: <b>" + esc(destek.ad || "") + "</b> <small>(" + esc(destek.aciklama || "") + ")</small> • " +
-      "KDA ölçütü: <b>" + esc(olcut.ad || "") + "</b> • KDA öznesi: <b>" + esc(ctx.ozne || "Öğrenci") + "</b> • " +
-      "Tablo düzeni: <b>" + esc(duzen.ad || "") + "</b>";
+    $("#destekSec").innerHTML = '<option value="">Otomatik – tanıya göre (' + esc(oto.ad || "") + ")</option>" +
+      BEP.DESTEK_DUZEYLERI.map(function (d) { return '<option value="' + d.id + '">' + esc(d.ad) + "</option>"; }).join("");
+    $("#olcutSec").innerHTML = BEP.OLCUTLER.map(function (o) { return '<option value="' + o.id + '">' + esc(o.ad + (o.id === "80" ? " – önerilen" : "")) + "</option>"; }).join("");
+    $("#otomatikAyarlar").innerHTML = "<b>" + esc(destek.ad || "") + ":</b> " + esc(destek.aciklama || "") +
+      "<br><small>KDA öznesi: <b>" + esc(ctx.ozne || "Öğrenci") + "</b> • Tablo düzeni: <b>" + esc(duzen.ad || "") + "</b>" +
+      " • Destek düzeyi veya ölçüt değişince plan yeniden oluşturulur.</small>";
     var sh = b.ayarlar.sinavHaftalari || [];
     $("#sinavHaftalari").innerHTML = [0, 1, 2, 3].map(function (i) {
       return '<input type="number" min="1" max="37" data-sinav="' + i + '" value="' + (sh[i] || "") + '" title="' + (i < 2 ? "1" : "2") + '. dönem ' + ((i % 2) + 1) + '. sınav haftası" aria-label="Sınav haftası ' + (i + 1) + '">';
@@ -3633,7 +3652,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
       "<h2>BEP Hazırlama Aracı – Nasıl kullanılır?</h2><ol>" +
       "<li><b>Öğrenci:</b> Öğrencinin bilgilerini yazın; yetersizlik türünü RAM raporuna göre işaretleyin.</li>" +
       "<li><b>Ders:</b> Okul türünü, dersi ve sınıf düzeyini seçin. Haftalık konular ve öğrenme çıktıları MEB’in 2026-2027 resmî çerçeve yıllık planlarından gelir. Meslek dersleri için “elle giriş” seçeneğini kullanın.</li>" +
-      "<li><b>Yıllık Plan:</b> Destek düzeyi, ölçüt ve tablo düzeni tanıya göre otomatik belirlenir; plan otomatik oluşur. Her hücreyi düzenleyebilir, KDA için başka öneriler seçebilirsiniz. Sarı hücreler elle düzenlenmiştir.</li>" +
+      "<li><b>Yıllık Plan:</b> Destek düzeyi tanıya göre otomatik belirlenir, KDA ölçütü %80’dir; ikisini de öğrencinize göre değiştirebilirsiniz. Plan otomatik oluşur. Her hücreyi düzenleyebilir, KDA için başka öneriler seçebilirsiniz. Sarı hücreler elle düzenlenmiştir.</li>" +
       "<li><b>Okul ve BEP Birimi:</b> Okul bilgilerini ve BEP geliştirme birimi üyeleri ile tasdik tarihlerini girin (bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır).</li>" +
       "<li><b>Önizle ve İndir:</b> Mevcut performans düzeyi tanıya ve derse göre otomatik doldurulur. Uyarlamalar (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3) ve izleme çizelgesi tanıya göre otomatik eklenir. Kontrol listesini inceleyin, Word belgesini indirin veya PDF olarak yazdırın.</li></ol>" +
       "<h2>Resmî takvim (" + esc(T.egitimYili) + ")</h2><ul><li>Ders yılı: " + T.dersBasi + " – " + T.dersSonu + " (36 öğretim haftası + 37. hafta sosyal etkinlik)</li><li>1. dönem ara tatili: 16-20 Kasım 2026 • Yarıyıl tatili: 25 Ocak – 5 Şubat 2027 • 2. dönem ara tatili: 8-12 Mart 2027</li></ul>" +

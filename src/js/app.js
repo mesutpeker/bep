@@ -50,7 +50,10 @@
     try {
       oturumDeposu().setItem(DEPO, JSON.stringify({ kayitlar: durum.kayitlar, aktifId: durum.aktifId }));
       var s = new Date();
-      $("#kayitDurumu").textContent = "✓ Bu sekmede tutuluyor " + ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2) + " • sekme kapatılınca silinir";
+      var saat = ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2);
+      // Dar ekranda (telefon) kısa metin gösterilir
+      $("#kayitDurumu").innerHTML = '<span class="uzun">✓ Bu sekmede tutuluyor ' + saat + " • sekme kapatılınca silinir</span>" +
+        '<span class="kisa" title="Bilgiler bu sekmede tutulur; sekme kapatılınca silinir">✓ Kaydedildi ' + saat + "</span>";
     } catch (e) {
       $("#kayitDurumu").textContent = "⚠ Tarayıcı bu sayfada kayda izin vermiyor; bilgiler yalnızca sayfa açıkken korunur (yenilemeyin).";
     }
@@ -58,8 +61,8 @@
   function kaydetGecikmeli() { clearTimeout(kayitZamanlayici); kayitZamanlayici = setTimeout(kaydet, 400); }
 
   /* ------------------------------------------------------------------ yeni kayıt */
-  // Arayüzde seçilmeyen, tanıya göre otomatik belirlenen ayarlar
-  var OTOMATIK_AYARLAR = { destek: "", olcut: "80", ozne: "ad", duzen: "mufredat" };
+  // Arayüzde seçilmeyen sabit ayarlar (destek düzeyi ve ölçüt 3. adımda seçilebilir)
+  var OTOMATIK_AYARLAR = { ozne: "ad", duzen: "mufredat" };
   // Artık toplanmayan kişisel alanlar (veri en aza indirme) ve arayüzden kaldırılan bölümler
   var KALDIRILAN_OGRENCI_ALANLARI = ["tc", "cinsiyet", "dogumTarihi", "dogumYeri", "alan", "ramKurum", "ramTarih", "ramNo", "okulDisiDestek"];
 
@@ -111,6 +114,9 @@
     if (!Array.isArray(b.ogrenci.yetersizlik)) b.ogrenci.yetersizlik = [];
     b.ayarlar = b.ayarlar || {};
     for (var k in OTOMATIK_AYARLAR) b.ayarlar[k] = OTOMATIK_AYARLAR[k];
+    // "" = tanıya göre otomatik destek düzeyi
+    if (!BEP.DESTEK_DUZEYLERI.some(function (d) { return d.id === b.ayarlar.destek; })) b.ayarlar.destek = "";
+    if (!BEP.OLCUTLER.some(function (o) { return o.id === b.ayarlar.olcut; })) b.ayarlar.olcut = "80";
     if (!Array.isArray(b.ayarlar.sinavHaftalari)) b.ayarlar.sinavHaftalari = [8, 16, 25, 33];
     if (!Array.isArray(b.izleme)) b.izleme = [];
     if (b.plan && (typeof b.plan !== "object" || !Array.isArray(b.plan.satirlar))) b.plan = null;
@@ -160,6 +166,7 @@
     kaydetGecikmeli();
     if (/^okul\.|^kurul\.(baskan|baskanUnvan|rehberOgretmen|tarih)$|^tasdik\.|^ders\.ogretmen$/.test(alan)) ustBaslikGoster();
     if (alan === "ders.saat") { saatUyarisiGoster(); planEtiketleriniGuncelle(); }
+    if (/^ayarlar\.(destek|olcut)$/.test(alan) && durum.adim === 3) { ayarSecimleriCiz(); planDurumuGuncelle(); }
     if (alan === "okul.tur" && b.ders.id && b.ders.id !== "__ozel__") {
       var d = BEP.dersBul(b.ders.id), sinif = (BEP.planBul(d, b.ders.planId) || {}).sinif;
       var oneri = BEP.planOner(d, sinif, b.okul.tur);
@@ -365,13 +372,15 @@
   /* ------------------------------------------------------------------ ADIM 3 – yıllık plan */
   function ayarSecimleriCiz() {
     var b = bep(), ctx = BEP.baglam(b);
-    var destek = BEP.DESTEK_DUZEYLERI.filter(function (d) { return d.id === ctx.destek; })[0] || {};
-    var olcut = BEP.OLCUTLER.filter(function (o) { return o.id === b.ayarlar.olcut; })[0] || {};
+    var destekBul = function (id) { return BEP.DESTEK_DUZEYLERI.filter(function (d) { return d.id === id; })[0] || {}; };
+    var destek = destekBul(ctx.destek), oto = destekBul(BEP.otomatikDestek(b));
     var duzen = BEP.PLAN_DUZENLERI[b.ayarlar.duzen] || {};
-    $("#otomatikAyarlar").innerHTML = "<b>Tanıya göre otomatik ayarlar:</b> " +
-      "Destek düzeyi: <b>" + esc(destek.ad || "") + "</b> <small>(" + esc(destek.aciklama || "") + ")</small> • " +
-      "KDA ölçütü: <b>" + esc(olcut.ad || "") + "</b> • KDA öznesi: <b>" + esc(ctx.ozne || "Öğrenci") + "</b> • " +
-      "Tablo düzeni: <b>" + esc(duzen.ad || "") + "</b>";
+    $("#destekSec").innerHTML = '<option value="">Otomatik – tanıya göre (' + esc(oto.ad || "") + ")</option>" +
+      BEP.DESTEK_DUZEYLERI.map(function (d) { return '<option value="' + d.id + '">' + esc(d.ad) + "</option>"; }).join("");
+    $("#olcutSec").innerHTML = BEP.OLCUTLER.map(function (o) { return '<option value="' + o.id + '">' + esc(o.ad + (o.id === "80" ? " – önerilen" : "")) + "</option>"; }).join("");
+    $("#otomatikAyarlar").innerHTML = "<b>" + esc(destek.ad || "") + ":</b> " + esc(destek.aciklama || "") +
+      "<br><small>KDA öznesi: <b>" + esc(ctx.ozne || "Öğrenci") + "</b> • Tablo düzeni: <b>" + esc(duzen.ad || "") + "</b>" +
+      " • Destek düzeyi veya ölçüt değişince plan yeniden oluşturulur.</small>";
     var sh = b.ayarlar.sinavHaftalari || [];
     $("#sinavHaftalari").innerHTML = [0, 1, 2, 3].map(function (i) {
       return '<input type="number" min="1" max="37" data-sinav="' + i + '" value="' + (sh[i] || "") + '" title="' + (i < 2 ? "1" : "2") + '. dönem ' + ((i % 2) + 1) + '. sınav haftası" aria-label="Sınav haftası ' + (i + 1) + '">';
@@ -600,7 +609,7 @@
       "<h2>BEP Hazırlama Aracı – Nasıl kullanılır?</h2><ol>" +
       "<li><b>Öğrenci:</b> Öğrencinin bilgilerini yazın; yetersizlik türünü RAM raporuna göre işaretleyin.</li>" +
       "<li><b>Ders:</b> Okul türünü, dersi ve sınıf düzeyini seçin. Haftalık konular ve öğrenme çıktıları MEB’in 2026-2027 resmî çerçeve yıllık planlarından gelir. Meslek dersleri için “elle giriş” seçeneğini kullanın.</li>" +
-      "<li><b>Yıllık Plan:</b> Destek düzeyi, ölçüt ve tablo düzeni tanıya göre otomatik belirlenir; plan otomatik oluşur. Her hücreyi düzenleyebilir, KDA için başka öneriler seçebilirsiniz. Sarı hücreler elle düzenlenmiştir.</li>" +
+      "<li><b>Yıllık Plan:</b> Destek düzeyi tanıya göre otomatik belirlenir, KDA ölçütü %80’dir; ikisini de öğrencinize göre değiştirebilirsiniz. Plan otomatik oluşur. Her hücreyi düzenleyebilir, KDA için başka öneriler seçebilirsiniz. Sarı hücreler elle düzenlenmiştir.</li>" +
       "<li><b>Okul ve BEP Birimi:</b> Okul bilgilerini ve BEP geliştirme birimi üyeleri ile tasdik tarihlerini girin (bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır).</li>" +
       "<li><b>Önizle ve İndir:</b> Mevcut performans düzeyi tanıya ve derse göre otomatik doldurulur. Uyarlamalar (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3) ve izleme çizelgesi tanıya göre otomatik eklenir. Kontrol listesini inceleyin, Word belgesini indirin veya PDF olarak yazdırın.</li></ol>" +
       "<h2>Resmî takvim (" + esc(T.egitimYili) + ")</h2><ul><li>Ders yılı: " + T.dersBasi + " – " + T.dersSonu + " (36 öğretim haftası + 37. hafta sosyal etkinlik)</li><li>1. dönem ara tatili: 16-20 Kasım 2026 • Yarıyıl tatili: 25 Ocak – 5 Şubat 2027 • 2. dönem ara tatili: 8-12 Mart 2027</li></ul>" +
