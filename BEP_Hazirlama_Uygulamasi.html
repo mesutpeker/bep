@@ -66,8 +66,6 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.25rem; }
 .panel-baslik .dugme { order: 1; }
 
 .kart { background: var(--kart); border: 1px solid var(--cizgi); border-radius: var(--yaricap); padding: 1rem 1.1rem; box-shadow: var(--golge); margin-bottom: 1rem; }
-.kart-ust { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
-.kart-ust h2 { margin: 0; }
 
 /* Form */
 .izgara { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem 1rem; }
@@ -182,10 +180,6 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
 .diyalog::backdrop { background: rgba(15,23,42,.45); }
 .diyalog textarea { width: 100%; }
 .diyalog-alt { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1rem; }
-.eokul-sonuc { max-height: 45vh; overflow: auto; margin-top: .75rem; }
-.eokul-sonuc table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-.eokul-sonuc th, .eokul-sonuc td { border-bottom: 1px solid var(--cizgi-2); padding: .35rem .4rem; text-align: left; vertical-align: top; }
-.eokul-sonuc .uyari { color: var(--amber); font-size: .78rem; }
 .bildirim { position: fixed; right: 1rem; bottom: 84px; z-index: 50; display: grid; gap: .5rem; }
 .bildirim div { background: var(--lacivert); color: #fff; padding: .6rem .9rem; border-radius: 8px; box-shadow: var(--golge); font-size: .9rem; max-width: 380px; animation: gir .2s ease-out; }
 .bildirim div.hata { background: var(--kirmizi); }
@@ -235,10 +229,7 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
       <p>Performans düzeyi, uyarlamalar ve BEP birimi kararları seçilen yetersizlik türüne göre otomatik hazırlanır.</p>
     </div>
     <div class="kart">
-      <div class="kart-ust">
-        <h2>Öğrenci</h2>
-        <button type="button" class="dugme ikincil kucuk" id="btnEokul">e-Okul listesinden aktar</button>
-      </div>
+      <h2>Öğrenci</h2>
       <div class="izgara">
         <label class="genis">Adı Soyadı<input data-alan="ogrenci.ad" placeholder="Örn. Deniz Yılmaz" autocomplete="off"></label>
         <label>Okul No<input data-alan="ogrenci.no" inputmode="numeric"></label>
@@ -390,17 +381,6 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
   <span id="kayitDurumu" class="durum-metni" aria-live="polite"></span>
   <button type="button" class="dugme birincil" id="btnIleri">İleri →</button>
 </footer>
-
-<dialog id="eokulDiyalog" class="diyalog">
-  <form method="dialog">
-    <h2>e-Okul Özel Eğitim Gereksinimli Öğrenci Listesinden Aktar</h2>
-    <p class="aciklama">e-Okul’dan aldığınız “Özel Eğitim Gereksinimli Öğrenci Listesi” PDF’ini açın, tüm metni seçip kopyalayın (Ctrl/Cmd + A, Ctrl/Cmd + C) ve aşağıya yapıştırın. Liste yalnızca bu bilgisayarda işlenir.</p>
-    <textarea id="eokulMetin" rows="8" placeholder="Listeyi buraya yapıştırın…"></textarea>
-    <div class="eylem-satiri"><button type="button" class="dugme ikincil" id="btnEokulAyristir">Listeyi oku</button><span id="eokulDurum" class="durum-metni"></span></div>
-    <div id="eokulSonuc" class="eokul-sonuc"></div>
-    <div class="diyalog-alt"><button class="dugme ikincil" value="kapat">Kapat</button></div>
-  </form>
-</dialog>
 
 <dialog id="yardimDiyalog" class="diyalog genis-diyalog">
   <form method="dialog">
@@ -1095,24 +1075,6 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
   BEP.yetersizlikBul = function (id) {
     for (var i = 0; i < BEP.YETERSIZLIKLER.length; i++) if (BEP.YETERSIZLIKLER[i].id === id) return BEP.YETERSIZLIKLER[i];
     return BEP.YETERSIZLIKLER[BEP.YETERSIZLIKLER.length - 1];
-  };
-
-  /* e-Okul "Engel Durumu" metnini profile eşler */
-  BEP.yetersizlikEsle = function (metin) {
-    var t = low(metin);
-    if (/orta düzeyde zihinsel|orta düzey zihinsel/.test(t)) return "zihinsel_orta";
-    if (/zihinsel/.test(t)) return "zihinsel_hafif";
-    if (/öğrenme güçlüğü/.test(t)) return "oog";
-    if (/hiperaktivite|dikkat eksikliği/.test(t)) return "dehb";
-    if (/otizm|otistik/.test(t)) return "otizm";
-    if (/işitme/.test(t)) return "isitme";
-    if (/görme|az gören/.test(t)) return "gorme";
-    if (/bedensel|ortopedik/.test(t)) return "bedensel";
-    if (/dil ve konuşma|konuşma/.test(t)) return "dil_konusma";
-    if (/duygusal|davranış bozukluğu/.test(t)) return "duygusal";
-    if (/süreğen/.test(t)) return "suregen";
-    if (/özel yetenek|üstün/.test(t)) return "ozel_yetenek";
-    return null;
   };
 
   /* ======================================================================
@@ -3043,72 +3005,6 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
 
 </script>
 <script>
-/* src/js/eokul.js */
-/*
- * BEP Hazırlama Aracı — e-Okul "Özel Eğitim Gereksinimli Öğrenci Listesi" ayrıştırıcı
- * PDF'ten kopyalanan metni öğrenci kayıtlarına dönüştürür. PDF görüntüleyicilere göre alanların
- * kopyalanma sırası değiştiği için her kayıt içinde alanlar sıradan bağımsız tanınır.
- * Aynı öğrencinin birden çok tanısı tek kayıtta birleştirilir. Metin yalnızca tarayıcıda işlenir.
- */
-(function (kok) {
-  "use strict";
-  var BEP = (kok.BEP = kok.BEP || {});
-  var tr = BEP.tr;
-
-  var TANI = /((?:Hafif|Orta|Ağır|Çok Ağır)\s+Düzeyde\s+Zihinsel\s+Yetersizlik|Zihinsel\s+Yetersizlik|Özel\s+Öğrenme\s+Güçlüğü|Dikkat\s+Eksikliği\s+ve\s+Hiperaktivite\s+Bozukluğu|(?:Hafif|Orta|Ağır)\s+Düzeyde\s+Otizm(?:\s+Spektrum\s+Bozukluğu)?|Otizm\s+Spektrum\s+Bozukluğu|İşitme\s+Yetersizliği(?:\s+(?:Az\s+İşiten|İşitmeyen|Ağır\s+İşiten))?|Görme\s+Yetersizliği(?:\s+(?:Az\s+Gören|Görmeyen))?|Bedensel\s+Yetersizlik|Dil\s+ve\s+Konuşma\s+Güçlüğü|Duygusal\s+ve\s+Davranış\s+Bozukluğu|Süreğen\s+Hastalık\w*|Özel\s+Yetenekli?)/i;
-  var SINIF = /(\d{1,2})\s*\.\s*Sınıf\s*\/\s*([A-ZÇĞİÖŞÜ0-9]{1,3})\s*Şubesi/;
-  var HIZMET = /(Tam|Yarı)\s+Zamanlı\s+Kaynaştırma\s*\/?\s*Bütünleştirme(?:\s+Yoluyla\s+Eğitim\s+Uygulamaları)?/i;
-  var RAM_UYARI = /RAM\s+Rapor[\s\S]*?başvurunuz/i;
-
-  function temizle(metin) {
-    var t = String(metin || "").replace(/\r/g, "");
-    t = t.replace(/Bütünle\s*\n\s*ştirme/g, "Bütünleştirme");
-    t = t.replace(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}(:\d{2})?(\s+\d{1,3})?/g, " "); // alt bilgi: tarih saat sayfa
-    t = t.replace(/\s+/g, " ");
-    [/T\.C\./g, /[A-ZÇĞİÖŞÜ]+\s+VALİLİĞİ/g, /\b[A-ZÇĞİÖŞÜa-zçğıöşü]+\s*\/\s*[^/]*?Müdürlüğü/g, /Özel Eğitim Gereksinimli Öğrenci Listesi/g,
-      /Sınıfı\s*\/\s*Şubesi/g, /Engel Durumu/g, /Önerilen Hizmet/g, /Adı\s+Soyadı/g, /Öğr\.\s*No/g, /S\.\s*No/g, /Cinsiyeti/g]
-      .forEach(function (d) { t = t.replace(d, " "); });
-    return t.replace(/\s+/g, " ").trim();
-  }
-
-  BEP.eokulAyristir = function (metin) {
-    var t = temizle(metin);
-    var baslar = [], d = /(?:^|\s)(\d{1,3})\s+(\d{1,6})(?=\s)/g, m;
-    while ((m = d.exec(t))) baslar.push({ i: m.index, son: d.lastIndex, sira: m[1], no: m[2] });
-    var liste = [], harita = {};
-    baslar.forEach(function (b, k) {
-      var parca = t.slice(b.son, k + 1 < baslar.length ? baslar[k + 1].i : t.length);
-      var sm = parca.match(SINIF);
-      if (!sm) return;
-      var cins = (parca.match(/\b(Erkek|Kız|Kadın)\b/) || [])[1] || "";
-      var tani = (parca.match(TANI) || [])[1] || "";
-      var hizmet = (parca.match(HIZMET) || [])[0] || "";
-      var uyari = RAM_UYARI.test(parca);
-      var ad = parca.replace(SINIF, " ").replace(TANI, " ").replace(HIZMET, " ").replace(RAM_UYARI, " ").replace(/\b(Erkek|Kız|Kadın)\b/, " ");
-      ad = ad.replace(/\bRAM\b/g, " ");
-      var adm = ad.match(/[A-ZÇĞİÖŞÜÂÎÛ]{2,}(?:\s+[A-ZÇĞİÖŞÜÂÎÛ]{2,})+/);
-      ad = adm ? adm[0] : tr.bosluk(ad);
-      var anahtar = b.no + "|" + sm[1] + sm[2];
-      var kayit = harita[anahtar];
-      if (!kayit) {
-        kayit = { no: b.no, sinif: sm[1], sube: sm[2], ad: tr.baslikDuzeni(tr.bosluk(ad)), cinsiyet: cins === "Kadın" ? "Kız" : cins, engeller: [], yetersizlik: [], hizmet: "", uyari: "" };
-        harita[anahtar] = kayit;
-        liste.push(kayit);
-      }
-      tani = tr.bosluk(tani);
-      if (tani && kayit.engeller.indexOf(tani) < 0) kayit.engeller.push(tani);
-      var id = BEP.yetersizlikEsle(tani);
-      if (id && kayit.yetersizlik.indexOf(id) < 0) kayit.yetersizlik.push(id);
-      if (/^Tam/i.test(hizmet)) kayit.hizmet = "Tam Zamanlı Kaynaştırma / Bütünleştirme";
-      else if (/^Yarı/i.test(hizmet)) kayit.hizmet = "Yarı Zamanlı Kaynaştırma / Bütünleştirme (Özel Eğitim Sınıfı)";
-      if (uyari) kayit.uyari = "e-Okul uyarısı: RAM raporundaki sınıf kademesi ile e-Okul sınıf kademesi farklı; RAM’a başvurulması gerekiyor.";
-    });
-    return liste;
-  };
-})(typeof window !== "undefined" ? window : globalThis);
-
-</script>
-<script>
 /* src/js/app.js */
 /*
  * BEP Hazırlama Aracı — Arayüz
@@ -3145,7 +3041,8 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
       durum.aktifId = j.aktifId;
     } catch (e) { durum.kayitlar = {}; }
     Object.keys(durum.kayitlar).forEach(function (k) {
-      try { kayitDuzelt(durum.kayitlar[k]); } catch (e) { if (window.console) console.error("Kayıt uyarlanamadı:", k, e); }
+      // Uyarlanamayan bozuk kayıt uygulamanın açılmasını engellemesin
+      try { kayitDuzelt(durum.kayitlar[k]); } catch (e) { if (window.console) console.error("Kayıt uyarlanamadı:", k, e); delete durum.kayitlar[k]; }
     });
   }
   var kayitZamanlayici = null;
@@ -3199,20 +3096,33 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     return b;
   }
 
+  /* Kayıtta eksik kalan alanları varsayılanlarla tamamlar (diziler ve dolu değerler korunur) */
+  function eksikleriTamamla(hedef, varsayilan) {
+    Object.keys(varsayilan).forEach(function (k) {
+      var v = varsayilan[k];
+      if (v && typeof v === "object" && !Array.isArray(v)) {
+        if (!hedef[k] || typeof hedef[k] !== "object" || Array.isArray(hedef[k])) hedef[k] = {};
+        eksikleriTamamla(hedef[k], v);
+      } else if (hedef[k] === undefined || hedef[k] === null) hedef[k] = v;
+    });
+  }
+
   /* Eski sürümlerde kaydedilmiş BEP'leri yeni yapıya uyarlar */
   function kayitDuzelt(b) {
-    if (!b || typeof b !== "object") return b;
-    b.ogrenci = b.ogrenci || {};
+    if (!b || typeof b !== "object") throw new Error("Geçersiz kayıt");
+    var v = yeniBep();
+    delete v.id; delete v.plan;
+    eksikleriTamamla(b, v);
+    if (!b.id) b.id = uid();
     KALDIRILAN_OGRENCI_ALANLARI.forEach(function (k) { delete b.ogrenci[k]; });
     if (!Array.isArray(b.ogrenci.yetersizlik)) b.ogrenci.yetersizlik = [];
     b.ayarlar = b.ayarlar || {};
     for (var k in OTOMATIK_AYARLAR) b.ayarlar[k] = OTOMATIK_AYARLAR[k];
-    if (!b.ayarlar.sinavHaftalari) b.ayarlar.sinavHaftalari = [8, 16, 25, 33];
-    if (b.ayarlar.kvkkNotu === undefined) b.ayarlar.kvkkNotu = true;
+    if (!Array.isArray(b.ayarlar.sinavHaftalari)) b.ayarlar.sinavHaftalari = [8, 16, 25, 33];
+    if (!Array.isArray(b.izleme)) b.izleme = [];
+    if (b.plan && (typeof b.plan !== "object" || !Array.isArray(b.plan.satirlar))) b.plan = null;
+    if (!Array.isArray(b.ders.ozel.uniteler)) b.ders.ozel.uniteler = [{ ad: "", saat: "", kazanimlar: "" }];
     delete b.uyarlamalar; delete b.uyarlamaElle; delete b.kararlar;
-    b.kurul = b.kurul || { baskanUnvan: "Müdür Yardımcısı" };
-    b.tasdik = b.tasdik || {};
-    b.ders = b.ders || {};
     // Performans düzeyi artık arayüzde düzenlenmez; her zaman tanı ve derse göre üretilir
     delete b.performansElle;
     b.surum = 2;
@@ -3332,34 +3242,6 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     if (e.target.checked && i < 0) l.push(id);
     if (!e.target.checked && i >= 0) l.splice(i, 1);
     yetersizlikListesiCiz(); degisti("ogrenci.yetersizlik"); adimDurumlari();
-  });
-
-  // e-Okul aktarımı
-  var eokulListe = [];
-  $("#btnEokul").addEventListener("click", function () { $("#eokulDiyalog").showModal(); });
-  $("#btnEokulAyristir").addEventListener("click", function () {
-    eokulListe = BEP.eokulAyristir($("#eokulMetin").value);
-    $("#eokulDurum").textContent = eokulListe.length ? eokulListe.length + " öğrenci bulundu." : "Öğrenci bulunamadı. Listenin tamamını kopyaladığınızdan emin olun.";
-    $("#eokulSonuc").innerHTML = eokulListe.length ? "<table><thead><tr><th>Sınıf</th><th>No</th><th>Adı Soyadı</th><th>Tanı</th><th></th></tr></thead><tbody>" +
-      eokulListe.map(function (s, i) {
-        return "<tr><td>" + esc(s.sinif + "/" + s.sube) + "</td><td>" + esc(s.no) + "</td><td>" + esc(s.ad) + "</td><td>" + esc(s.engeller.join(", ")) +
-          (s.uyari ? '<div class="uyari">⚠ ' + esc(s.uyari) + "</div>" : "") + '</td><td><button type="button" class="dugme ikincil kucuk" data-eokul="' + i + '">Bu öğrenciyi seç</button></td></tr>';
-      }).join("") + "</tbody></table>" : "";
-  });
-  $("#eokulSonuc").addEventListener("click", function (e) {
-    var i = e.target.dataset && e.target.dataset.eokul;
-    if (i === undefined) return;
-    var s = eokulListe[+i], b = bep();
-    var baskaOgrenci = tr.bosluk(b.ogrenci.ad) && tr.bosluk(b.ogrenci.ad) !== s.ad;
-    if (baskaOgrenci && !confirm("Bu BEP’teki öğrenci bilgileri “" + s.ad + "” ile değiştirilsin mi?")) return;
-    // Veli ve sınıf rehber öğretmeni öğrenciye özgüdür
-    if (baskaOgrenci) { b.kurul.veli = ""; b.kurul.sinifRehber = ""; }
-    b.ogrenci.ad = s.ad; b.ogrenci.no = s.no; b.ogrenci.sinif = s.sinif; b.ogrenci.sube = s.sube;
-    b.ogrenci.yetersizlik = s.yetersizlik.slice();
-    if (s.hizmet) b.ogrenci.hizmet = s.hizmet;
-    $("#eokulDiyalog").close();
-    degisti("ogrenci.ad"); formuDoldur(); yetersizlikListesiCiz(); adimDurumlari();
-    bildir(s.ad + " aktarıldı." + (s.uyari ? " Not: e-Okul RAM kademe uyarısı var." : ""));
   });
 
   /* ------------------------------------------------------------------ ADIM 2 – ders */
@@ -3687,7 +3569,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     var T = BEP.takvimBilgi("2026-2027");
     $("#yardimIcerik").innerHTML =
       "<h2>BEP Hazırlama Aracı – Nasıl kullanılır?</h2><ol>" +
-      "<li><b>Öğrenci:</b> Öğrenciyi elle yazın ya da e-Okul “Özel Eğitim Gereksinimli Öğrenci Listesi”nden aktarın. Yetersizlik türünü RAM raporuna göre işaretleyin.</li>" +
+      "<li><b>Öğrenci:</b> Öğrencinin bilgilerini yazın; yetersizlik türünü RAM raporuna göre işaretleyin.</li>" +
       "<li><b>Ders:</b> Dersi ve sınıf düzeyini seçin. Haftalık konular ve öğrenme çıktıları MEB’in 2026-2027 resmî çerçeve yıllık planlarından gelir. Meslek dersleri için “elle giriş” seçeneğini kullanın.</li>" +
       "<li><b>Yıllık Plan:</b> Destek düzeyi, ölçüt ve tablo düzeni tanıya göre otomatik belirlenir; plan otomatik oluşur. Her hücreyi düzenleyebilir, KDA için başka öneriler seçebilirsiniz. Sarı hücreler elle düzenlenmiştir.</li>" +
       "<li><b>Okul ve BEP Birimi:</b> Okul bilgilerini ve BEP geliştirme birimi üyeleri ile tasdik tarihlerini girin (bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır).</li>" +

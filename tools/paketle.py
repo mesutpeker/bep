@@ -4,7 +4,12 @@ Uygulamayı tek bir HTML dosyasında paketler (internet ve kurulum gerektirmez).
 
 Girdi : index.html + src/css/*.css + src/js/*.js + data/dersler.js
 Çıktı : BEP_Hazirlama_Uygulamasi.html
+
+Ayrıca index.html'deki ?v=... sürüm eklerini dosya içeriklerinin özetiyle
+günceller; böylece web sürümünde tarayıcılar eski önbellekli JS/CSS
+dosyalarını yeni sayfayla karıştırmaz.
 """
+import hashlib
 import os
 import re
 
@@ -22,7 +27,25 @@ def guvenli_script(metin):
     return metin.replace("</script", "<\\/script").replace("<!--", "<\\!--")
 
 
+VARLIK = r'(<link rel="stylesheet" href="|<script src=")([^"?]+)(?:\?v=[^"]*)?"'
+
+
+def surum_guncelle():
+    """index.html'deki yerel CSS/JS bağlantılarına içerik özetinden ?v= ekler."""
+    html = oku("index.html")
+    ozet = hashlib.sha1()
+    for m in re.finditer(VARLIK, html):
+        ozet.update(oku(m.group(2)).encode("utf-8"))
+    surum = ozet.hexdigest()[:10]
+    yeni = re.sub(VARLIK, lambda m: m.group(1) + m.group(2) + "?v=" + surum + '"', html)
+    if yeni != html:
+        with open(os.path.join(KOK, "index.html"), "w", encoding="utf-8") as f:
+            f.write(yeni)
+    return surum
+
+
 def main():
+    print("Web sürümü önbellek anahtarı:", surum_guncelle())
     html = oku("index.html")
 
     def css_yerlestir(m):
@@ -31,8 +54,8 @@ def main():
     def js_yerlestir(m):
         return "<script>\n/* " + m.group(1) + " */\n" + guvenli_script(oku(m.group(1))) + "\n</script>"
 
-    html = re.sub(r'<link rel="stylesheet" href="([^"]+)">', css_yerlestir, html)
-    html = re.sub(r'<script src="([^"]+)"></script>', js_yerlestir, html)
+    html = re.sub(r'<link rel="stylesheet" href="([^"?]+)(?:\?v=[^"]*)?">', css_yerlestir, html)
+    html = re.sub(r'<script src="([^"?]+)(?:\?v=[^"]*)?"></script>', js_yerlestir, html)
     html = html.replace("<!--GOVDE-BASI-->", "").replace("<!--GOVDE-SONU-->", "")
     with open(CIKTI, "w", encoding="utf-8") as f:
         f.write(html)

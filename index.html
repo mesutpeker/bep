@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BEP Hazırlama Aracı – Lise (2026-2027)</title>
-<link rel="stylesheet" href="src/css/app.css">
+<link rel="stylesheet" href="src/css/app.css?v=95bf184ca9">
 </head>
 <body>
 <!--GOVDE-BASI-->
@@ -39,10 +39,7 @@
       <p>Performans düzeyi, uyarlamalar ve BEP birimi kararları seçilen yetersizlik türüne göre otomatik hazırlanır.</p>
     </div>
     <div class="kart">
-      <div class="kart-ust">
-        <h2>Öğrenci</h2>
-        <button type="button" class="dugme ikincil kucuk" id="btnEokul">e-Okul listesinden aktar</button>
-      </div>
+      <h2>Öğrenci</h2>
       <div class="izgara">
         <label class="genis">Adı Soyadı<input data-alan="ogrenci.ad" placeholder="Örn. Deniz Yılmaz" autocomplete="off"></label>
         <label>Okul No<input data-alan="ogrenci.no" inputmode="numeric"></label>
@@ -195,17 +192,6 @@
   <button type="button" class="dugme birincil" id="btnIleri">İleri →</button>
 </footer>
 
-<dialog id="eokulDiyalog" class="diyalog">
-  <form method="dialog">
-    <h2>e-Okul Özel Eğitim Gereksinimli Öğrenci Listesinden Aktar</h2>
-    <p class="aciklama">e-Okul’dan aldığınız “Özel Eğitim Gereksinimli Öğrenci Listesi” PDF’ini açın, tüm metni seçip kopyalayın (Ctrl/Cmd + A, Ctrl/Cmd + C) ve aşağıya yapıştırın. Liste yalnızca bu bilgisayarda işlenir.</p>
-    <textarea id="eokulMetin" rows="8" placeholder="Listeyi buraya yapıştırın…"></textarea>
-    <div class="eylem-satiri"><button type="button" class="dugme ikincil" id="btnEokulAyristir">Listeyi oku</button><span id="eokulDurum" class="durum-metni"></span></div>
-    <div id="eokulSonuc" class="eokul-sonuc"></div>
-    <div class="diyalog-alt"><button class="dugme ikincil" value="kapat">Kapat</button></div>
-  </form>
-</dialog>
-
 <dialog id="yardimDiyalog" class="diyalog genis-diyalog">
   <form method="dialog">
     <div id="yardimIcerik"></div>
@@ -216,16 +202,15 @@
 <div id="bildirim" class="bildirim" role="status" aria-live="polite"></div>
 <div id="yazdirma-alani"></div>
 <!--GOVDE-SONU-->
-<script src="data/dersler.js"></script>
-<script src="src/js/kutuphane.js"></script>
-<script src="src/js/takvim.js"></script>
-<script src="src/js/uretici.js"></script>
-<script src="src/js/zip.js"></script>
-<script src="src/js/yazitipi.js"></script>
-<script src="src/js/belge.js"></script>
-<script src="src/js/docx.js"></script>
-<script src="src/js/onizleme.js"></script>
-<script src="src/js/eokul.js"></script>
-<script src="src/js/app.js"></script>
+<script src="data/dersler.js?v=95bf184ca9"></script>
+<script src="src/js/kutuphane.js?v=95bf184ca9"></script>
+<script src="src/js/takvim.js?v=95bf184ca9"></script>
+<script src="src/js/uretici.js?v=95bf184ca9"></script>
+<script src="src/js/zip.js?v=95bf184ca9"></script>
+<script src="src/js/yazitipi.js?v=95bf184ca9"></script>
+<script src="src/js/belge.js?v=95bf184ca9"></script>
+<script src="src/js/docx.js?v=95bf184ca9"></script>
+<script src="src/js/onizleme.js?v=95bf184ca9"></script>
+<script src="src/js/app.js?v=95bf184ca9"></script>
 </body>
 </html>

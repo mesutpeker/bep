@@ -59,8 +59,6 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.25rem; }
 .panel-baslik .dugme { order: 1; }
 
 .kart { background: var(--kart); border: 1px solid var(--cizgi); border-radius: var(--yaricap); padding: 1rem 1.1rem; box-shadow: var(--golge); margin-bottom: 1rem; }
-.kart-ust { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
-.kart-ust h2 { margin: 0; }
 
 /* Form */
 .izgara { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem 1rem; }
@@ -175,10 +173,6 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
 .diyalog::backdrop { background: rgba(15,23,42,.45); }
 .diyalog textarea { width: 100%; }
 .diyalog-alt { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1rem; }
-.eokul-sonuc { max-height: 45vh; overflow: auto; margin-top: .75rem; }
-.eokul-sonuc table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-.eokul-sonuc th, .eokul-sonuc td { border-bottom: 1px solid var(--cizgi-2); padding: .35rem .4rem; text-align: left; vertical-align: top; }
-.eokul-sonuc .uyari { color: var(--amber); font-size: .78rem; }
 .bildirim { position: fixed; right: 1rem; bottom: 84px; z-index: 50; display: grid; gap: .5rem; }
 .bildirim div { background: var(--lacivert); color: #fff; padding: .6rem .9rem; border-radius: 8px; box-shadow: var(--golge); font-size: .9rem; max-width: 380px; animation: gir .2s ease-out; }
 .bildirim div.hata { background: var(--kirmizi); }
