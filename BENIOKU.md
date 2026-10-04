@@ -20,7 +20,7 @@ Tek dosya yeterlidir; dosyayı USB bellekle ya da e-postayla başka bilgisayara 
 | 4. Okul ve BEP Birimi | Okul bilgileri ile BEP geliştirme birimi üyeleri (birim başkanı, ders öğretmeni, rehber öğretmen, sınıf rehber öğretmeni, veli) ve toplantı/onay tarihleri girilir. Okul ve birim bilgileri bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır. Boş bırakılan ad ve tarihler belgede noktalı satır olur. |
 | 5. Önizle ve İndir | Kontrol listesi, A4 yatay sayfa önizlemesi, Word ve PDF çıktısı. Mevcut performans düzeyi (gelişim özellikleri, ders alanı performansı, güçlü yönler, desteklenmesi gereken yönler ve davranış özellikleri) **tanıya ve derse göre otomatik doldurulur**. Sınıf içi ve sınav uyarlamaları (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3: destek eğitim odası, aile bilgilendirme, davranış desteği, sonraki toplantı) ve izleme çizelgesi **tanıya ve hizmet türüne göre otomatik** eklenir. |
 
-**Kayıt:** Girilen bilgiler yalnızca o bilgisayardaki tarayıcıda tutulur ve sayfa yeniden açıldığında kaldığınız yerden devam edilir. Yeni öğrenci için 1. adımdaki bilgileri değiştirmeniz yeterlidir; okul ve birim bilgileri korunur.
+**Kayıt:** Girilen bilgiler yalnızca açık sekmede tutulur. Sayfa yenilenince kaldığınız yerden devam edilir; sekme ya da tarayıcı kapatılınca bilgiler silinir, böylece aynı bilgisayarı sonra kullanan kişi önceki BEP'i görmez. Word belgesini indirdikten sonra 5. adımdaki **Sıradaki öğrenci için yeni BEP** ile okul ve BEP birimi bilgilerini koruyarak yeni öğrenciye geçebilir, **Tüm bilgileri temizle** ile her şeyi silebilirsiniz.
 
 ## Word çıktısı
 
@@ -53,7 +53,7 @@ Tek dosya yeterlidir; dosyayı USB bellekle ya da e-postayla başka bilgisayara 
 
 ## Kişisel veriler (KVKK)
 
-BEP, özel nitelikli kişisel veri (sağlık/eğitsel tanı) içerir. Uygulama T.C. kimlik no, doğum tarihi/yeri, cinsiyet ve RAM rapor bilgisi istemez; ağ isteği yapmaz; veriler yalnızca o bilgisayardaki tarayıcının yerel deposunda kalır. Ortak kullanılan bilgisayarlarda işiniz bitince tarayıcının site verilerini temizleyin. Tarayıcı yerel depoya izin vermiyorsa uygulama yine çalışır, ancak altta uyarı gösterir; bu durumda veriler yalnızca sayfa açıkken korunur.
+BEP, özel nitelikli kişisel veri (sağlık/eğitsel tanı) içerir. Uygulama T.C. kimlik no, doğum tarihi/yeri, cinsiyet ve RAM rapor bilgisi istemez; ağ isteği yapmaz; veriler yalnızca açık sekmenin oturum deposunda (sessionStorage) tutulur ve sekme kapatılınca silinir. Önceki sürümlerin tarayıcıda kalıcı olarak bıraktığı kayıtlar uygulama açılınca silinir. Tarayıcının form otomatik tamamlaması kapalıdır; önceki kullanıcının yazdığı adlar öneri olarak çıkmaz. Ortak kullanılan bilgisayarlarda işiniz bitince **Tüm bilgileri temizle** düğmesini kullanın ya da sekmeyi kapatın. Tarayıcı depolamaya izin vermiyorsa uygulama yine çalışır, ancak altta uyarı gösterir; bu durumda veriler yalnızca sayfa açıkken korunur.
 
 ## Sınırlılıklar
 

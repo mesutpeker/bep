@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BEP Hazırlama Aracı – Lise (2026-2027)</title>
-<link rel="stylesheet" href="src/css/app.css?v=8a82f76c4e">
+<link rel="stylesheet" href="src/css/app.css?v=65cb590f3b">
 </head>
 <body>
 <!--GOVDE-BASI-->
@@ -42,18 +42,18 @@
       <h2>Öğrenci</h2>
       <div class="izgara">
         <label class="genis">Adı Soyadı<input data-alan="ogrenci.ad" placeholder="Örn. Deniz Yılmaz" autocomplete="off"></label>
-        <label>Okul No<input data-alan="ogrenci.no" inputmode="numeric"></label>
+        <label>Okul No<input data-alan="ogrenci.no" inputmode="numeric" autocomplete="off"></label>
         <label>Sınıf
           <select data-alan="ogrenci.sinif">
             <option value="H">Hazırlık</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
           </select>
         </label>
-        <label>Şube<input data-alan="ogrenci.sube" maxlength="4" placeholder="A"></label>
+        <label>Şube<input data-alan="ogrenci.sube" maxlength="4" placeholder="A" autocomplete="off"></label>
       </div>
       <fieldset class="yetersizlik">
         <legend>Yetersizlik Türü / Eğitsel Tanı <small>(RAM raporundaki tanı; birden fazla seçilebilir — ilk seçilen birincil kabul edilir)</small></legend>
         <div id="yetersizlikListesi" class="secim-izgarasi"></div>
-        <label id="yetersizlikDigerKutu" hidden>Diğer tanı<input data-alan="ogrenci.yetersizlikMetni"></label>
+        <label id="yetersizlikDigerKutu" hidden>Diğer tanı<input data-alan="ogrenci.yetersizlikMetni" autocomplete="off"></label>
       </fieldset>
       <div class="izgara">
         <label class="genis">Önerilen Hizmet / Kurul Kararı
@@ -64,9 +64,9 @@
             <option>Evde / Hastanede Eğitim</option>
           </select>
         </label>
-        <label>BEP Başlangıç<input type="date" data-alan="ogrenci.bepBaslangic"></label>
-        <label>BEP Bitiş<input type="date" data-alan="ogrenci.bepBitis"></label>
-        <label class="genis">Kullandığı Destek Materyali / Cihaz<input data-alan="ogrenci.cihaz" placeholder="Örn. işitme cihazı, büyüteç, tablet (yoksa boş bırakın)"></label>
+        <label>BEP Başlangıç<input type="date" data-alan="ogrenci.bepBaslangic" autocomplete="off"></label>
+        <label>BEP Bitiş<input type="date" data-alan="ogrenci.bepBitis" autocomplete="off"></label>
+        <label class="genis">Kullandığı Destek Materyali / Cihaz<input data-alan="ogrenci.cihaz" placeholder="Örn. işitme cihazı, büyüteç, tablet (yoksa boş bırakın)" autocomplete="off"></label>
       </div>
     </div>
   </section>
@@ -92,7 +92,7 @@
         <label class="genis">Ders<select id="dersSec"></select></label>
         <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
         <label class="genis">Plan (okul türü)<select id="planSec"></select></label>
-        <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir"></label>
+        <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir" autocomplete="off"></label>
       </div>
       <div id="saatUyari" class="uyari-kutusu" hidden></div>
       <div id="planBilgi" class="bilgi-kutusu"></div>
@@ -101,7 +101,7 @@
       <h2>Meslek Dersi / Listede Olmayan Ders</h2>
       <p class="aciklama">Mesleki ve Teknik Eğitim Genel Müdürlüğü meslek dersleri için haftalık çerçeve plan yayımlamaz; öğrenme birimleri ve kazanımlar <a href="https://meslek.meb.gov.tr/dersbilgi" target="_blank" rel="noopener">Ders Bilgi Formlarında (meslek.meb.gov.tr)</a> yer alır. Öğrenme birimlerini ve kazanımlarını buraya yazın/yapıştırın; araç bunları 36 haftaya ders saatlerine göre dağıtır.</p>
       <div class="izgara">
-        <label class="genis">Dersin Adı<input data-alan="ders.ozel.ad" placeholder="Örn. Mesleki Gelişim Atölyesi"></label>
+        <label class="genis">Dersin Adı<input data-alan="ders.ozel.ad" placeholder="Örn. Mesleki Gelişim Atölyesi" autocomplete="off"></label>
         <label>Sınıf<select data-alan="ders.ozel.sinif"><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
       </div>
       <div id="ozelUniteler"></div>
@@ -136,34 +136,34 @@
   <section class="panel" data-panel="4" hidden>
     <div class="panel-baslik">
       <h1>Okul ve BEP Geliştirme Birimi</h1>
-      <p>Okul ve birim bilgileri bir sonraki BEP için otomatik hatırlanır. Bilgiler yalnızca bu bilgisayarda (tarayıcıda) saklanır; hiçbir yere gönderilmez.</p>
+      <p>Bilgiler yalnızca bu sekmede tutulur, hiçbir yere gönderilmez ve sekme kapatılınca silinir. Aynı oturumda “Sıradaki öğrenci için yeni BEP” ile devam ederseniz okul ve birim bilgileri korunur.</p>
     </div>
     <div class="kart">
       <h2>Okul Bilgileri</h2>
       <div class="izgara">
-        <label>İl<input data-alan="okul.il" placeholder="Örn. Karaman"></label>
-        <label>İlçe<input data-alan="okul.ilce" placeholder="Örn. Merkez"></label>
-        <label class="genis">Okul Adı<input data-alan="okul.ad" placeholder="Örn. … Mesleki ve Teknik Anadolu Lisesi"></label>
-        <label>Okul Müdürü<input data-alan="okul.mudur" placeholder="Adı Soyadı"></label>
+        <label>İl<input data-alan="okul.il" placeholder="Örn. Karaman" autocomplete="off"></label>
+        <label>İlçe<input data-alan="okul.ilce" placeholder="Örn. Merkez" autocomplete="off"></label>
+        <label class="genis">Okul Adı<input data-alan="okul.ad" placeholder="Örn. … Mesleki ve Teknik Anadolu Lisesi" autocomplete="off"></label>
+        <label>Okul Müdürü<input data-alan="okul.mudur" placeholder="Adı Soyadı" autocomplete="off"></label>
       </div>
       <div class="bilgi-kutusu" id="ustBaslikOnizleme"></div>
       <details class="ek-ayar"><summary>Belge üst başlığını elle değiştir</summary>
-        <label>2. satır (Valilik/Kaymakamlık)<input data-alan="okul.baslikSatiri2" placeholder="Boş bırakılırsa il/ilçeye göre otomatik yazılır"></label>
+        <label>2. satır (Valilik/Kaymakamlık)<input data-alan="okul.baslikSatiri2" placeholder="Boş bırakılırsa il/ilçeye göre otomatik yazılır" autocomplete="off"></label>
       </details>
     </div>
 
     <div class="kart">
       <h2>BEP Geliştirme Birimi ve Tasdik <small>(ÖEHY Md. 47)</small></h2>
       <div class="izgara">
-        <label>BEP Birim Başkanı<input data-alan="kurul.baskan" placeholder="Adı Soyadı"></label>
-        <label>Başkanın Unvanı<input data-alan="kurul.baskanUnvan" placeholder="Müdür Yardımcısı"></label>
-        <label>Ders Öğretmeni<input data-alan="ders.ogretmen" placeholder="BEP hazırlanan dersin öğretmeni"></label>
-        <label>Rehber Öğretmen / Psikolojik Danışman<input data-alan="kurul.rehberOgretmen" placeholder="Adı Soyadı"></label>
-        <label>Sınıf Rehber Öğretmeni<input data-alan="kurul.sinifRehber" placeholder="Öğrencinin sınıf rehber öğretmeni"></label>
+        <label>BEP Birim Başkanı<input data-alan="kurul.baskan" placeholder="Adı Soyadı" autocomplete="off"></label>
+        <label>Başkanın Unvanı<input data-alan="kurul.baskanUnvan" placeholder="Müdür Yardımcısı" autocomplete="off"></label>
+        <label>Ders Öğretmeni<input data-alan="ders.ogretmen" placeholder="BEP hazırlanan dersin öğretmeni" autocomplete="off"></label>
+        <label>Rehber Öğretmen / Psikolojik Danışman<input data-alan="kurul.rehberOgretmen" placeholder="Adı Soyadı" autocomplete="off"></label>
+        <label>Sınıf Rehber Öğretmeni<input data-alan="kurul.sinifRehber" placeholder="Öğrencinin sınıf rehber öğretmeni" autocomplete="off"></label>
         <label>Öğrenci Velisi<input data-alan="kurul.veli" placeholder="Anne / Baba / Vasi" autocomplete="off"></label>
-        <label>Birim Toplantı / İmza Tarihi<input type="date" data-alan="kurul.tarih"></label>
-        <label>Uygulamaya Başlama Tarihi<input type="date" data-alan="tasdik.uygulamaTarihi"></label>
-        <label>Müdür Onay Tarihi<input type="date" data-alan="tasdik.tarih"></label>
+        <label>Birim Toplantı / İmza Tarihi<input type="date" data-alan="kurul.tarih" autocomplete="off"></label>
+        <label>Uygulamaya Başlama Tarihi<input type="date" data-alan="tasdik.uygulamaTarihi" autocomplete="off"></label>
+        <label>Müdür Onay Tarihi<input type="date" data-alan="tasdik.tarih" autocomplete="off"></label>
         <label class="onay tam"><input type="checkbox" data-alan="ayarlar.kvkkNotu"> Belgeye KVKK uyarı notunu ekle</label>
       </div>
       <p class="aciklama">Boş bırakılan ad ve tarihler belgede elle doldurulmak üzere noktalı satır olarak bırakılır. Veli ve sınıf rehber öğretmeni her öğrenci için ayrıca yazılır.</p>
@@ -182,6 +182,14 @@
       <label class="olcek">Önizleme boyutu <input type="range" id="olcekAyar" min="35" max="100" value="60"></label>
     </div>
     <div id="kontrolListesi" class="kontrol-listesi"></div>
+    <div class="kart bitis-kart">
+      <h2>Bitirdiniz mi?</h2>
+      <p class="aciklama">Bilgiler yalnızca bu sekmede tutulur ve sekme kapatılınca silinir. Word belgesini indirdikten sonra sıradaki öğrenciye geçebilir ya da bilgisayarı başkasına bırakmadan önce tüm bilgileri temizleyebilirsiniz.</p>
+      <div class="eylem-satiri">
+        <button type="button" class="dugme ikincil" id="btnYeniBep">Sıradaki öğrenci için yeni BEP</button>
+        <button type="button" class="dugme tehlike-cizgi" id="btnTemizle">Tüm bilgileri temizle</button>
+      </div>
+    </div>
     <div id="onizleme" class="onizleme-kapsayici"></div>
   </section>
 </main>
@@ -202,15 +210,15 @@
 <div id="bildirim" class="bildirim" role="status" aria-live="polite"></div>
 <div id="yazdirma-alani"></div>
 <!--GOVDE-SONU-->
-<script src="data/dersler.js?v=8a82f76c4e"></script>
-<script src="src/js/kutuphane.js?v=8a82f76c4e"></script>
-<script src="src/js/takvim.js?v=8a82f76c4e"></script>
-<script src="src/js/uretici.js?v=8a82f76c4e"></script>
-<script src="src/js/zip.js?v=8a82f76c4e"></script>
-<script src="src/js/yazitipi.js?v=8a82f76c4e"></script>
-<script src="src/js/belge.js?v=8a82f76c4e"></script>
-<script src="src/js/docx.js?v=8a82f76c4e"></script>
-<script src="src/js/onizleme.js?v=8a82f76c4e"></script>
-<script src="src/js/app.js?v=8a82f76c4e"></script>
+<script src="data/dersler.js?v=65cb590f3b"></script>
+<script src="src/js/kutuphane.js?v=65cb590f3b"></script>
+<script src="src/js/takvim.js?v=65cb590f3b"></script>
+<script src="src/js/uretici.js?v=65cb590f3b"></script>
+<script src="src/js/zip.js?v=65cb590f3b"></script>
+<script src="src/js/yazitipi.js?v=65cb590f3b"></script>
+<script src="src/js/belge.js?v=65cb590f3b"></script>
+<script src="src/js/docx.js?v=65cb590f3b"></script>
+<script src="src/js/onizleme.js?v=65cb590f3b"></script>
+<script src="src/js/app.js?v=65cb590f3b"></script>
 </body>
 </html>
