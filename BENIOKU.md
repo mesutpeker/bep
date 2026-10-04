@@ -14,13 +14,13 @@ Tek dosya yeterlidir; dosyayı USB bellekle ya da e-postayla başka bilgisayara 
 
 | Adım | Ne yapılır? |
 |---|---|
-| 1. Öğrenci | Ad soyad, okul no, sınıf, şube, yetersizlik türü (RAM raporuna göre; birden fazla seçilebilir), önerilen hizmet, BEP tarihleri ve varsa kullandığı cihaz. Öğrenci **e-Okul listesinden aktar** ile e-Okul'daki "Özel Eğitim Gereksinimli Öğrenci Listesi" metni yapıştırılarak da aktarılabilir. |
+| 1. Öğrenci | Ad soyad, okul no, sınıf, şube, yetersizlik türü (RAM raporuna göre; birden fazla seçilebilir), önerilen hizmet, BEP tarihleri ve varsa kullandığı cihaz. |
 | 2. Ders | Ders ve sınıf düzeyi seçilir; uygun resmî plan otomatik önerilir. Haftalık ders saati okulunuza göre değiştirilebilir. Meslek dersleri için **Meslek Dersi / Listede Olmayan Ders** bölümünden öğrenme birimleri elle girilir. |
 | 3. Yıllık Plan | Destek düzeyi, KDA ölçütü (%80 – 4/5), KDA öznesi (öğrencinin adı) ve tablo düzeni (müfredat çıktısı sütunlu) **otomatik belirlenir**; birden fazla tanıda en yoğun destek düzeyi esas alınır. BEP sınav haftaları değiştirilebilir. 37 haftalık plan otomatik oluşur; her hücre düzenlenebilir, KDA için başka öneriler seçilebilir. Elle düzenlenen hücreler sarı görünür. |
 | 4. Okul ve BEP Birimi | Okul bilgileri ile BEP geliştirme birimi üyeleri (birim başkanı, ders öğretmeni, rehber öğretmen, sınıf rehber öğretmeni, veli) ve toplantı/onay tarihleri girilir. Okul ve birim bilgileri bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır. Boş bırakılan ad ve tarihler belgede noktalı satır olur. |
 | 5. Önizle ve İndir | Kontrol listesi, A4 yatay sayfa önizlemesi, Word ve PDF çıktısı. Mevcut performans düzeyi (gelişim özellikleri, ders alanı performansı, güçlü yönler, desteklenmesi gereken yönler ve davranış özellikleri) **tanıya ve derse göre otomatik doldurulur**. Sınıf içi ve sınav uyarlamaları (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3: destek eğitim odası, aile bilgilendirme, davranış desteği, sonraki toplantı) ve izleme çizelgesi **tanıya ve hizmet türüne göre otomatik** eklenir. |
 
-**Kayıt:** Girilen bilgiler yalnızca o bilgisayardaki tarayıcıda tutulur ve sayfa yeniden açıldığında kaldığınız yerden devam edilir. Yeni öğrenci için 1. adımdaki bilgileri değiştirmeniz (ya da e-Okul listesinden başka bir öğrenci seçmeniz) yeterlidir; okul ve birim bilgileri korunur.
+**Kayıt:** Girilen bilgiler yalnızca o bilgisayardaki tarayıcıda tutulur ve sayfa yeniden açıldığında kaldığınız yerden devam edilir. Yeni öğrenci için 1. adımdaki bilgileri değiştirmeniz yeterlidir; okul ve birim bilgileri korunur.
 
 ## Word çıktısı
 
@@ -67,7 +67,7 @@ BEP, özel nitelikli kişisel veri (sağlık/eğitsel tanı) içerir. Uygulama T
 
 ```
 BEP_Hazirlama_Uygulamasi.html   tek dosyalık paket (öğretmenlere dağıtılacak dosya)
-index.html, src/css, src/js      kaynak kod (kutuphane, takvim, uretici, belge, docx, zip, yazitipi, onizleme, eokul, app)
+index.html, src/css, src/js      kaynak kod (kutuphane, takvim, uretici, belge, docx, zip, yazitipi, onizleme, app)
 data/dersler.js                  ders/plan veri seti (veri_olustur.py üretir)
 tools/kaynaklar/                 MEB'den indirilen resmî dosyalar (ogm, dogm, tymm, mevzuat)
 tools/plan_ayristir.py           Excel planlarını ayrıştırır → tools/ara/planlar_ham.json

@@ -10,7 +10,6 @@ Ortaöğretimde kaynaştırma/bütünleştirme yoluyla eğitim alan lise öğren
 
 - **Resmî Müfredat Entegrasyonu:** MEB'in 2026-2027 çerçeve yıllık planlarındaki (TYMM Hazırlık, 9, 10, 11 ve 12. sınıf programları; 42 ders, 162 plan) haftalık konu ve kazanımları otomatik çeker.
 - **Otomatik Doldurma:** RAM raporundaki yetersizlik türü ve seçilen derse göre mevcut performans düzeyi, eğitsel uyarlamalar, sınav uyarlamaları, BEP birimi kararları ve UDA/KDA hedefleri otomatik oluşturulur.
-- **e-Okul Entegrasyonu:** e-Okul "Özel Eğitim Gereksinimli Öğrenci Listesi" metnini kopyalayıp yapıştırarak öğrencileri tek tıkla aktarma imkânı.
 - **Resmî Standartlarda Word (.docx) Çıktısı:** A4 yatay sayfa düzeninde, MEB formatına birebir uygun, tabloları bölünmeyen ve sayfalandırması hazır Word ve PDF/yazdırma çıktısı.
 - **Tek Dosyada Çevrim Dışı Kullanım:** `BEP_Hazirlama_Uygulamasi.html` tek başına açılabilir; internet veya sunucu gerektirmez, USB ile taşınabilir.
 - **Gizlilik ve KVKK:** Özel nitelikli kişisel veriler hiçbir uzak sunucuya gönderilmez; tüm kayıtlar kullanıcının kendi tarayıcısının yerel deposunda (localStorage) kalır.
@@ -19,7 +18,7 @@ Ortaöğretimde kaynaştırma/bütünleştirme yoluyla eğitim alan lise öğren
 
 ## 5 Adımda Kolay BEP Hazırlama
 
-1. **Öğrenci:** Öğrenci ve tanı bilgileri seçilir veya e-Okul'dan aktarılır.
+1. **Öğrenci:** Öğrenci ve tanı bilgileri girilir.
 2. **Ders:** Ders ve sınıf seçilir; resmî çerçeve plan otomatik eşleştirilir.
 3. **Yıllık Plan:** 37 haftalık ünitelendirilmiş BEP planı ve hedefleri oluşturulur, düzenlenebilir.
 4. **Okul ve BEP Birimi:** Okul ve kurul üyeleri girilir (bilgiler bir sonraki BEP için otomatik hatırlanır).
@@ -57,5 +56,7 @@ python3 tools/veri_olustur.py
 # 3. Tek dosyalık dağıtımı paketle
 python3 tools/paketle.py
 ```
+
+`paketle.py`, `index.html`'deki CSS/JS bağlantılarının `?v=` sürüm ekini dosya içeriklerine göre de günceller. Böylece web sürümünde tarayıcılar önbellekteki eski dosyaları yeni sayfayla karıştırmaz; yayına almadan önce mutlaka çalıştırın.
 
 Gereksinimler: Python 3 (`openpyxl`), Node.js (testler için). Ayrıntılı yasal ve teknik bilgi için [BENIOKU.md](BENIOKU.md) dosyasına bakabilirsiniz.

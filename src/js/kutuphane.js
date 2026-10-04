@@ -675,24 +675,6 @@
     return BEP.YETERSIZLIKLER[BEP.YETERSIZLIKLER.length - 1];
   };
 
-  /* e-Okul "Engel Durumu" metnini profile eşler */
-  BEP.yetersizlikEsle = function (metin) {
-    var t = low(metin);
-    if (/orta düzeyde zihinsel|orta düzey zihinsel/.test(t)) return "zihinsel_orta";
-    if (/zihinsel/.test(t)) return "zihinsel_hafif";
-    if (/öğrenme güçlüğü/.test(t)) return "oog";
-    if (/hiperaktivite|dikkat eksikliği/.test(t)) return "dehb";
-    if (/otizm|otistik/.test(t)) return "otizm";
-    if (/işitme/.test(t)) return "isitme";
-    if (/görme|az gören/.test(t)) return "gorme";
-    if (/bedensel|ortopedik/.test(t)) return "bedensel";
-    if (/dil ve konuşma|konuşma/.test(t)) return "dil_konusma";
-    if (/duygusal|davranış bozukluğu/.test(t)) return "duygusal";
-    if (/süreğen/.test(t)) return "suregen";
-    if (/özel yetenek|üstün/.test(t)) return "ozel_yetenek";
-    return null;
-  };
-
   /* ======================================================================
    * Ders grupları
    * ==================================================================== */
