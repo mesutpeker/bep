@@ -19,7 +19,7 @@ Ortaöğretimde kaynaştırma/bütünleştirme yoluyla eğitim alan lise öğren
 ## 5 Adımda Kolay BEP Hazırlama
 
 1. **Öğrenci:** Öğrenci ve tanı bilgileri girilir.
-2. **Ders:** Ders ve sınıf seçilir; resmî çerçeve plan otomatik eşleştirilir.
+2. **Ders:** Okul türü, ders ve sınıf seçilir; resmî çerçeve plan otomatik eşleştirilir.
 3. **Yıllık Plan:** 37 haftalık ünitelendirilmiş BEP planı ve hedefleri oluşturulur, düzenlenebilir.
 4. **Okul ve BEP Birimi:** Okul ve kurul üyeleri girilir (bilgiler bir sonraki BEP için otomatik hatırlanır).
 5. **Önizle ve İndir:** Önizleme yapılır, tek tıkla Word (.docx) indirilir veya yazdırılır.

@@ -164,6 +164,7 @@
       var oneri = BEP.planOner(d, sinif, b.okul.tur);
       if (oneri && oneri !== b.ders.planId) { b.ders.planId = oneri; }
     }
+    if (alan === "okul.tur" && durum.adim === 2) dersFormuCiz();
     if (/^ogrenci\.(ad|yetersizlik|yetersizlikMetni)$|^ders\.(id|planId|ozel\.ad)$/.test(alan)) performansOtomatik(b);
     adimDurumlari();
   }
@@ -562,7 +563,7 @@
     $("#yardimIcerik").innerHTML =
       "<h2>BEP Hazırlama Aracı – Nasıl kullanılır?</h2><ol>" +
       "<li><b>Öğrenci:</b> Öğrencinin bilgilerini yazın; yetersizlik türünü RAM raporuna göre işaretleyin.</li>" +
-      "<li><b>Ders:</b> Dersi ve sınıf düzeyini seçin. Haftalık konular ve öğrenme çıktıları MEB’in 2026-2027 resmî çerçeve yıllık planlarından gelir. Meslek dersleri için “elle giriş” seçeneğini kullanın.</li>" +
+      "<li><b>Ders:</b> Okul türünü, dersi ve sınıf düzeyini seçin. Haftalık konular ve öğrenme çıktıları MEB’in 2026-2027 resmî çerçeve yıllık planlarından gelir. Meslek dersleri için “elle giriş” seçeneğini kullanın.</li>" +
       "<li><b>Yıllık Plan:</b> Destek düzeyi, ölçüt ve tablo düzeni tanıya göre otomatik belirlenir; plan otomatik oluşur. Her hücreyi düzenleyebilir, KDA için başka öneriler seçebilirsiniz. Sarı hücreler elle düzenlenmiştir.</li>" +
       "<li><b>Okul ve BEP Birimi:</b> Okul bilgilerini ve BEP geliştirme birimi üyeleri ile tasdik tarihlerini girin (bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır).</li>" +
       "<li><b>Önizle ve İndir:</b> Mevcut performans düzeyi tanıya ve derse göre otomatik doldurulur. Uyarlamalar (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3) ve izleme çizelgesi tanıya göre otomatik eklenir. Kontrol listesini inceleyin, Word belgesini indirin veya PDF olarak yazdırın.</li></ol>" +

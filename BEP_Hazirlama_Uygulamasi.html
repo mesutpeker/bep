@@ -269,6 +269,16 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
     </div>
     <div class="kart">
       <div class="izgara">
+        <label>Okul Türü
+          <select data-alan="okul.tur">
+            <option value="anadolu">Anadolu Lisesi</option>
+            <option value="mtal">Mesleki ve Teknik Anadolu Lisesi</option>
+            <option value="fen">Fen Lisesi</option>
+            <option value="sosyal">Sosyal Bilimler Lisesi</option>
+            <option value="aihl">Anadolu İmam Hatip Lisesi</option>
+            <option value="diger">Diğer (Güzel Sanatlar, Spor, Çok Programlı vb.)</option>
+          </select>
+        </label>
         <label class="genis">Ders<select id="dersSec"></select></label>
         <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
         <label class="genis">Plan (okul türü)<select id="planSec"></select></label>
@@ -324,16 +334,6 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
         <label>İl<input data-alan="okul.il" placeholder="Örn. Karaman"></label>
         <label>İlçe<input data-alan="okul.ilce" placeholder="Örn. Merkez"></label>
         <label class="genis">Okul Adı<input data-alan="okul.ad" placeholder="Örn. … Mesleki ve Teknik Anadolu Lisesi"></label>
-        <label>Okul Türü
-          <select data-alan="okul.tur">
-            <option value="anadolu">Anadolu Lisesi</option>
-            <option value="mtal">Mesleki ve Teknik Anadolu Lisesi</option>
-            <option value="fen">Fen Lisesi</option>
-            <option value="sosyal">Sosyal Bilimler Lisesi</option>
-            <option value="aihl">Anadolu İmam Hatip Lisesi</option>
-            <option value="diger">Diğer (Güzel Sanatlar, Spor, Çok Programlı vb.)</option>
-          </select>
-        </label>
         <label>Okul Müdürü<input data-alan="okul.mudur" placeholder="Adı Soyadı"></label>
       </div>
       <div class="bilgi-kutusu" id="ustBaslikOnizleme"></div>
@@ -3172,6 +3172,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
       var oneri = BEP.planOner(d, sinif, b.okul.tur);
       if (oneri && oneri !== b.ders.planId) { b.ders.planId = oneri; }
     }
+    if (alan === "okul.tur" && durum.adim === 2) dersFormuCiz();
     if (/^ogrenci\.(ad|yetersizlik|yetersizlikMetni)$|^ders\.(id|planId|ozel\.ad)$/.test(alan)) performansOtomatik(b);
     adimDurumlari();
   }
@@ -3570,7 +3571,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     $("#yardimIcerik").innerHTML =
       "<h2>BEP Hazırlama Aracı – Nasıl kullanılır?</h2><ol>" +
       "<li><b>Öğrenci:</b> Öğrencinin bilgilerini yazın; yetersizlik türünü RAM raporuna göre işaretleyin.</li>" +
-      "<li><b>Ders:</b> Dersi ve sınıf düzeyini seçin. Haftalık konular ve öğrenme çıktıları MEB’in 2026-2027 resmî çerçeve yıllık planlarından gelir. Meslek dersleri için “elle giriş” seçeneğini kullanın.</li>" +
+      "<li><b>Ders:</b> Okul türünü, dersi ve sınıf düzeyini seçin. Haftalık konular ve öğrenme çıktıları MEB’in 2026-2027 resmî çerçeve yıllık planlarından gelir. Meslek dersleri için “elle giriş” seçeneğini kullanın.</li>" +
       "<li><b>Yıllık Plan:</b> Destek düzeyi, ölçüt ve tablo düzeni tanıya göre otomatik belirlenir; plan otomatik oluşur. Her hücreyi düzenleyebilir, KDA için başka öneriler seçebilirsiniz. Sarı hücreler elle düzenlenmiştir.</li>" +
       "<li><b>Okul ve BEP Birimi:</b> Okul bilgilerini ve BEP geliştirme birimi üyeleri ile tasdik tarihlerini girin (bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır).</li>" +
       "<li><b>Önizle ve İndir:</b> Mevcut performans düzeyi tanıya ve derse göre otomatik doldurulur. Uyarlamalar (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3) ve izleme çizelgesi tanıya göre otomatik eklenir. Kontrol listesini inceleyin, Word belgesini indirin veya PDF olarak yazdırın.</li></ol>" +
