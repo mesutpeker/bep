@@ -12,10 +12,9 @@
   function $$(s, k) { return Array.prototype.slice.call((k || document).querySelectorAll(s)); }
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   function uid() { return "bep-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7); }
-  function kopya(o) { return JSON.parse(JSON.stringify(o)); }
   function bep() { return durum.kayitlar[durum.aktifId]; }
   function otoYukseklik(t) { t.style.height = "auto"; t.style.height = Math.max(t.scrollHeight + 2, 40) + "px"; }
-  document.addEventListener("input", function (e) { if (e.target && e.target.tagName === "TEXTAREA" && e.target.closest('.plan-duzenleyici, [data-panel="4"]')) otoYukseklik(e.target); });
+  document.addEventListener("input", function (e) { if (e.target && e.target.tagName === "TEXTAREA" && e.target.closest(".plan-duzenleyici")) otoYukseklik(e.target); });
 
   /* ------------------------------------------------------------------ bildirim */
   function bildir(metin, tur) {
@@ -44,7 +43,7 @@
       var s = new Date();
       $("#kayitDurumu").textContent = "✓ Bu bilgisayara kaydedildi " + ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2);
     } catch (e) {
-      $("#kayitDurumu").textContent = "⚠ Kaydedilemedi (tarayıcı bu sayfada kayda izin vermiyor ya da depolama alanı dolu). Yedekle düğmesini kullanın.";
+      $("#kayitDurumu").textContent = "⚠ Kaydedilemedi (tarayıcı bu sayfada kayda izin vermiyor ya da depolama alanı dolu). Bu durumda veriler yalnızca sayfa açıkken korunur.";
     }
   }
   function kaydetGecikmeli() { clearTimeout(kayitZamanlayici); kayitZamanlayici = setTimeout(kaydet, 400); }
@@ -66,7 +65,6 @@
   var OTOMATIK_AYARLAR = { destek: "", olcut: "80", ozne: "ad", duzen: "mufredat" };
   // Artık toplanmayan kişisel alanlar (veri en aza indirme) ve arayüzden kaldırılan bölümler
   var KALDIRILAN_OGRENCI_ALANLARI = ["tc", "cinsiyet", "dogumTarihi", "dogumYeri", "alan", "ramKurum", "ramTarih", "ramNo", "okulDisiDestek"];
-  var PERFORMANS_ALANLARI = ["gelisim", "ders", "guclu", "destek", "davranis"];
 
   function yeniBep() {
     var h = okulHafizasi();
@@ -76,7 +74,7 @@
       ogrenci: { ad: "", no: "", sinif: "9", sube: "", yetersizlik: [], yetersizlikMetni: "",
         hizmet: "Tam Zamanlı Kaynaştırma / Bütünleştirme", bepBaslangic: "2026-09-14", bepBitis: "2027-06-25", cihaz: "" },
       ders: { id: "", planId: "", saat: "", ogretmen: h.ogretmen || "", ozel: { ad: "", sinif: "9", saat: 2, uniteler: [{ ad: "", saat: "", kazanimlar: "" }] } },
-      performans: { gelisim: "", ders: "", guclu: "", destek: "", davranis: "" }, performansElle: {},
+      performans: { gelisim: "", ders: "", guclu: "", destek: "", davranis: "" },
       ayarlar: { destek: "", olcut: "80", ozne: "ad", sinavHaftalari: [8, 16, 25, 33], duzen: "mufredat", donemSayfa: false, kvkkNotu: true },
       plan: null, izleme: [],
       kurul: { baskan: "", baskanUnvan: "Müdür Yardımcısı", sinifRehber: "", rehberOgretmen: "", veli: "", tarih: "" },
@@ -103,27 +101,15 @@
     b.kurul = b.kurul || { baskanUnvan: "Müdür Yardımcısı" };
     b.tasdik = b.tasdik || {};
     b.ders = b.ders || {};
-    b.performans = b.performans || {};
-    if (!b.performansElle || typeof b.performansElle !== "object") {
-      // Eski kayıtlarda dolu performans metinleri öğretmenin elle yazdığı kabul edilir
-      b.performansElle = {};
-      if (b.surum !== 2) PERFORMANS_ALANLARI.forEach(function (a) { if (tr.bosluk(b.performans[a])) b.performansElle[a] = true; });
-    }
+    // Performans düzeyi artık arayüzde düzenlenmez; her zaman tanı ve derse göre üretilir
+    delete b.performansElle;
     b.surum = 2;
     performansOtomatik(b);
     return b;
   }
 
-  /* Performans düzeyi: öğretmenin düzenlemediği alanlar tanı ve derse göre otomatik doldurulur */
-  function performansOtomatik(b) {
-    var v = BEP.varsayilanPerformans(b);
-    b.performans = b.performans || {};
-    b.performansElle = b.performansElle || {};
-    PERFORMANS_ALANLARI.forEach(function (a) {
-      if (!b.performansElle[a] || !tr.bosluk(b.performans[a])) { b.performans[a] = v[a]; b.performansElle[a] = false; }
-    });
-  }
-  function performansDuzenlendiMi(b) { return PERFORMANS_ALANLARI.some(function (a) { return b.performansElle && b.performansElle[a]; }); }
+  /* Performans düzeyi: tanı (yetersizlik türü) ve derse göre otomatik doldurulur */
+  function performansOtomatik(b) { b.performans = BEP.varsayilanPerformans(b); }
 
   /* ------------------------------------------------------------------ veri bağlama */
   function al(obj, yol) { return yol.split(".").reduce(function (o, k) { return o == null ? undefined : o[k]; }, obj); }
@@ -158,87 +144,17 @@
     b.guncelleme = new Date().toISOString();
     kaydetGecikmeli();
     if (/^okul\.|^kurul\.(baskan|baskanUnvan|rehberOgretmen|tarih)$|^tasdik\.|^ders\.ogretmen$/.test(alan)) { okulHafizaKaydet(); ustBaslikGoster(); }
-    if (/^ogrenci\.(ad|sinif|sube)$/.test(alan) || alan === "ders.saat") kayitListesiCiz();
     if (alan === "ders.saat") saatUyarisiGoster();
-    if (/^ders\.ozel/.test(alan)) kayitListesiCiz();
     if (alan === "okul.tur" && b.ders.id && b.ders.id !== "__ozel__") {
       var d = BEP.dersBul(b.ders.id), sinif = (BEP.planBul(d, b.ders.planId) || {}).sinif;
       var oneri = BEP.planOner(d, sinif, b.okul.tur);
       if (oneri && oneri !== b.ders.planId) { b.ders.planId = oneri; }
     }
-    if (alan === "ogrenci.yetersizlikMetni") kayitListesiCiz();
-    if (/^performans\./.test(alan)) {
-      // Öğretmenin düzenlediği alan artık otomatik değiştirilmez
-      b.performansElle = b.performansElle || {};
-      b.performansElle[alan.split(".")[1]] = true;
-      $("#btnPerformansDoldur").hidden = false;
-    } else if (/^ogrenci\.(ad|yetersizlik)$|^ders\.(id|planId|ozel\.ad)$/.test(alan)) {
-      performansOtomatik(b);
-    }
+    if (/^ogrenci\.(ad|yetersizlik|yetersizlikMetni)$|^ders\.(id|planId|ozel\.ad)$/.test(alan)) performansOtomatik(b);
     adimDurumlari();
   }
 
-  /* ------------------------------------------------------------------ kayıt listesi */
-  function kayitEtiketi(b) {
-    var ad = tr.bosluk(b.ogrenci && b.ogrenci.ad) || "Adsız öğrenci";
-    var o = b.ogrenci || {};
-    var ss = o.sinif ? (o.sinif === "H" ? "Hz" : o.sinif) + (o.sube ? "/" + tr.up(o.sube) : "") : "";
-    var d = b.ders && b.ders.id === "__ozel__" ? (b.ders.ozel && b.ders.ozel.ad) || "Meslek dersi" : (BEP.dersBul(b.ders && b.ders.id) || {}).ad || "ders seçilmedi";
-    return ad + (ss ? " (" + ss + ")" : "") + " – " + d;
-  }
-  function kayitListesiCiz() {
-    var sel = $("#kayitSec");
-    var liste = Object.keys(durum.kayitlar).map(function (k) { return durum.kayitlar[k]; })
-      .sort(function (a, b) { return (b.guncelleme || "").localeCompare(a.guncelleme || ""); });
-    sel.innerHTML = liste.map(function (b) { return '<option value="' + esc(b.id) + '"' + (b.id === durum.aktifId ? " selected" : "") + ">" + esc(kayitEtiketi(b)) + "</option>"; }).join("");
-  }
-  $("#kayitSec").addEventListener("change", function (e) {
-    durum.aktifId = e.target.value; kaydet(); hepsiniCiz();
-  });
-  $("#btnYeni").addEventListener("click", function () {
-    var b = yeniBep(); durum.kayitlar[b.id] = b; durum.aktifId = b.id; kaydet(); hepsiniCiz(); adimaGit(1);
-    bildir("Yeni BEP oluşturuldu. Okul bilgileri hatırlandı.");
-  });
-  $("#btnSil").addEventListener("click", function () {
-    if (!confirm("“" + kayitEtiketi(bep()) + "” kaydı bu bilgisayardan silinsin mi? Bu işlem geri alınamaz.")) return;
-    delete durum.kayitlar[durum.aktifId];
-    var kalan = Object.keys(durum.kayitlar);
-    if (!kalan.length) { var b = yeniBep(); durum.kayitlar[b.id] = b; kalan = [b.id]; }
-    durum.aktifId = kalan[0]; kaydet(); hepsiniCiz(); adimaGit(1);
-  });
-  $("#btnKopya").addEventListener("click", function () { kopyaDiyalogu(); });
-
-  function kopyaDiyalogu() {
-    var d = document.createElement("dialog");
-    d.className = "diyalog";
-    d.innerHTML = '<h2>BEP’i kopyala</h2><p class="aciklama">Kopyayı hangi amaçla kullanacaksınız?</p>' +
-      '<div class="eylem-satiri"><button class="dugme birincil" data-k="ders">Aynı öğrenci – başka ders</button>' +
-      '<button class="dugme ikincil" data-k="ogrenci">Aynı ders – başka öğrenci</button><button class="dugme ikincil" data-k="iptal">Vazgeç</button></div>';
-    document.body.appendChild(d);
-    d.addEventListener("click", function (e) {
-      var k = e.target.dataset && e.target.dataset.k;
-      if (!k) return;
-      if (k !== "iptal") {
-        var y = kopya(bep());
-        y.id = uid(); y.olusturma = y.guncelleme = new Date().toISOString();
-        if (k === "ders") {
-          // Aynı öğrenci – başka ders: derse özgü performans metni yeni derse göre yeniden üretilir
-          y.ders = yeniBep().ders; y.ders.ogretmen = bep().ders.ogretmen; y.plan = null; y.izleme = [];
-          y.performansElle = y.performansElle || {}; y.performansElle.ders = false;
-        } else {
-          y.ogrenci = yeniBep().ogrenci; y.ogrenci.sinif = bep().ogrenci.sinif; y.plan = null; y.izleme = [];
-          y.performans = {}; y.performansElle = {}; y.kurul.veli = ""; y.kurul.sinifRehber = "";
-        }
-        performansOtomatik(y);
-        durum.kayitlar[y.id] = y; durum.aktifId = y.id; kaydet(); hepsiniCiz(); adimaGit(k === "ders" ? 3 : 2);
-        bildir("Kopya oluşturuldu.");
-      }
-      d.close(); d.remove();
-    });
-    d.showModal();
-  }
-
-  /* ------------------------------------------------------------------ yedekleme */
+  /* ------------------------------------------------------------------ dosya indirme */
   function indir(ad, veri, tip) {
     var blob = new Blob([veri], { type: tip });
     var url = URL.createObjectURL(blob);
@@ -247,70 +163,46 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
   }
-  $("#btnDisaAktar").addEventListener("click", function () {
-    var b = bep();
-    indir("BEP_Yedek_" + (tr.dosyaAdi(b.ogrenci.ad) || "ogrenci") + "_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(b, null, 1), "application/json");
-    bildir("Yedek dosyası indirildi. Kişisel veri içerdiği için güvenli saklayınız.");
-  });
-  $("#iceAktarDosya").addEventListener("change", function (e) {
-    var f = e.target.files[0];
-    if (!f) return;
-    var r = new FileReader();
-    r.onload = function () {
-      try {
-        var j = JSON.parse(r.result);
-        var liste = j.kayitlar ? Object.keys(j.kayitlar).map(function (k) { return j.kayitlar[k]; }) : [j];
-        var n = 0;
-        liste.forEach(function (b) {
-          if (!b || !b.ogrenci || !b.ders) return;
-          if (durum.kayitlar[b.id]) b.id = uid();
-          durum.kayitlar[b.id] = kayitDuzelt(b); durum.aktifId = b.id; n++;
-        });
-        if (!n) throw new Error("Geçerli BEP kaydı bulunamadı");
-        kaydet(); hepsiniCiz(); bildir(n + " BEP kaydı yüklendi.");
-      } catch (err) { bildir("Dosya okunamadı: " + err.message, "hata"); }
-      e.target.value = "";
-    };
-    r.readAsText(f, "utf-8");
-  });
 
   /* ------------------------------------------------------------------ adımlar */
+  // 1 Öğrenci • 2 Ders • 3 Yıllık Plan • 4 Okul ve BEP Birimi • 5 Önizle ve İndir
+  var SON_ADIM = 5;
   function adimaGit(n) {
     durum.adim = n;
     $$(".panel").forEach(function (p) { p.hidden = +p.dataset.panel !== n; });
     $$("#adimlar button").forEach(function (b) { b.classList.toggle("aktif", +b.dataset.adim === n); });
     $("#btnGeri").disabled = n === 1;
-    $("#btnIleri").textContent = n === 6 ? "⬇ Word Belgesi İndir" : "İleri →";
-    if (n === 3) dersFormuCiz();
-    if (n === 4) performansCiz();
-    if (n === 5) planAdimi();
-    if (n === 6) onizlemeAdimi();
+    $("#btnIleri").textContent = n === SON_ADIM ? "⬇ Word Belgesi İndir" : "İleri →";
+    if (n === 2) dersFormuCiz();
+    if (n === 3) planAdimi();
+    if (n === 5) onizlemeAdimi();
     adimDurumlari();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   $$("#adimlar button").forEach(function (b) { b.addEventListener("click", function () { adimaGit(+b.dataset.adim); }); });
   $("#btnGeri").addEventListener("click", function () { if (durum.adim > 1) adimaGit(durum.adim - 1); });
-  $("#btnIleri").addEventListener("click", function () { if (durum.adim < 6) adimaGit(durum.adim + 1); else wordIndir(); });
+  $("#btnIleri").addEventListener("click", function () { if (durum.adim < SON_ADIM) adimaGit(durum.adim + 1); else wordIndir(); });
 
   function adimDurumlari() {
     var b = bep();
     var tamam = {
-      1: !!(tr.bosluk(b.okul.ad) && tr.bosluk(b.okul.il) && tr.bosluk(b.kurul.baskan)),
-      2: !!(tr.bosluk(b.ogrenci.ad) && b.ogrenci.yetersizlik.length),
-      3: !!(b.ders.id && (b.ders.id === "__ozel__" ? tr.bosluk(b.ders.ozel.ad) : b.ders.planId)),
-      4: !!(b.ogrenci.yetersizlik.length && tr.bosluk(b.performans.gelisim) && tr.bosluk(b.performans.ders)),
-      5: !!(b.plan && b.plan.satirlar && b.plan.satirlar.length)
+      1: !!(tr.bosluk(b.ogrenci.ad) && b.ogrenci.yetersizlik.length),
+      2: !!(b.ders.id && (b.ders.id === "__ozel__" ? tr.bosluk(b.ders.ozel.ad) : b.ders.planId)),
+      3: !!(b.plan && b.plan.satirlar && b.plan.satirlar.length),
+      4: !!(tr.bosluk(b.okul.ad) && tr.bosluk(b.okul.il) && tr.bosluk(b.kurul.baskan))
     };
     $$("#adimlar button").forEach(function (btn) { btn.classList.toggle("tamam", !!tamam[+btn.dataset.adim]); });
   }
 
-  /* ------------------------------------------------------------------ ADIM 1 */
+  /* ------------------------------------------------------------------ ADIM 4 – okul ve BEP birimi */
   function ustBaslikGoster() {
     var b = bep();
     var s2 = BEP.ustBaslikSatiri(b.okul);
     var okulAd = tr.up(b.okul.ad || "");
     $("#ustBaslikOnizleme").innerHTML = "<b>Belge üst başlığı:</b> T.C. / " + esc(s2 || "… VALİLİĞİ") + " / " + esc(okulAd ? (/MÜDÜRLÜĞÜ$/.test(okulAd) ? okulAd : okulAd + " MÜDÜRLÜĞÜ") : "… MÜDÜRLÜĞÜ");
   }
+
+  /* ------------------------------------------------------------------ ADIM 1 – öğrenci */
   function yetersizlikListesiCiz() {
     var b = bep(), secili = b.ogrenci.yetersizlik || [];
     $("#yetersizlikListesi").innerHTML = BEP.YETERSIZLIKLER.map(function (y) {
@@ -346,7 +238,10 @@
     var i = e.target.dataset && e.target.dataset.eokul;
     if (i === undefined) return;
     var s = eokulListe[+i], b = bep();
-    if (tr.bosluk(b.ogrenci.ad) && tr.bosluk(b.ogrenci.ad) !== s.ad && !confirm("Bu BEP’teki öğrenci bilgileri “" + s.ad + "” ile değiştirilsin mi?\n(Yeni öğrenci için önce “+ Yeni BEP”i kullanabilirsiniz.)")) return;
+    var baskaOgrenci = tr.bosluk(b.ogrenci.ad) && tr.bosluk(b.ogrenci.ad) !== s.ad;
+    if (baskaOgrenci && !confirm("Bu BEP’teki öğrenci bilgileri “" + s.ad + "” ile değiştirilsin mi?")) return;
+    // Veli ve sınıf rehber öğretmeni öğrenciye özgüdür
+    if (baskaOgrenci) { b.kurul.veli = ""; b.kurul.sinifRehber = ""; }
     b.ogrenci.ad = s.ad; b.ogrenci.no = s.no; b.ogrenci.sinif = s.sinif; b.ogrenci.sube = s.sube;
     b.ogrenci.yetersizlik = s.yetersizlik.slice();
     if (s.hizmet) b.ogrenci.hizmet = s.hizmet;
@@ -355,7 +250,7 @@
     bildir(s.ad + " aktarıldı." + (s.uyari ? " Not: e-Okul RAM kademe uyarısı var." : ""));
   });
 
-  /* ------------------------------------------------------------------ ADIM 2 */
+  /* ------------------------------------------------------------------ ADIM 2 – ders */
   var SINIF_SIRA = ["H", "9", "10", "11", "12", "S"];
   function dersSecimiCiz() {
     var gruplar = {};
@@ -433,7 +328,7 @@
       if (!var_ && sinif !== "S") bildir("Bu ders için " + BEP.sinifAdi(ogrSinif) + " planı yok; " + BEP.sinifAdi(sinif) + " seçildi.");
     } else b.ders.planId = "";
     b.ders.saat = "";
-    degisti("ders.id"); dersFormuCiz(); kayitListesiCiz(); adimDurumlari();
+    degisti("ders.id"); dersFormuCiz(); adimDurumlari();
   });
   $("#sinifSec").addEventListener("change", function (e) {
     var b = bep(), ders = BEP.dersBul(b.ders.id);
@@ -461,33 +356,7 @@
     bep().ders.ozel.uniteler.splice(+i, 1); ozelUniteCiz(); kaydetGecikmeli();
   });
 
-  /* ------------------------------------------------------------------ ADIM 4 – performans (otomatik) */
-  function performansCiz() {
-    var b = bep();
-    performansOtomatik(b);
-    var o = BEP.performansOnerileri(b);
-    var dersAd = b.ders.id === "__ozel__" ? (b.ders.ozel.ad || "Ders") : ((BEP.dersBul(b.ders.id) || {}).ad || "Ders");
-    $("#dersPerformansBaslik").textContent = dersAd.replace(/\s*\(.*\)$/, "") + " Alanı Performans Düzeyi " + o.alanEtiketi;
-    var tanilar = BEP.tanilarMetni(b);
-    $("#performansBilgi").innerHTML = (b.ogrenci.yetersizlik.length
-      ? "Bu bölüm <b>" + esc(tanilar) + "</b> " + (b.ogrenci.yetersizlik.length > 1 ? "tanılarına" : "tanısına") + (b.ders.id ? " ve <b>" + esc(dersAd.replace(/\s*\(.*\)$/, "")) + "</b> dersine" : "") + " göre otomatik dolduruldu."
-      : "Yetersizlik türü seçildiğinde bu bölüm tanıya göre otomatik doldurulur (2. adım).") +
-      " Öğrencinize göre düzenleyebilirsiniz; düzenlediğiniz metinler korunur.";
-    $("#btnPerformansDoldur").hidden = !performansDuzenlendiMi(b);
-    formuDoldur($('[data-panel="4"]'));
-    requestAnimationFrame(function () { $$('[data-panel="4"] textarea').forEach(otoYukseklik); });
-    kaydetGecikmeli();
-  }
-  $("#btnPerformansDoldur").addEventListener("click", function () {
-    var b = bep();
-    if (!confirm("Düzenlediğiniz performans metinleri silinip tanıya göre yeniden doldurulsun mu?")) return;
-    b.performansElle = {};
-    performansOtomatik(b);
-    performansCiz(); degisti("ogrenci.yetersizlik"); adimDurumlari();
-    bildir("Performans düzeyi tanıya göre yeniden dolduruldu.");
-  });
-
-  /* ------------------------------------------------------------------ ADIM 5 – yıllık plan */
+  /* ------------------------------------------------------------------ ADIM 3 – yıllık plan */
   function ayarSecimleriCiz() {
     var b = bep(), ctx = BEP.baglam(b);
     var destek = BEP.DESTEK_DUZEYLERI.filter(function (d) { return d.id === ctx.destek; })[0] || {};
@@ -512,7 +381,7 @@
 
   function planOlustur(koru) {
     var b = bep();
-    if (!b.ders.id) { bildir("Önce 3. adımda ders seçiniz.", "hata"); return false; }
+    if (!b.ders.id) { bildir("Önce 2. adımda ders seçiniz.", "hata"); return false; }
     var s = BEP.planiHazirla(b, { duzenlemeleriKoru: !!koru });
     if (s.hata) { bildir(s.hata, "hata"); return false; }
     kaydet(); adimDurumlari();
@@ -521,7 +390,7 @@
   function planAdimi() {
     ayarSecimleriCiz();
     var b = bep();
-    if (!b.ders.id) { $("#planTablosu").innerHTML = ""; planUyarisi("Yıllık planın oluşturulabilmesi için 3. adımda ders seçiniz."); return; }
+    if (!b.ders.id) { $("#planTablosu").innerHTML = ""; planUyarisi("Yıllık planın oluşturulabilmesi için 2. adımda ders seçiniz."); return; }
     if (!b.plan) planOlustur(false);
     else if (b.plan.imza !== BEP.planImzasi(b)) {
       if (!duzenlemeVarMi(b)) { planOlustur(false); bildir("Plan seçimlerinize göre güncellendi."); }
@@ -544,7 +413,7 @@
     if (duzenlemeVarMi(b)) koru = confirm("Elle düzenlediğiniz hücreler korunsun mu?\n\nTamam: düzenlemeler korunur, diğer hücreler yenilenir.\nİptal: plan tamamen baştan oluşturulur.");
     if (planOlustur(koru)) { planTablosuCiz(); bildir("Yıllık plan oluşturuldu."); }
   });
-  $("#sinavHaftalari").addEventListener("change", function () { if (durum.adim === 5) planDurumuGuncelle(); });
+  $("#sinavHaftalari").addEventListener("change", function () { if (durum.adim === 3) planDurumuGuncelle(); });
 
   function planDurumuGuncelle() {
     var b = bep();
@@ -620,21 +489,20 @@
     kaydetGecikmeli();
   });
 
-  /* ------------------------------------------------------------------ ADIM 6 */
+  /* ------------------------------------------------------------------ ADIM 5 – önizle ve indir */
   function kontroller() {
     var b = bep(), l = [];
     var ekle = function (tur, metin, adim) { l.push({ tur: tur, metin: metin, adim: adim }); };
-    if (!tr.bosluk(b.ogrenci.ad)) ekle("hata", "Öğrencinin adı soyadı yazılmamış.", 2);
-    if (!b.ogrenci.yetersizlik.length) ekle("hata", "Yetersizlik türü / eğitsel tanı seçilmemiş.", 2);
-    if (!b.ders.id) ekle("hata", "Ders seçilmemiş.", 3);
-    if (b.ders.id === "__ozel__" && !b.ders.ozel.uniteler.some(function (u) { return tr.bosluk(u.ad); })) ekle("hata", "Elle girilen ders için en az bir öğrenme birimi/ünite yazınız.", 3);
-    if (!tr.bosluk(b.okul.ad) || !tr.bosluk(b.okul.il)) ekle("uyari", "Okul adı veya il bilgisi eksik (belge başlığında kullanılır).", 1);
-    if (b.plan && b.plan.imza !== BEP.planImzasi(b)) ekle("uyari", "Seçimleriniz plan oluşturulduktan sonra değişmiş; 5. adımda planı yenilemeniz önerilir.", 5);
-    ["gelisim", "ders", "guclu", "destek"].forEach(function (a) { if (!tr.bosluk(b.performans[a])) { ekle("uyari", "Performans düzeyi bölümünde boş alanlar var.", 4); } });
+    if (!tr.bosluk(b.ogrenci.ad)) ekle("hata", "Öğrencinin adı soyadı yazılmamış.", 1);
+    if (!b.ogrenci.yetersizlik.length) ekle("hata", "Yetersizlik türü / eğitsel tanı seçilmemiş.", 1);
+    if (!b.ders.id) ekle("hata", "Ders seçilmemiş.", 2);
+    if (b.ders.id === "__ozel__" && !b.ders.ozel.uniteler.some(function (u) { return tr.bosluk(u.ad); })) ekle("hata", "Elle girilen ders için en az bir öğrenme birimi/ünite yazınız.", 2);
+    if (b.plan && b.plan.imza !== BEP.planImzasi(b)) ekle("uyari", "Seçimleriniz plan oluşturulduktan sonra değişmiş; 3. adımda planı yenilemeniz önerilir.", 3);
     var sh = (b.ayarlar.sinavHaftalari || []);
-    if (sh.filter(function (h) { return h <= 18; }).length !== 2 || sh.filter(function (h) { return h > 18; }).length !== 2) ekle("uyari", "BEP yazılı sınavları: her dönemde 2 sınav haftası belirlenmesi önerilir (OKY Md. 45/1-a; 1. dönem 1-18, 2. dönem 19-36. haftalar).", 5);
-    if (!tr.bosluk(b.ders.ogretmen)) ekle("uyari", "Ders öğretmeninin adı yazılmamış (imza bölümünde noktalı satır bırakılır).", 1);
-    if (!tr.bosluk(b.kurul.baskan) || !tr.bosluk(b.kurul.rehberOgretmen)) ekle("uyari", "BEP geliştirme birimi üyelerinin adları eksik (imza bölümünde noktalı satır bırakılır).", 1);
+    if (sh.filter(function (h) { return h <= 18; }).length !== 2 || sh.filter(function (h) { return h > 18; }).length !== 2) ekle("uyari", "BEP yazılı sınavları: her dönemde 2 sınav haftası belirlenmesi önerilir (OKY Md. 45/1-a; 1. dönem 1-18, 2. dönem 19-36. haftalar).", 3);
+    if (!tr.bosluk(b.okul.ad) || !tr.bosluk(b.okul.il)) ekle("uyari", "Okul adı veya il bilgisi eksik (belge başlığında kullanılır).", 4);
+    if (!tr.bosluk(b.ders.ogretmen)) ekle("uyari", "Ders öğretmeninin adı yazılmamış (imza bölümünde noktalı satır bırakılır).", 4);
+    if (!tr.bosluk(b.kurul.baskan) || !tr.bosluk(b.kurul.rehberOgretmen)) ekle("uyari", "BEP geliştirme birimi üyelerinin adları eksik (imza bölümünde noktalı satır bırakılır).", 4);
     var uniq = {};
     l = l.filter(function (x) { if (uniq[x.metin]) return false; uniq[x.metin] = 1; return true; });
     if (!l.some(function (x) { return x.tur === "hata"; })) l.unshift({ tur: "tamam", metin: "Belge oluşturulmaya hazır. Word belgesini indirip son kontrolünüzü yapabilirsiniz." });
@@ -707,12 +575,11 @@
     var T = BEP.takvimBilgi("2026-2027");
     $("#yardimIcerik").innerHTML =
       "<h2>BEP Hazırlama Aracı – Nasıl kullanılır?</h2><ol>" +
-      "<li><b>Okul ve BEP Birimi:</b> Okul bilgilerini ve BEP geliştirme birimi üyeleri ile tasdik tarihlerini girin (sonraki BEP’lerde hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır).</li>" +
       "<li><b>Öğrenci:</b> Öğrenciyi elle yazın ya da e-Okul “Özel Eğitim Gereksinimli Öğrenci Listesi”nden aktarın. Yetersizlik türünü RAM raporuna göre işaretleyin.</li>" +
       "<li><b>Ders:</b> Dersi ve sınıf düzeyini seçin. Haftalık konular ve öğrenme çıktıları MEB’in 2026-2027 resmî çerçeve yıllık planlarından gelir. Meslek dersleri için “elle giriş” seçeneğini kullanın.</li>" +
-      "<li><b>Performans Düzeyi:</b> Tanıya ve derse göre otomatik doldurulur; isterseniz öğrencinize göre düzenleyin.</li>" +
       "<li><b>Yıllık Plan:</b> Destek düzeyi, ölçüt ve tablo düzeni tanıya göre otomatik belirlenir; plan otomatik oluşur. Her hücreyi düzenleyebilir, KDA için başka öneriler seçebilirsiniz. Sarı hücreler elle düzenlenmiştir.</li>" +
-      "<li><b>Önizle ve İndir:</b> Uyarlamalar (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3) ve izleme çizelgesi tanıya göre otomatik eklenir. Kontrol listesini inceleyin, Word belgesini indirin veya PDF olarak yazdırın.</li></ol>" +
+      "<li><b>Okul ve BEP Birimi:</b> Okul bilgilerini ve BEP geliştirme birimi üyeleri ile tasdik tarihlerini girin (bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır).</li>" +
+      "<li><b>Önizle ve İndir:</b> Mevcut performans düzeyi tanıya ve derse göre otomatik doldurulur. Uyarlamalar (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3) ve izleme çizelgesi tanıya göre otomatik eklenir. Kontrol listesini inceleyin, Word belgesini indirin veya PDF olarak yazdırın.</li></ol>" +
       "<h2>Resmî takvim (" + esc(T.egitimYili) + ")</h2><ul><li>Ders yılı: " + T.dersBasi + " – " + T.dersSonu + " (36 öğretim haftası + 37. hafta sosyal etkinlik)</li><li>1. dönem ara tatili: 16-20 Kasım 2026 • Yarıyıl tatili: 25 Ocak – 5 Şubat 2027 • 2. dönem ara tatili: 8-12 Mart 2027</li></ul>" +
       "<h2>Kaynaklar</h2><ul>" + m.kaynaklar.map(function (k) { return '<li><a href="' + esc(k.url) + '" target="_blank" rel="noopener">' + esc(k.ad) + "</a></li>"; }).join("") +
       '<li><a href="https://www.meb.gov.tr/2026-2027-egitim-ogretim-yili-takvimi-aciklandi/haber/41057/tr" target="_blank" rel="noopener">MEB 2026-2027 Eğitim Öğretim Yılı Takvimi</a></li>' +
@@ -721,15 +588,14 @@
       '<li><a href="https://orgm.meb.gov.tr/meb_iys_dosyalar/2022_09/20140845_BYREYSELLEYTYRYLMYY_EYYTYM_PROGRAMI_TUM_OYRETMENLER_YCYN_YOL_HARITASI.pdf" target="_blank" rel="noopener">ORGM – BEP: Tüm Öğretmenler İçin Yol Haritası</a> (KDA: birey + koşul + davranış + ölçüt)</li>' +
       '<li><a href="https://meslek.meb.gov.tr/dersbilgi" target="_blank" rel="noopener">MTEGM Ders Bilgi Formları (meslek dersleri)</a></li></ul>' +
       "<h2>Önemli notlar</h2><ul><li>2026-2027’de hazırlık, 9, 10 ve 11. sınıflarda Türkiye Yüzyılı Maarif Modeli programları; 12. sınıflarda önceki programlar uygulanmaktadır (OGM).</li>" +
-      "<li>Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler liseleri için yayımlanmıştır; MTAL ve diğer okullarda haftalık ders saatinizi 3. adımda düzeltebilirsiniz.</li>" +
+      "<li>Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler liseleri için yayımlanmıştır; MTAL ve diğer okullarda haftalık ders saatinizi 2. adımda düzeltebilirsiniz.</li>" +
       "<li>Üretilen amaçlar birer taslaktır; BEP geliştirme birimi tarafından öğrencinin performansına göre gözden geçirilmelidir.</li>" +
-      "<li>Veriler yalnızca bu tarayıcıda saklanır. Bilgisayar değiştirirken “Yedekle” ile .json dosyası alın. BEP özel nitelikli kişisel veri içerir (KVKK).</li></ul>";
+      "<li>Veriler yalnızca bu tarayıcıda saklanır. BEP özel nitelikli kişisel veri içerir (KVKK).</li></ul>";
     $("#yardimDiyalog").showModal();
   });
 
   /* ------------------------------------------------------------------ başlangıç */
   function hepsiniCiz() {
-    kayitListesiCiz();
     formuDoldur();
     ustBaslikGoster();
     yetersizlikListesiCiz();

@@ -5,7 +5,7 @@ Ortaöğretimde kaynaştırma/bütünleştirme yoluyla eğitim alan öğrenciler
 ## Hızlı başlangıç
 
 1. `BEP_Hazirlama_Uygulamasi.html` dosyasını çift tıklayarak açın (Chrome, Edge, Firefox veya Safari).
-2. Üstteki altı adımı sırayla doldurun, her adımda **İleri →** düğmesine basın.
+2. Üstteki beş adımı sırayla doldurun, her adımda **İleri →** düğmesine basın.
 3. Son adımda **⬇ Word Belgesi İndir (.docx)** ya da **🖨 Yazdır / PDF** düğmesini kullanın.
 
 Tek dosya yeterlidir; dosyayı USB bellekle ya da e-postayla başka bilgisayara taşıyabilirsiniz.
@@ -14,14 +14,13 @@ Tek dosya yeterlidir; dosyayı USB bellekle ya da e-postayla başka bilgisayara 
 
 | Adım | Ne yapılır? |
 |---|---|
-| 1. Okul ve BEP Birimi | Okul bilgileri ile BEP geliştirme birimi üyeleri (birim başkanı, ders öğretmeni, rehber öğretmen, sınıf rehber öğretmeni, veli) ve toplantı/onay tarihleri girilir. Okul ve birim bilgileri sonraki BEP'lerde hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır. Boş bırakılan ad ve tarihler belgede noktalı satır olur. |
-| 2. Öğrenci | Ad soyad, okul no, sınıf, şube, yetersizlik türü (RAM raporuna göre; birden fazla seçilebilir), önerilen hizmet, BEP tarihleri ve varsa kullandığı cihaz. Öğrenci **e-Okul listesinden aktar** ile e-Okul'daki "Özel Eğitim Gereksinimli Öğrenci Listesi" metni yapıştırılarak da aktarılabilir. |
-| 3. Ders | Ders ve sınıf düzeyi seçilir; uygun resmî plan otomatik önerilir. Haftalık ders saati okulunuza göre değiştirilebilir. Meslek dersleri için **Meslek Dersi / Listede Olmayan Ders** bölümünden öğrenme birimleri elle girilir. |
-| 4. Performans Düzeyi | Gelişim özellikleri, ders alanı performansı, güçlü yönler, desteklenmesi gereken yönler ve davranış özellikleri **tanıya ve derse göre otomatik doldurulur**. İstenirse düzenlenir; düzenlenen metinler korunur, **Tanıya göre yeniden doldur** ile otomatik metne dönülür. |
-| 5. Yıllık Plan | Destek düzeyi, KDA ölçütü (%80 – 4/5), KDA öznesi (öğrencinin adı) ve tablo düzeni (müfredat çıktısı sütunlu) **otomatik belirlenir**; birden fazla tanıda en yoğun destek düzeyi esas alınır. BEP sınav haftaları değiştirilebilir. 37 haftalık plan otomatik oluşur; her hücre düzenlenebilir, KDA için başka öneriler seçilebilir. Elle düzenlenen hücreler sarı görünür. |
-| 6. Önizle ve İndir | Kontrol listesi, A4 yatay sayfa önizlemesi, Word ve PDF çıktısı. Sınıf içi ve sınav uyarlamaları (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3: destek eğitim odası, aile bilgilendirme, davranış desteği, sonraki toplantı) ve izleme çizelgesi **tanıya ve hizmet türüne göre otomatik** eklenir. |
+| 1. Öğrenci | Ad soyad, okul no, sınıf, şube, yetersizlik türü (RAM raporuna göre; birden fazla seçilebilir), önerilen hizmet, BEP tarihleri ve varsa kullandığı cihaz. Öğrenci **e-Okul listesinden aktar** ile e-Okul'daki "Özel Eğitim Gereksinimli Öğrenci Listesi" metni yapıştırılarak da aktarılabilir. |
+| 2. Ders | Ders ve sınıf düzeyi seçilir; uygun resmî plan otomatik önerilir. Haftalık ders saati okulunuza göre değiştirilebilir. Meslek dersleri için **Meslek Dersi / Listede Olmayan Ders** bölümünden öğrenme birimleri elle girilir. |
+| 3. Yıllık Plan | Destek düzeyi, KDA ölçütü (%80 – 4/5), KDA öznesi (öğrencinin adı) ve tablo düzeni (müfredat çıktısı sütunlu) **otomatik belirlenir**; birden fazla tanıda en yoğun destek düzeyi esas alınır. BEP sınav haftaları değiştirilebilir. 37 haftalık plan otomatik oluşur; her hücre düzenlenebilir, KDA için başka öneriler seçilebilir. Elle düzenlenen hücreler sarı görünür. |
+| 4. Okul ve BEP Birimi | Okul bilgileri ile BEP geliştirme birimi üyeleri (birim başkanı, ders öğretmeni, rehber öğretmen, sınıf rehber öğretmeni, veli) ve toplantı/onay tarihleri girilir. Okul ve birim bilgileri bir sonraki BEP için hatırlanır; veli ve sınıf rehber öğretmeni her öğrenci için yazılır. Boş bırakılan ad ve tarihler belgede noktalı satır olur. |
+| 5. Önizle ve İndir | Kontrol listesi, A4 yatay sayfa önizlemesi, Word ve PDF çıktısı. Mevcut performans düzeyi (gelişim özellikleri, ders alanı performansı, güçlü yönler, desteklenmesi gereken yönler ve davranış özellikleri) **tanıya ve derse göre otomatik doldurulur**. Sınıf içi ve sınav uyarlamaları (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3: destek eğitim odası, aile bilgilendirme, davranış desteği, sonraki toplantı) ve izleme çizelgesi **tanıya ve hizmet türüne göre otomatik** eklenir. |
 
-**Yedekle / Yedekten yükle:** Kayıtlar yalnızca o bilgisayardaki tarayıcıda tutulur. Bilgisayar değiştirirken ya da tarayıcı verileri silinmeden önce **Yedekle** ile `.json` yedeği alın.
+**Kayıt:** Girilen bilgiler yalnızca o bilgisayardaki tarayıcıda tutulur ve sayfa yeniden açıldığında kaldığınız yerden devam edilir. Yeni öğrenci için 1. adımdaki bilgileri değiştirmeniz (ya da e-Okul listesinden başka bir öğrenci seçmeniz) yeterlidir; okul ve birim bilgileri korunur.
 
 ## Word çıktısı
 
@@ -54,7 +53,7 @@ Tek dosya yeterlidir; dosyayı USB bellekle ya da e-postayla başka bilgisayara 
 
 ## Kişisel veriler (KVKK)
 
-BEP, özel nitelikli kişisel veri (sağlık/eğitsel tanı) içerir. Uygulama T.C. kimlik no, doğum tarihi/yeri, cinsiyet ve RAM rapor bilgisi istemez; ağ isteği yapmaz; veriler yalnızca o bilgisayardaki tarayıcının yerel deposunda kalır. Ortak kullanılan bilgisayarlarda işiniz bitince kaydı **Sil** düğmesiyle silin. Tarayıcı yerel depoya izin vermiyorsa uygulama yine çalışır, ancak altta uyarı gösterir; bu durumda **Yedekle** ile dosya alın.
+BEP, özel nitelikli kişisel veri (sağlık/eğitsel tanı) içerir. Uygulama T.C. kimlik no, doğum tarihi/yeri, cinsiyet ve RAM rapor bilgisi istemez; ağ isteği yapmaz; veriler yalnızca o bilgisayardaki tarayıcının yerel deposunda kalır. Ortak kullanılan bilgisayarlarda işiniz bitince tarayıcının site verilerini temizleyin. Tarayıcı yerel depoya izin vermiyorsa uygulama yine çalışır, ancak altta uyarı gösterir; bu durumda veriler yalnızca sayfa açıkken korunur.
 
 ## Sınırlılıklar
 

@@ -41,10 +41,8 @@ h2 small, legend small, label small { color: var(--yazi-3); font-weight: 400; }
 .marka small { color: #c9d6ea; font-size: .78rem; }
 .logo { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; background: #fff; color: var(--lacivert); font-weight: 800; letter-spacing: .5px; }
 .ust-eylemler { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
-.ust-eylemler select { max-width: 320px; background: #fff; }
 .ust-eylemler .dugme.ikincil { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.35); }
 .ust-eylemler .dugme.ikincil:hover { background: rgba(255,255,255,.2); }
-.ust-eylemler .dugme.tehlike-cizgi { background: transparent; color: #ffd4d4; border-color: rgba(255,180,180,.5); }
 
 /* Adımlar */
 .adimlar { display: flex; gap: .35rem; padding: .6rem 1.25rem; background: #fff; border-bottom: 1px solid var(--cizgi); overflow-x: auto; }
@@ -63,8 +61,6 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.25rem; }
 .kart { background: var(--kart); border: 1px solid var(--cizgi); border-radius: var(--yaricap); padding: 1rem 1.1rem; box-shadow: var(--golge); margin-bottom: 1rem; }
 .kart-ust { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
 .kart-ust h2 { margin: 0; }
-.iki-sutun { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 900px) { .iki-sutun { grid-template-columns: 1fr; } }
 
 /* Form */
 .izgara { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem 1rem; }
