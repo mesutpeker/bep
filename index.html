@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BEP Hazırlama Aracı – Lise (2026-2027)</title>
-<link rel="stylesheet" href="src/css/app.css?v=95bf184ca9">
+<link rel="stylesheet" href="src/css/app.css?v=59e9b7d20a">
 </head>
 <body>
 <!--GOVDE-BASI-->
@@ -79,6 +79,16 @@
     </div>
     <div class="kart">
       <div class="izgara">
+        <label>Okul Türü
+          <select data-alan="okul.tur">
+            <option value="anadolu">Anadolu Lisesi</option>
+            <option value="mtal">Mesleki ve Teknik Anadolu Lisesi</option>
+            <option value="fen">Fen Lisesi</option>
+            <option value="sosyal">Sosyal Bilimler Lisesi</option>
+            <option value="aihl">Anadolu İmam Hatip Lisesi</option>
+            <option value="diger">Diğer (Güzel Sanatlar, Spor, Çok Programlı vb.)</option>
+          </select>
+        </label>
         <label class="genis">Ders<select id="dersSec"></select></label>
         <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
         <label class="genis">Plan (okul türü)<select id="planSec"></select></label>
@@ -134,16 +144,6 @@
         <label>İl<input data-alan="okul.il" placeholder="Örn. Karaman"></label>
         <label>İlçe<input data-alan="okul.ilce" placeholder="Örn. Merkez"></label>
         <label class="genis">Okul Adı<input data-alan="okul.ad" placeholder="Örn. … Mesleki ve Teknik Anadolu Lisesi"></label>
-        <label>Okul Türü
-          <select data-alan="okul.tur">
-            <option value="anadolu">Anadolu Lisesi</option>
-            <option value="mtal">Mesleki ve Teknik Anadolu Lisesi</option>
-            <option value="fen">Fen Lisesi</option>
-            <option value="sosyal">Sosyal Bilimler Lisesi</option>
-            <option value="aihl">Anadolu İmam Hatip Lisesi</option>
-            <option value="diger">Diğer (Güzel Sanatlar, Spor, Çok Programlı vb.)</option>
-          </select>
-        </label>
         <label>Okul Müdürü<input data-alan="okul.mudur" placeholder="Adı Soyadı"></label>
       </div>
       <div class="bilgi-kutusu" id="ustBaslikOnizleme"></div>
@@ -202,15 +202,15 @@
 <div id="bildirim" class="bildirim" role="status" aria-live="polite"></div>
 <div id="yazdirma-alani"></div>
 <!--GOVDE-SONU-->
-<script src="data/dersler.js?v=95bf184ca9"></script>
-<script src="src/js/kutuphane.js?v=95bf184ca9"></script>
-<script src="src/js/takvim.js?v=95bf184ca9"></script>
-<script src="src/js/uretici.js?v=95bf184ca9"></script>
-<script src="src/js/zip.js?v=95bf184ca9"></script>
-<script src="src/js/yazitipi.js?v=95bf184ca9"></script>
-<script src="src/js/belge.js?v=95bf184ca9"></script>
-<script src="src/js/docx.js?v=95bf184ca9"></script>
-<script src="src/js/onizleme.js?v=95bf184ca9"></script>
-<script src="src/js/app.js?v=95bf184ca9"></script>
+<script src="data/dersler.js?v=59e9b7d20a"></script>
+<script src="src/js/kutuphane.js?v=59e9b7d20a"></script>
+<script src="src/js/takvim.js?v=59e9b7d20a"></script>
+<script src="src/js/uretici.js?v=59e9b7d20a"></script>
+<script src="src/js/zip.js?v=59e9b7d20a"></script>
+<script src="src/js/yazitipi.js?v=59e9b7d20a"></script>
+<script src="src/js/belge.js?v=59e9b7d20a"></script>
+<script src="src/js/docx.js?v=59e9b7d20a"></script>
+<script src="src/js/onizleme.js?v=59e9b7d20a"></script>
+<script src="src/js/app.js?v=59e9b7d20a"></script>
 </body>
 </html>
