@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BEP Hazırlama Aracı – Lise (2026-2027)</title>
+<link rel="stylesheet" href="src/css/app.css">
+</head>
+<body>
+<!--GOVDE-BASI-->
+<div class="sabit-ust">
+<header class="ust-cubuk">
+  <div class="marka">
+    <span class="logo" aria-hidden="true">BEP</span>
+    <div>
+      <strong>BEP Hazırlama Aracı</strong>
+      <small>Lise • <span id="egitimYiliEtiket">2026-2027</span> • MEB resmî çerçeve planlarına göre</small>
+    </div>
+  </div>
+  <div class="ust-eylemler">
+    <label class="gizli-etiket" for="kayitSec">Kayıtlı BEP’ler</label>
+    <select id="kayitSec" title="Kayıtlı BEP’ler arasında geçiş yapın"></select>
+    <button type="button" id="btnYeni" class="dugme ikincil" title="Boş bir BEP oluştur">+ Yeni BEP</button>
+    <button type="button" id="btnKopya" class="dugme ikincil" title="Bu BEP’i başka bir öğrenci/ders için kopyala">Kopyala</button>
+    <button type="button" id="btnSil" class="dugme tehlike-cizgi" title="Bu BEP kaydını sil">Sil</button>
+    <button type="button" id="btnDisaAktar" class="dugme ikincil" title="Kaydı .json dosyası olarak yedekle">Yedekle</button>
+    <label class="dugme ikincil" title="Yedek .json dosyasını yükle">Yedekten yükle<input type="file" id="iceAktarDosya" accept=".json,application/json" hidden></label>
+    <button type="button" id="btnYardim" class="dugme ikincil" title="Kullanım ve kaynaklar">? Yardım</button>
+  </div>
+</header>
+
+<nav class="adimlar" id="adimlar" aria-label="Adımlar">
+  <button type="button" data-adim="1"><b>1</b><span>Okul ve BEP Birimi</span></button>
+  <button type="button" data-adim="2"><b>2</b><span>Öğrenci</span></button>
+  <button type="button" data-adim="3"><b>3</b><span>Ders</span></button>
+  <button type="button" data-adim="4"><b>4</b><span>Performans Düzeyi</span></button>
+  <button type="button" data-adim="5"><b>5</b><span>Yıllık Plan</span></button>
+  <button type="button" data-adim="6"><b>6</b><span>Önizle ve İndir</span></button>
+</nav>
+</div>
+
+<main id="icerik">
+  <!-- ADIM 1 -->
+  <section class="panel" data-panel="1">
+    <div class="panel-baslik">
+      <h1>Okul ve BEP Geliştirme Birimi</h1>
+      <p>Okul ve birim bilgileri yeni BEP’lerde otomatik hatırlanır. Bilgiler yalnızca bu bilgisayarda (tarayıcıda) saklanır; hiçbir yere gönderilmez.</p>
+    </div>
+    <div class="kart">
+      <h2>Okul Bilgileri</h2>
+      <div class="izgara">
+        <label>İl<input data-alan="okul.il" placeholder="Örn. Karaman"></label>
+        <label>İlçe<input data-alan="okul.ilce" placeholder="Örn. Merkez"></label>
+        <label class="genis">Okul Adı<input data-alan="okul.ad" placeholder="Örn. … Mesleki ve Teknik Anadolu Lisesi"></label>
+        <label>Okul Türü
+          <select data-alan="okul.tur">
+            <option value="anadolu">Anadolu Lisesi</option>
+            <option value="mtal">Mesleki ve Teknik Anadolu Lisesi</option>
+            <option value="fen">Fen Lisesi</option>
+            <option value="sosyal">Sosyal Bilimler Lisesi</option>
+            <option value="aihl">Anadolu İmam Hatip Lisesi</option>
+            <option value="diger">Diğer (Güzel Sanatlar, Spor, Çok Programlı vb.)</option>
+          </select>
+        </label>
+        <label>Okul Müdürü<input data-alan="okul.mudur" placeholder="Adı Soyadı"></label>
+      </div>
+      <div class="bilgi-kutusu" id="ustBaslikOnizleme"></div>
+      <details class="ek-ayar"><summary>Belge üst başlığını elle değiştir</summary>
+        <label>2. satır (Valilik/Kaymakamlık)<input data-alan="okul.baslikSatiri2" placeholder="Boş bırakılırsa il/ilçeye göre otomatik yazılır"></label>
+      </details>
+    </div>
+
+    <div class="kart">
+      <h2>BEP Geliştirme Birimi ve Tasdik <small>(ÖEHY Md. 47)</small></h2>
+      <div class="izgara">
+        <label>BEP Birim Başkanı<input data-alan="kurul.baskan" placeholder="Adı Soyadı"></label>
+        <label>Başkanın Unvanı<input data-alan="kurul.baskanUnvan" placeholder="Müdür Yardımcısı"></label>
+        <label>Ders Öğretmeni<input data-alan="ders.ogretmen" placeholder="BEP hazırlanan dersin öğretmeni"></label>
+        <label>Rehber Öğretmen / Psikolojik Danışman<input data-alan="kurul.rehberOgretmen" placeholder="Adı Soyadı"></label>
+        <label>Sınıf Rehber Öğretmeni<input data-alan="kurul.sinifRehber" placeholder="Öğrencinin sınıf rehber öğretmeni"></label>
+        <label>Öğrenci Velisi<input data-alan="kurul.veli" placeholder="Anne / Baba / Vasi" autocomplete="off"></label>
+        <label>Birim Toplantı / İmza Tarihi<input type="date" data-alan="kurul.tarih"></label>
+        <label>Uygulamaya Başlama Tarihi<input type="date" data-alan="tasdik.uygulamaTarihi"></label>
+        <label>Müdür Onay Tarihi<input type="date" data-alan="tasdik.tarih"></label>
+        <label class="onay tam"><input type="checkbox" data-alan="ayarlar.kvkkNotu"> Belgeye KVKK uyarı notunu ekle</label>
+      </div>
+      <p class="aciklama">Boş bırakılan ad ve tarihler belgede elle doldurulmak üzere noktalı satır olarak bırakılır. Veli ve sınıf rehber öğretmeni her öğrenci için ayrıca yazılır.</p>
+    </div>
+  </section>
+
+  <!-- ADIM 2 -->
+  <section class="panel" data-panel="2" hidden>
+    <div class="panel-baslik">
+      <h1>Öğrenci Bilgileri</h1>
+      <p>Performans düzeyi, uyarlamalar ve BEP birimi kararları seçilen yetersizlik türüne göre otomatik hazırlanır.</p>
+    </div>
+    <div class="kart">
+      <div class="kart-ust">
+        <h2>Öğrenci</h2>
+        <button type="button" class="dugme ikincil kucuk" id="btnEokul">e-Okul listesinden aktar</button>
+      </div>
+      <div class="izgara">
+        <label class="genis">Adı Soyadı<input data-alan="ogrenci.ad" placeholder="Örn. Deniz Yılmaz" autocomplete="off"></label>
+        <label>Okul No<input data-alan="ogrenci.no" inputmode="numeric"></label>
+        <label>Sınıf
+          <select data-alan="ogrenci.sinif">
+            <option value="H">Hazırlık</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+          </select>
+        </label>
+        <label>Şube<input data-alan="ogrenci.sube" maxlength="4" placeholder="A"></label>
+      </div>
+      <fieldset class="yetersizlik">
+        <legend>Yetersizlik Türü / Eğitsel Tanı <small>(RAM raporundaki tanı; birden fazla seçilebilir — ilk seçilen birincil kabul edilir)</small></legend>
+        <div id="yetersizlikListesi" class="secim-izgarasi"></div>
+        <label id="yetersizlikDigerKutu" hidden>Diğer tanı<input data-alan="ogrenci.yetersizlikMetni"></label>
+      </fieldset>
+      <div class="izgara">
+        <label class="genis">Önerilen Hizmet / Kurul Kararı
+          <select data-alan="ogrenci.hizmet">
+            <option>Tam Zamanlı Kaynaştırma / Bütünleştirme</option>
+            <option>Yarı Zamanlı Kaynaştırma / Bütünleştirme (Özel Eğitim Sınıfı)</option>
+            <option>Tam Zamanlı Kaynaştırma / Bütünleştirme + Destek Eğitim Odası</option>
+            <option>Evde / Hastanede Eğitim</option>
+          </select>
+        </label>
+        <label>BEP Başlangıç<input type="date" data-alan="ogrenci.bepBaslangic"></label>
+        <label>BEP Bitiş<input type="date" data-alan="ogrenci.bepBitis"></label>
+        <label class="genis">Kullandığı Destek Materyali / Cihaz<input data-alan="ogrenci.cihaz" placeholder="Örn. işitme cihazı, büyüteç, tablet (yoksa boş bırakın)"></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADIM 3 -->
+  <section class="panel" data-panel="3" hidden>
+    <div class="panel-baslik">
+      <h1>Ders ve Plan Kaynağı</h1>
+      <p>Haftalık konu ve öğrenme çıktıları, MEB’in 2026-2027 resmî çerçeve yıllık planlarından otomatik gelir.</p>
+    </div>
+    <div class="kart">
+      <div class="izgara">
+        <label class="genis">Ders<select id="dersSec"></select></label>
+        <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
+        <label class="genis">Plan (okul türü)<select id="planSec"></select></label>
+        <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir"></label>
+      </div>
+      <div id="saatUyari" class="uyari-kutusu" hidden></div>
+      <div id="planBilgi" class="bilgi-kutusu"></div>
+    </div>
+    <div class="kart" id="ozelDersKart" hidden>
+      <h2>Meslek Dersi / Listede Olmayan Ders</h2>
+      <p class="aciklama">Mesleki ve Teknik Eğitim Genel Müdürlüğü meslek dersleri için haftalık çerçeve plan yayımlamaz; öğrenme birimleri ve kazanımlar <a href="https://meslek.meb.gov.tr/dersbilgi" target="_blank" rel="noopener">Ders Bilgi Formlarında (meslek.meb.gov.tr)</a> yer alır. Öğrenme birimlerini ve kazanımlarını buraya yazın/yapıştırın; araç bunları 36 haftaya ders saatlerine göre dağıtır.</p>
+      <div class="izgara">
+        <label class="genis">Dersin Adı<input data-alan="ders.ozel.ad" placeholder="Örn. Mesleki Gelişim Atölyesi"></label>
+        <label>Sınıf<select data-alan="ders.ozel.sinif"><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
+      </div>
+      <div id="ozelUniteler"></div>
+      <button type="button" class="dugme ikincil kucuk" id="btnOzelUniteEkle">+ Öğrenme birimi / ünite ekle</button>
+    </div>
+  </section>
+
+  <!-- ADIM 4 -->
+  <section class="panel" data-panel="4" hidden>
+    <div class="panel-baslik">
+      <h1>Mevcut Eğitsel Performans Düzeyi</h1>
+      <p id="performansBilgi">Bu bölüm seçilen yetersizlik türüne ve derse göre otomatik doldurulur. Öğrencinize göre düzenleyebilirsiniz; düzenlediğiniz metinler korunur.</p>
+      <button type="button" class="dugme ikincil" id="btnPerformansDoldur" hidden>Tanıya göre yeniden doldur</button>
+    </div>
+    <div class="kart">
+      <h2>Bilişsel, Duyuşsal ve Sosyal Gelişim Özellikleri</h2>
+      <textarea data-alan="performans.gelisim" rows="5"></textarea>
+    </div>
+    <div class="kart">
+      <h2 id="dersPerformansBaslik">Ders Alanı Performans Düzeyi</h2>
+      <textarea data-alan="performans.ders" rows="6"></textarea>
+    </div>
+    <div class="iki-sutun">
+      <div class="kart">
+        <h2>Güçlü Yönleri</h2>
+        <textarea data-alan="performans.guclu" rows="5"></textarea>
+      </div>
+      <div class="kart">
+        <h2>Geliştirilmesi / Desteklenmesi Gereken Yönleri</h2>
+        <textarea data-alan="performans.destek" rows="5"></textarea>
+      </div>
+    </div>
+    <div class="kart">
+      <h2>Davranış Özellikleri <small>(yönetmelik Md. 20/1-d)</small></h2>
+      <textarea data-alan="performans.davranis" rows="3"></textarea>
+    </div>
+  </section>
+
+  <!-- ADIM 5 -->
+  <section class="panel" data-panel="5" hidden>
+    <div class="panel-baslik">
+      <h1>Bireyselleştirilmiş Yıllık Plan</h1>
+      <p>Plan; resmî takvim (37 hafta + tatiller), seçilen dersin resmî çerçeve planı ve öğrencinin tanısına göre otomatik üretilir. Tüm hücreler düzenlenebilir.</p>
+    </div>
+    <div class="kart ayarlar-kart">
+      <div id="otomatikAyarlar" class="bilgi-kutusu"></div>
+      <div class="izgara">
+        <label class="genis">BEP Yazılı Sınav Haftaları <small>(dönem başına 2 sınav – OKY Md. 45/1-a)</small>
+          <span class="sinav-girisleri" id="sinavHaftalari"></span>
+        </label>
+        <label class="onay"><input type="checkbox" data-alan="ayarlar.donemSayfa"> 2. dönemi yeni sayfada başlat</label>
+      </div>
+      <div class="eylem-satiri">
+        <button type="button" class="dugme birincil" id="btnPlanOlustur">Planı Oluştur / Yenile</button>
+        <span id="planDurum" class="durum-metni"></span>
+      </div>
+    </div>
+    <div id="planUyari" class="uyari-kutusu" hidden></div>
+    <div id="planTablosu" class="plan-duzenleyici"></div>
+  </section>
+
+  <!-- ADIM 6 -->
+  <section class="panel" data-panel="6" hidden>
+    <div class="panel-baslik">
+      <h1>Önizle ve İndir</h1>
+      <p>Word belgesi düzenlenebilir biçimde iner. PDF için “Yazdır” düğmesinden “PDF olarak kaydet”i seçin.</p>
+    </div>
+    <div class="indirme-cubugu">
+      <button type="button" class="dugme birincil buyuk" id="btnWord">⬇ Word Belgesi İndir (.docx)</button>
+      <button type="button" class="dugme ikincil buyuk" id="btnYazdir">🖨 Yazdır / PDF</button>
+      <label class="olcek">Önizleme boyutu <input type="range" id="olcekAyar" min="35" max="100" value="60"></label>
+    </div>
+    <div id="kontrolListesi" class="kontrol-listesi"></div>
+    <div id="onizleme" class="onizleme-kapsayici"></div>
+  </section>
+</main>
+
+<footer class="alt-gezinme">
+  <button type="button" class="dugme ikincil" id="btnGeri">← Geri</button>
+  <span id="kayitDurumu" class="durum-metni" aria-live="polite"></span>
+  <button type="button" class="dugme birincil" id="btnIleri">İleri →</button>
+</footer>
+
+<dialog id="eokulDiyalog" class="diyalog">
+  <form method="dialog">
+    <h2>e-Okul Özel Eğitim Gereksinimli Öğrenci Listesinden Aktar</h2>
+    <p class="aciklama">e-Okul’dan aldığınız “Özel Eğitim Gereksinimli Öğrenci Listesi” PDF’ini açın, tüm metni seçip kopyalayın (Ctrl/Cmd + A, Ctrl/Cmd + C) ve aşağıya yapıştırın. Liste yalnızca bu bilgisayarda işlenir.</p>
+    <textarea id="eokulMetin" rows="8" placeholder="Listeyi buraya yapıştırın…"></textarea>
+    <div class="eylem-satiri"><button type="button" class="dugme ikincil" id="btnEokulAyristir">Listeyi oku</button><span id="eokulDurum" class="durum-metni"></span></div>
+    <div id="eokulSonuc" class="eokul-sonuc"></div>
+    <div class="diyalog-alt"><button class="dugme ikincil" value="kapat">Kapat</button></div>
+  </form>
+</dialog>
+
+<dialog id="yardimDiyalog" class="diyalog genis-diyalog">
+  <form method="dialog">
+    <div id="yardimIcerik"></div>
+    <div class="diyalog-alt"><button class="dugme birincil" value="kapat">Kapat</button></div>
+  </form>
+</dialog>
+
+<div id="bildirim" class="bildirim" role="status" aria-live="polite"></div>
+<div id="yazdirma-alani"></div>
+<!--GOVDE-SONU-->
+<script src="data/dersler.js"></script>
+<script src="src/js/kutuphane.js"></script>
+<script src="src/js/takvim.js"></script>
+<script src="src/js/uretici.js"></script>
+<script src="src/js/zip.js"></script>
+<script src="src/js/yazitipi.js"></script>
+<script src="src/js/belge.js"></script>
+<script src="src/js/docx.js"></script>
+<script src="src/js/onizleme.js"></script>
+<script src="src/js/eokul.js"></script>
+<script src="src/js/app.js"></script>
+</body>
+</html>
