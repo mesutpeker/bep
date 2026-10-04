@@ -1537,6 +1537,20 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     return adaylar[0].id;
   };
 
+  /* Resmî çerçeve planları Anadolu/Fen/Sosyal Bilimler liselerinin saatine göredir.
+     Haftalık ders çizelgesinde saati farklı olan okul türleri için resmî haftalık saat. */
+  var OKUL_TURU_SAATLERI = {
+    // Mesleki ve Teknik Anadolu Lisesi haftalık ders çizelgesi (ortak dersler)
+    mtal: { "turk-dili-ve-edebiyati": { "10": 4, "11": 4, "12": 4 } }
+  };
+  BEP.okulTuruSaati = function (bep) {
+    var d = bep.ders || {};
+    if (!d.id || d.id === "__ozel__") return null;
+    var plan = BEP.planBul(BEP.dersBul(d.id), d.planId);
+    var t = OKUL_TURU_SAATLERI[bep.okul && bep.okul.tur];
+    return (plan && t && t[d.id] && t[d.id][plan.sinif]) || null;
+  };
+
   /* Elle girilen (meslek dersi vb.) ders için sentetik plan */
   BEP.ozelPlanOlustur = function (oz) {
     var uniteler = (oz.uniteler || []).filter(function (u) { return tr.bosluk(u.ad); });
@@ -1606,7 +1620,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
       destek: ayar.destek || otomatikDestek(profiller),
       olcut: olcut.metin, ozne: ozne, ad: ad || "Öğrenci",
       dil: ders && ders.id === "ingilizce" ? "en" : "tr",
-      saat: parseInt(bep.ders && bep.ders.saat, 10) || (plan && plan.saat) || 2,
+      saat: parseInt(bep.ders && bep.ders.saat, 10) || (!ozel && BEP.okulTuruSaati(bep)) || (plan && plan.saat) || 2,
       sinavHaftalari: (ayar.sinavHaftalari || [8, 16, 25, 33]).map(Number)
     };
   };
@@ -2096,7 +2110,10 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
   /* Planı etkileyen seçimlerin imzası: değiştiğinde arayüz "planı yenile" uyarısı gösterir */
   BEP.planImzasi = function (bep) {
     var o = bep.ogrenci || {}, d = bep.ders || {}, a = bep.ayarlar || {};
-    return JSON.stringify([d.id, d.planId, d.saat, d.id === "__ozel__" ? d.ozel : null, (o.yetersizlik || []).join(","), BEP.tr.ilkAd(o.ad), a.destek, a.olcut, a.ozne, (a.sinavHaftalari || []).join(",")]);
+    var imza = [d.id, d.planId, d.saat, d.id === "__ozel__" ? d.ozel : null, (o.yetersizlik || []).join(","), BEP.tr.ilkAd(o.ad), a.destek, a.olcut, a.ozne, (a.sinavHaftalari || []).join(",")];
+    var okulSaat = BEP.okulTuruSaati(bep);
+    if (okulSaat) imza.push("okul-saat:" + okulSaat); // yalnızca istisnada eklenir; mevcut planların imzası değişmez
+    return JSON.stringify(imza);
   };
 })(typeof window !== "undefined" ? window : globalThis);
 
@@ -3285,7 +3302,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
       $("#sinifSec").innerHTML = ""; $("#planSec").innerHTML = "";
     }
     var ctx = BEP.baglam(b);
-    $("#saatGir").placeholder = ctx.plan ? String(ctx.plan.saat) : "";
+    $("#saatGir").placeholder = ctx.plan ? String(BEP.okulTuruSaati(b) || ctx.plan.saat) : "";
     formuDoldur($('[data-panel="2"]'));
     planBilgiCiz(ctx);
     saatUyarisiGoster();
@@ -3293,8 +3310,11 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
   function saatUyarisiGoster() {
     var b = bep(), kutu = $("#saatUyari");
     var mtal = b.okul.tur === "mtal" || b.okul.tur === "diger" || b.okul.tur === "aihl";
-    var ctx = BEP.baglam(b);
-    if (mtal && ctx.plan && b.ders.id !== "__ozel__" && !b.ders.saat) {
+    var ctx = BEP.baglam(b), okulSaat = BEP.okulTuruSaati(b);
+    if (okulSaat && !b.ders.saat) {
+      kutu.hidden = false;
+      kutu.textContent = "Okulunuzun haftalık ders çizelgesine göre bu ders " + ctx.plan.sinif + ". sınıfta haftalık " + okulSaat + " saattir; plan " + okulSaat + " saate göre hazırlanır (resmî çerçeve plan: haftalık " + ctx.plan.saat + " saat). Konu sıralaması aynen korunur.";
+    } else if (mtal && ctx.plan && b.ders.id !== "__ozel__" && !b.ders.saat) {
       kutu.hidden = false;
       kutu.textContent = "Resmî çerçeve planları Anadolu/Fen/Sosyal Bilimler liselerinin ders saatine göre hazırlanmıştır (bu plan: haftalık " + ctx.plan.saat + " saat). Okulunuzun haftalık ders çizelgesindeki saat farklıysa “Haftalık Ders Saati” alanına yazınız; konu sıralaması aynen korunur.";
     } else kutu.hidden = true;
@@ -3583,7 +3603,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
       '<li><a href="https://orgm.meb.gov.tr/meb_iys_dosyalar/2022_09/20140845_BYREYSELLEYTYRYLMYY_EYYTYM_PROGRAMI_TUM_OYRETMENLER_YCYN_YOL_HARITASI.pdf" target="_blank" rel="noopener">ORGM – BEP: Tüm Öğretmenler İçin Yol Haritası</a> (KDA: birey + koşul + davranış + ölçüt)</li>' +
       '<li><a href="https://meslek.meb.gov.tr/dersbilgi" target="_blank" rel="noopener">MTEGM Ders Bilgi Formları (meslek dersleri)</a></li></ul>' +
       "<h2>Önemli notlar</h2><ul><li>2026-2027’de hazırlık, 9, 10 ve 11. sınıflarda Türkiye Yüzyılı Maarif Modeli programları; 12. sınıflarda önceki programlar uygulanmaktadır (OGM).</li>" +
-      "<li>Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler liseleri için yayımlanmıştır; MTAL ve diğer okullarda haftalık ders saatinizi 2. adımda düzeltebilirsiniz.</li>" +
+      "<li>Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler liseleri için yayımlanmıştır; MTAL ve diğer okullarda haftalık ders saatinizi 2. adımda düzeltebilirsiniz (MTAL’de Türk Dili ve Edebiyatı 10-12. sınıflarda otomatik olarak 4 saat alınır).</li>" +
       "<li>Üretilen amaçlar birer taslaktır; BEP geliştirme birimi tarafından öğrencinin performansına göre gözden geçirilmelidir.</li>" +
       "<li>Veriler yalnızca bu tarayıcıda saklanır. BEP özel nitelikli kişisel veri içerir (KVKK).</li></ul>";
     $("#yardimDiyalog").showModal();
