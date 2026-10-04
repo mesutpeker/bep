@@ -1,11 +1,15 @@
 /*
  * BEP Hazırlama Aracı — Arayüz
- * Tüm veriler tarayıcının yerel deposunda (localStorage) tutulur; ağ isteği yapılmaz.
+ * Veriler yalnızca bu sekmenin oturum deposunda (sessionStorage) tutulur: sayfa yenilenince
+ * korunur, sekme/tarayıcı kapatılınca silinir. Aynı bilgisayarı kullanan sonraki kişi önceki
+ * BEP'i görmez. Ağ isteği yapılmaz.
  */
 (function () {
   "use strict";
   var BEP = window.BEP, tr = BEP.tr;
-  var DEPO = "bep-hazirlama-kayitlari-v1", OKUL_DEPO = "bep-hazirlama-okul-v1";
+  var DEPO = "bep-hazirlama-oturum-v1";
+  // Önceki sürümlerin localStorage'da kalıcı tuttuğu anahtarlar (açılışta silinir)
+  var ESKI_KALICI_DEPOLAR = ["bep-hazirlama-kayitlari-v1", "bep-hazirlama-okul-v1"];
   var durum = { kayitlar: {}, aktifId: null, adim: 1 };
 
   function $(s, k) { return (k || document).querySelector(s); }
@@ -26,9 +30,13 @@
   }
 
   /* ------------------------------------------------------------------ depolama */
+  function oturumDeposu() { try { return window.sessionStorage || null; } catch (e) { return null; } }
+  function eskiKaliciVerileriSil() {
+    try { ESKI_KALICI_DEPOLAR.forEach(function (k) { window.localStorage.removeItem(k); }); } catch (e) { /* depolama kapalı */ }
+  }
   function yukle() {
     try {
-      var j = JSON.parse(localStorage.getItem(DEPO) || "{}");
+      var j = JSON.parse((oturumDeposu() && oturumDeposu().getItem(DEPO)) || "{}");
       durum.kayitlar = j.kayitlar || {};
       durum.aktifId = j.aktifId;
     } catch (e) { durum.kayitlar = {}; }
@@ -40,26 +48,14 @@
   var kayitZamanlayici = null;
   function kaydet() {
     try {
-      localStorage.setItem(DEPO, JSON.stringify({ kayitlar: durum.kayitlar, aktifId: durum.aktifId }));
+      oturumDeposu().setItem(DEPO, JSON.stringify({ kayitlar: durum.kayitlar, aktifId: durum.aktifId }));
       var s = new Date();
-      $("#kayitDurumu").textContent = "✓ Bu bilgisayara kaydedildi " + ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2);
+      $("#kayitDurumu").textContent = "✓ Bu sekmede tutuluyor " + ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2) + " • sekme kapatılınca silinir";
     } catch (e) {
-      $("#kayitDurumu").textContent = "⚠ Kaydedilemedi (tarayıcı bu sayfada kayda izin vermiyor ya da depolama alanı dolu). Bu durumda veriler yalnızca sayfa açıkken korunur.";
+      $("#kayitDurumu").textContent = "⚠ Tarayıcı bu sayfada kayda izin vermiyor; bilgiler yalnızca sayfa açıkken korunur (yenilemeyin).";
     }
   }
   function kaydetGecikmeli() { clearTimeout(kayitZamanlayici); kayitZamanlayici = setTimeout(kaydet, 400); }
-  function okulHafizasi() { try { return JSON.parse(localStorage.getItem(OKUL_DEPO) || "{}"); } catch (e) { return {}; } }
-  function okulHafizaKaydet() {
-    var b = bep();
-    try {
-      localStorage.setItem(OKUL_DEPO, JSON.stringify({
-        okul: b.okul,
-        kurul: { baskan: b.kurul.baskan, baskanUnvan: b.kurul.baskanUnvan, rehberOgretmen: b.kurul.rehberOgretmen, tarih: b.kurul.tarih },
-        tasdik: { tarih: b.tasdik.tarih, uygulamaTarihi: b.tasdik.uygulamaTarihi },
-        ogretmen: b.ders.ogretmen
-      }));
-    } catch (e) { /* depolama kapalıysa okul bilgisi yalnızca bu oturumda kalır */ }
-  }
 
   /* ------------------------------------------------------------------ yeni kayıt */
   // Arayüzde seçilmeyen, tanıya göre otomatik belirlenen ayarlar
@@ -67,23 +63,28 @@
   // Artık toplanmayan kişisel alanlar (veri en aza indirme) ve arayüzden kaldırılan bölümler
   var KALDIRILAN_OGRENCI_ALANLARI = ["tc", "cinsiyet", "dogumTarihi", "dogumYeri", "alan", "ramKurum", "ramTarih", "ramNo", "okulDisiDestek"];
 
-  function yeniBep() {
-    var h = okulHafizasi();
+  /* Boş BEP. "onceki" verilirse aynı oturumda sıradaki öğrenci için okul ve BEP birimi
+     bilgileri (öğrenciye özgü veli ve sınıf rehber öğretmeni hariç) aktarılır. */
+  function yeniBep(onceki) {
     var b = {
       id: uid(), surum: 2, olusturma: new Date().toISOString(), guncelleme: new Date().toISOString(), egitimYili: "2026-2027",
       okul: { il: "", ilce: "", ad: "", tur: "anadolu", mudur: "", baslikSatiri2: "" },
       ogrenci: { ad: "", no: "", sinif: "9", sube: "", yetersizlik: [], yetersizlikMetni: "",
         hizmet: "Tam Zamanlı Kaynaştırma / Bütünleştirme", bepBaslangic: "2026-09-14", bepBitis: "2027-06-25", cihaz: "" },
-      ders: { id: "", planId: "", saat: "", ogretmen: h.ogretmen || "", ozel: { ad: "", sinif: "9", saat: 2, uniteler: [{ ad: "", saat: "", kazanimlar: "" }] } },
+      ders: { id: "", planId: "", saat: "", ogretmen: "", ozel: { ad: "", sinif: "9", saat: 2, uniteler: [{ ad: "", saat: "", kazanimlar: "" }] } },
       performans: { gelisim: "", ders: "", guclu: "", destek: "", davranis: "" },
       ayarlar: { destek: "", olcut: "80", ozne: "ad", sinavHaftalari: [8, 16, 25, 33], duzen: "mufredat", donemSayfa: false, kvkkNotu: true },
       plan: null, izleme: [],
       kurul: { baskan: "", baskanUnvan: "Müdür Yardımcısı", sinifRehber: "", rehberOgretmen: "", veli: "", tarih: "" },
       tasdik: { tarih: "", uygulamaTarihi: "" }
     };
-    if (h.okul) for (var k in h.okul) b.okul[k] = h.okul[k];
-    if (h.kurul) for (var j in h.kurul) if (h.kurul[j] !== undefined) b.kurul[j] = h.kurul[j];
-    if (h.tasdik) for (var t in h.tasdik) if (h.tasdik[t] !== undefined) b.tasdik[t] = h.tasdik[t];
+    if (onceki) {
+      b.okul = JSON.parse(JSON.stringify(onceki.okul || b.okul));
+      b.tasdik = JSON.parse(JSON.stringify(onceki.tasdik || b.tasdik));
+      ["baskan", "baskanUnvan", "rehberOgretmen", "tarih"].forEach(function (k) { if (onceki.kurul && onceki.kurul[k] !== undefined) b.kurul[k] = onceki.kurul[k]; });
+      b.ders.ogretmen = (onceki.ders && onceki.ders.ogretmen) || "";
+      b.ayarlar.kvkkNotu = !onceki.ayarlar || onceki.ayarlar.kvkkNotu !== false;
+    }
     performansOtomatik(b);
     return b;
   }
@@ -157,7 +158,7 @@
     var b = bep();
     b.guncelleme = new Date().toISOString();
     kaydetGecikmeli();
-    if (/^okul\.|^kurul\.(baskan|baskanUnvan|rehberOgretmen|tarih)$|^tasdik\.|^ders\.ogretmen$/.test(alan)) { okulHafizaKaydet(); ustBaslikGoster(); }
+    if (/^okul\.|^kurul\.(baskan|baskanUnvan|rehberOgretmen|tarih)$|^tasdik\.|^ders\.ogretmen$/.test(alan)) ustBaslikGoster();
     if (alan === "ders.saat") { saatUyarisiGoster(); planEtiketleriniGuncelle(); }
     if (alan === "okul.tur" && b.ders.id && b.ders.id !== "__ozel__") {
       var d = BEP.dersBul(b.ders.id), sinif = (BEP.planBul(d, b.ders.planId) || {}).sinif;
@@ -347,7 +348,7 @@
     if (!oz.uniteler || !oz.uniteler.length) oz.uniteler = [{ ad: "", saat: "", kazanimlar: "" }];
     $("#ozelUniteler").innerHTML = '<label style="max-width:220px">Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.ozel.saat"></label>' +
       oz.uniteler.map(function (u, i) {
-        return '<div class="ozel-unite"><label>Öğrenme birimi / ünite ' + (i + 1) + '<input data-alan="ders.ozel.uniteler.' + i + '.ad" placeholder="Örn. İş Sağlığı ve Güvenliği"></label>' +
+        return '<div class="ozel-unite"><label>Öğrenme birimi / ünite ' + (i + 1) + '<input data-alan="ders.ozel.uniteler.' + i + '.ad" autocomplete="off" placeholder="Örn. İş Sağlığı ve Güvenliği"></label>' +
           '<label>Ders saati<input type="number" min="1" data-alan="ders.ozel.uniteler.' + i + '.saat" placeholder="Örn. 12"></label>' +
           '<button type="button" class="sil-dugme" data-ozel-sil="' + i + '" title="Üniteyi sil">✕</button>' +
           '<label class="tam">Kazanımlar / öğrenme çıktıları (her satıra bir tane)<textarea rows="4" data-alan="ders.ozel.uniteler.' + i + '.kazanimlar" placeholder="Örn.&#10;İş kazalarının nedenlerini açıklar.&#10;Kişisel koruyucu donanımları kullanır."></textarea></label></div>';
@@ -574,6 +575,23 @@
     setTimeout(function () { window.print(); }, 50);
   });
 
+  /* ------------------------------------------------------------------ yeni BEP / temizle */
+  function bastanBasla(b, mesaj) {
+    durum.kayitlar = {}; durum.kayitlar[b.id] = b; durum.aktifId = b.id;
+    kaydet(); hepsiniCiz(); adimaGit(1);
+    bildir(mesaj);
+  }
+  $("#btnYeniBep").addEventListener("click", function () {
+    if (!confirm("Bu BEP’teki öğrenci, ders ve plan bilgileri silinecek; okul ve BEP birimi bilgileri sıradaki öğrenci için korunacak.\n\nWord belgesini indirdiyseniz devam edin.")) return;
+    bastanBasla(yeniBep(bep()), "Yeni BEP başlatıldı. Okul ve BEP birimi bilgileri korundu.");
+  });
+  $("#btnTemizle").addEventListener("click", function () {
+    if (!confirm("Bu sekmedeki tüm bilgiler (öğrenci, ders, plan, okul ve BEP birimi) silinecek.\n\nWord belgesini indirdiyseniz devam edin.")) return;
+    try { oturumDeposu().removeItem(DEPO); } catch (e) { /* depolama kapalı */ }
+    eskiKaliciVerileriSil();
+    bastanBasla(yeniBep(), "Tüm bilgiler temizlendi.");
+  });
+
   /* ------------------------------------------------------------------ yardım */
   $("#btnYardim").addEventListener("click", function () {
     var m = (window.BEP_VERI && window.BEP_VERI.meta) || { kaynaklar: [] };
@@ -595,7 +613,7 @@
       "<h2>Önemli notlar</h2><ul><li>2026-2027’de hazırlık, 9, 10 ve 11. sınıflarda Türkiye Yüzyılı Maarif Modeli programları; 12. sınıflarda önceki programlar uygulanmaktadır (OGM).</li>" +
       "<li>Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler liseleri için yayımlanmıştır; MTAL ve diğer okullarda haftalık ders saatinizi 2. adımda düzeltebilirsiniz (MTAL’de Türk Dili ve Edebiyatı 10-12. sınıflarda otomatik olarak 4 saat alınır).</li>" +
       "<li>Üretilen amaçlar birer taslaktır; BEP geliştirme birimi tarafından öğrencinin performansına göre gözden geçirilmelidir.</li>" +
-      "<li>Veriler yalnızca bu tarayıcıda saklanır. BEP özel nitelikli kişisel veri içerir (KVKK).</li></ul>";
+      "<li>Bilgiler yalnızca bu sekmede tutulur; sayfa yenilenince korunur, sekme ya da tarayıcı kapatılınca silinir. Aynı bilgisayarı sonra kullanan kişi önceki BEP’i görmez. İşiniz bitince 5. adımdaki “Tüm bilgileri temizle” düğmesini de kullanabilirsiniz. BEP özel nitelikli kişisel veri içerir (KVKK).</li></ul>";
     $("#yardimDiyalog").showModal();
   });
 
@@ -612,6 +630,7 @@
     var st = document.createElement("style");
     st.textContent = BEP.ONIZLEME_CSS;
     document.head.appendChild(st);
+    eskiKaliciVerileriSil();
     yukle();
     if (!durum.aktifId || !durum.kayitlar[durum.aktifId]) {
       var ids = Object.keys(durum.kayitlar);

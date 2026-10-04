@@ -12,7 +12,7 @@ Ortaöğretimde kaynaştırma/bütünleştirme yoluyla eğitim alan lise öğren
 - **Otomatik Doldurma:** RAM raporundaki yetersizlik türü ve seçilen derse göre mevcut performans düzeyi, eğitsel uyarlamalar, sınav uyarlamaları, BEP birimi kararları ve UDA/KDA hedefleri otomatik oluşturulur.
 - **Resmî Standartlarda Word (.docx) Çıktısı:** A4 yatay sayfa düzeninde, MEB formatına birebir uygun, tabloları bölünmeyen ve sayfalandırması hazır Word ve PDF/yazdırma çıktısı.
 - **Tek Dosyada Çevrim Dışı Kullanım:** `BEP_Hazirlama_Uygulamasi.html` tek başına açılabilir; internet veya sunucu gerektirmez, USB ile taşınabilir.
-- **Gizlilik ve KVKK:** Özel nitelikli kişisel veriler hiçbir uzak sunucuya gönderilmez; tüm kayıtlar kullanıcının kendi tarayıcısının yerel deposunda (localStorage) kalır.
+- **Gizlilik ve KVKK:** Özel nitelikli kişisel veriler hiçbir uzak sunucuya gönderilmez; bilgiler yalnızca açık sekmenin oturum deposunda (sessionStorage) tutulur ve sekme kapatılınca silinir; aynı bilgisayarı sonra kullanan kişi önceki BEP'i görmez.
 
 ---
 

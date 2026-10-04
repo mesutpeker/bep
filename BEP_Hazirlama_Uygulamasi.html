@@ -232,18 +232,18 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
       <h2>Öğrenci</h2>
       <div class="izgara">
         <label class="genis">Adı Soyadı<input data-alan="ogrenci.ad" placeholder="Örn. Deniz Yılmaz" autocomplete="off"></label>
-        <label>Okul No<input data-alan="ogrenci.no" inputmode="numeric"></label>
+        <label>Okul No<input data-alan="ogrenci.no" inputmode="numeric" autocomplete="off"></label>
         <label>Sınıf
           <select data-alan="ogrenci.sinif">
             <option value="H">Hazırlık</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
           </select>
         </label>
-        <label>Şube<input data-alan="ogrenci.sube" maxlength="4" placeholder="A"></label>
+        <label>Şube<input data-alan="ogrenci.sube" maxlength="4" placeholder="A" autocomplete="off"></label>
       </div>
       <fieldset class="yetersizlik">
         <legend>Yetersizlik Türü / Eğitsel Tanı <small>(RAM raporundaki tanı; birden fazla seçilebilir — ilk seçilen birincil kabul edilir)</small></legend>
         <div id="yetersizlikListesi" class="secim-izgarasi"></div>
-        <label id="yetersizlikDigerKutu" hidden>Diğer tanı<input data-alan="ogrenci.yetersizlikMetni"></label>
+        <label id="yetersizlikDigerKutu" hidden>Diğer tanı<input data-alan="ogrenci.yetersizlikMetni" autocomplete="off"></label>
       </fieldset>
       <div class="izgara">
         <label class="genis">Önerilen Hizmet / Kurul Kararı
@@ -254,9 +254,9 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
             <option>Evde / Hastanede Eğitim</option>
           </select>
         </label>
-        <label>BEP Başlangıç<input type="date" data-alan="ogrenci.bepBaslangic"></label>
-        <label>BEP Bitiş<input type="date" data-alan="ogrenci.bepBitis"></label>
-        <label class="genis">Kullandığı Destek Materyali / Cihaz<input data-alan="ogrenci.cihaz" placeholder="Örn. işitme cihazı, büyüteç, tablet (yoksa boş bırakın)"></label>
+        <label>BEP Başlangıç<input type="date" data-alan="ogrenci.bepBaslangic" autocomplete="off"></label>
+        <label>BEP Bitiş<input type="date" data-alan="ogrenci.bepBitis" autocomplete="off"></label>
+        <label class="genis">Kullandığı Destek Materyali / Cihaz<input data-alan="ogrenci.cihaz" placeholder="Örn. işitme cihazı, büyüteç, tablet (yoksa boş bırakın)" autocomplete="off"></label>
       </div>
     </div>
   </section>
@@ -282,7 +282,7 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
         <label class="genis">Ders<select id="dersSec"></select></label>
         <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
         <label class="genis">Plan (okul türü)<select id="planSec"></select></label>
-        <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir"></label>
+        <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir" autocomplete="off"></label>
       </div>
       <div id="saatUyari" class="uyari-kutusu" hidden></div>
       <div id="planBilgi" class="bilgi-kutusu"></div>
@@ -291,7 +291,7 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
       <h2>Meslek Dersi / Listede Olmayan Ders</h2>
       <p class="aciklama">Mesleki ve Teknik Eğitim Genel Müdürlüğü meslek dersleri için haftalık çerçeve plan yayımlamaz; öğrenme birimleri ve kazanımlar <a href="https://meslek.meb.gov.tr/dersbilgi" target="_blank" rel="noopener">Ders Bilgi Formlarında (meslek.meb.gov.tr)</a> yer alır. Öğrenme birimlerini ve kazanımlarını buraya yazın/yapıştırın; araç bunları 36 haftaya ders saatlerine göre dağıtır.</p>
       <div class="izgara">
-        <label class="genis">Dersin Adı<input data-alan="ders.ozel.ad" placeholder="Örn. Mesleki Gelişim Atölyesi"></label>
+        <label class="genis">Dersin Adı<input data-alan="ders.ozel.ad" placeholder="Örn. Mesleki Gelişim Atölyesi" autocomplete="off"></label>
         <label>Sınıf<select data-alan="ders.ozel.sinif"><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
       </div>
       <div id="ozelUniteler"></div>
@@ -326,34 +326,34 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
   <section class="panel" data-panel="4" hidden>
     <div class="panel-baslik">
       <h1>Okul ve BEP Geliştirme Birimi</h1>
-      <p>Okul ve birim bilgileri bir sonraki BEP için otomatik hatırlanır. Bilgiler yalnızca bu bilgisayarda (tarayıcıda) saklanır; hiçbir yere gönderilmez.</p>
+      <p>Bilgiler yalnızca bu sekmede tutulur, hiçbir yere gönderilmez ve sekme kapatılınca silinir. Aynı oturumda “Sıradaki öğrenci için yeni BEP” ile devam ederseniz okul ve birim bilgileri korunur.</p>
     </div>
     <div class="kart">
       <h2>Okul Bilgileri</h2>
       <div class="izgara">
-        <label>İl<input data-alan="okul.il" placeholder="Örn. Karaman"></label>
-        <label>İlçe<input data-alan="okul.ilce" placeholder="Örn. Merkez"></label>
-        <label class="genis">Okul Adı<input data-alan="okul.ad" placeholder="Örn. … Mesleki ve Teknik Anadolu Lisesi"></label>
-        <label>Okul Müdürü<input data-alan="okul.mudur" placeholder="Adı Soyadı"></label>
+        <label>İl<input data-alan="okul.il" placeholder="Örn. Karaman" autocomplete="off"></label>
+        <label>İlçe<input data-alan="okul.ilce" placeholder="Örn. Merkez" autocomplete="off"></label>
+        <label class="genis">Okul Adı<input data-alan="okul.ad" placeholder="Örn. … Mesleki ve Teknik Anadolu Lisesi" autocomplete="off"></label>
+        <label>Okul Müdürü<input data-alan="okul.mudur" placeholder="Adı Soyadı" autocomplete="off"></label>
       </div>
       <div class="bilgi-kutusu" id="ustBaslikOnizleme"></div>
       <details class="ek-ayar"><summary>Belge üst başlığını elle değiştir</summary>
-        <label>2. satır (Valilik/Kaymakamlık)<input data-alan="okul.baslikSatiri2" placeholder="Boş bırakılırsa il/ilçeye göre otomatik yazılır"></label>
+        <label>2. satır (Valilik/Kaymakamlık)<input data-alan="okul.baslikSatiri2" placeholder="Boş bırakılırsa il/ilçeye göre otomatik yazılır" autocomplete="off"></label>
       </details>
     </div>
 
     <div class="kart">
       <h2>BEP Geliştirme Birimi ve Tasdik <small>(ÖEHY Md. 47)</small></h2>
       <div class="izgara">
-        <label>BEP Birim Başkanı<input data-alan="kurul.baskan" placeholder="Adı Soyadı"></label>
-        <label>Başkanın Unvanı<input data-alan="kurul.baskanUnvan" placeholder="Müdür Yardımcısı"></label>
-        <label>Ders Öğretmeni<input data-alan="ders.ogretmen" placeholder="BEP hazırlanan dersin öğretmeni"></label>
-        <label>Rehber Öğretmen / Psikolojik Danışman<input data-alan="kurul.rehberOgretmen" placeholder="Adı Soyadı"></label>
-        <label>Sınıf Rehber Öğretmeni<input data-alan="kurul.sinifRehber" placeholder="Öğrencinin sınıf rehber öğretmeni"></label>
+        <label>BEP Birim Başkanı<input data-alan="kurul.baskan" placeholder="Adı Soyadı" autocomplete="off"></label>
+        <label>Başkanın Unvanı<input data-alan="kurul.baskanUnvan" placeholder="Müdür Yardımcısı" autocomplete="off"></label>
+        <label>Ders Öğretmeni<input data-alan="ders.ogretmen" placeholder="BEP hazırlanan dersin öğretmeni" autocomplete="off"></label>
+        <label>Rehber Öğretmen / Psikolojik Danışman<input data-alan="kurul.rehberOgretmen" placeholder="Adı Soyadı" autocomplete="off"></label>
+        <label>Sınıf Rehber Öğretmeni<input data-alan="kurul.sinifRehber" placeholder="Öğrencinin sınıf rehber öğretmeni" autocomplete="off"></label>
         <label>Öğrenci Velisi<input data-alan="kurul.veli" placeholder="Anne / Baba / Vasi" autocomplete="off"></label>
-        <label>Birim Toplantı / İmza Tarihi<input type="date" data-alan="kurul.tarih"></label>
-        <label>Uygulamaya Başlama Tarihi<input type="date" data-alan="tasdik.uygulamaTarihi"></label>
-        <label>Müdür Onay Tarihi<input type="date" data-alan="tasdik.tarih"></label>
+        <label>Birim Toplantı / İmza Tarihi<input type="date" data-alan="kurul.tarih" autocomplete="off"></label>
+        <label>Uygulamaya Başlama Tarihi<input type="date" data-alan="tasdik.uygulamaTarihi" autocomplete="off"></label>
+        <label>Müdür Onay Tarihi<input type="date" data-alan="tasdik.tarih" autocomplete="off"></label>
         <label class="onay tam"><input type="checkbox" data-alan="ayarlar.kvkkNotu"> Belgeye KVKK uyarı notunu ekle</label>
       </div>
       <p class="aciklama">Boş bırakılan ad ve tarihler belgede elle doldurulmak üzere noktalı satır olarak bırakılır. Veli ve sınıf rehber öğretmeni her öğrenci için ayrıca yazılır.</p>
@@ -372,6 +372,14 @@ table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border
       <label class="olcek">Önizleme boyutu <input type="range" id="olcekAyar" min="35" max="100" value="60"></label>
     </div>
     <div id="kontrolListesi" class="kontrol-listesi"></div>
+    <div class="kart bitis-kart">
+      <h2>Bitirdiniz mi?</h2>
+      <p class="aciklama">Bilgiler yalnızca bu sekmede tutulur ve sekme kapatılınca silinir. Word belgesini indirdikten sonra sıradaki öğrenciye geçebilir ya da bilgisayarı başkasına bırakmadan önce tüm bilgileri temizleyebilirsiniz.</p>
+      <div class="eylem-satiri">
+        <button type="button" class="dugme ikincil" id="btnYeniBep">Sıradaki öğrenci için yeni BEP</button>
+        <button type="button" class="dugme tehlike-cizgi" id="btnTemizle">Tüm bilgileri temizle</button>
+      </div>
+    </div>
     <div id="onizleme" class="onizleme-kapsayici"></div>
   </section>
 </main>
@@ -3025,12 +3033,16 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
 /* src/js/app.js */
 /*
  * BEP Hazırlama Aracı — Arayüz
- * Tüm veriler tarayıcının yerel deposunda (localStorage) tutulur; ağ isteği yapılmaz.
+ * Veriler yalnızca bu sekmenin oturum deposunda (sessionStorage) tutulur: sayfa yenilenince
+ * korunur, sekme/tarayıcı kapatılınca silinir. Aynı bilgisayarı kullanan sonraki kişi önceki
+ * BEP'i görmez. Ağ isteği yapılmaz.
  */
 (function () {
   "use strict";
   var BEP = window.BEP, tr = BEP.tr;
-  var DEPO = "bep-hazirlama-kayitlari-v1", OKUL_DEPO = "bep-hazirlama-okul-v1";
+  var DEPO = "bep-hazirlama-oturum-v1";
+  // Önceki sürümlerin localStorage'da kalıcı tuttuğu anahtarlar (açılışta silinir)
+  var ESKI_KALICI_DEPOLAR = ["bep-hazirlama-kayitlari-v1", "bep-hazirlama-okul-v1"];
   var durum = { kayitlar: {}, aktifId: null, adim: 1 };
 
   function $(s, k) { return (k || document).querySelector(s); }
@@ -3051,9 +3063,13 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
   }
 
   /* ------------------------------------------------------------------ depolama */
+  function oturumDeposu() { try { return window.sessionStorage || null; } catch (e) { return null; } }
+  function eskiKaliciVerileriSil() {
+    try { ESKI_KALICI_DEPOLAR.forEach(function (k) { window.localStorage.removeItem(k); }); } catch (e) { /* depolama kapalı */ }
+  }
   function yukle() {
     try {
-      var j = JSON.parse(localStorage.getItem(DEPO) || "{}");
+      var j = JSON.parse((oturumDeposu() && oturumDeposu().getItem(DEPO)) || "{}");
       durum.kayitlar = j.kayitlar || {};
       durum.aktifId = j.aktifId;
     } catch (e) { durum.kayitlar = {}; }
@@ -3065,26 +3081,14 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
   var kayitZamanlayici = null;
   function kaydet() {
     try {
-      localStorage.setItem(DEPO, JSON.stringify({ kayitlar: durum.kayitlar, aktifId: durum.aktifId }));
+      oturumDeposu().setItem(DEPO, JSON.stringify({ kayitlar: durum.kayitlar, aktifId: durum.aktifId }));
       var s = new Date();
-      $("#kayitDurumu").textContent = "✓ Bu bilgisayara kaydedildi " + ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2);
+      $("#kayitDurumu").textContent = "✓ Bu sekmede tutuluyor " + ("0" + s.getHours()).slice(-2) + ":" + ("0" + s.getMinutes()).slice(-2) + " • sekme kapatılınca silinir";
     } catch (e) {
-      $("#kayitDurumu").textContent = "⚠ Kaydedilemedi (tarayıcı bu sayfada kayda izin vermiyor ya da depolama alanı dolu). Bu durumda veriler yalnızca sayfa açıkken korunur.";
+      $("#kayitDurumu").textContent = "⚠ Tarayıcı bu sayfada kayda izin vermiyor; bilgiler yalnızca sayfa açıkken korunur (yenilemeyin).";
     }
   }
   function kaydetGecikmeli() { clearTimeout(kayitZamanlayici); kayitZamanlayici = setTimeout(kaydet, 400); }
-  function okulHafizasi() { try { return JSON.parse(localStorage.getItem(OKUL_DEPO) || "{}"); } catch (e) { return {}; } }
-  function okulHafizaKaydet() {
-    var b = bep();
-    try {
-      localStorage.setItem(OKUL_DEPO, JSON.stringify({
-        okul: b.okul,
-        kurul: { baskan: b.kurul.baskan, baskanUnvan: b.kurul.baskanUnvan, rehberOgretmen: b.kurul.rehberOgretmen, tarih: b.kurul.tarih },
-        tasdik: { tarih: b.tasdik.tarih, uygulamaTarihi: b.tasdik.uygulamaTarihi },
-        ogretmen: b.ders.ogretmen
-      }));
-    } catch (e) { /* depolama kapalıysa okul bilgisi yalnızca bu oturumda kalır */ }
-  }
 
   /* ------------------------------------------------------------------ yeni kayıt */
   // Arayüzde seçilmeyen, tanıya göre otomatik belirlenen ayarlar
@@ -3092,23 +3096,28 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
   // Artık toplanmayan kişisel alanlar (veri en aza indirme) ve arayüzden kaldırılan bölümler
   var KALDIRILAN_OGRENCI_ALANLARI = ["tc", "cinsiyet", "dogumTarihi", "dogumYeri", "alan", "ramKurum", "ramTarih", "ramNo", "okulDisiDestek"];
 
-  function yeniBep() {
-    var h = okulHafizasi();
+  /* Boş BEP. "onceki" verilirse aynı oturumda sıradaki öğrenci için okul ve BEP birimi
+     bilgileri (öğrenciye özgü veli ve sınıf rehber öğretmeni hariç) aktarılır. */
+  function yeniBep(onceki) {
     var b = {
       id: uid(), surum: 2, olusturma: new Date().toISOString(), guncelleme: new Date().toISOString(), egitimYili: "2026-2027",
       okul: { il: "", ilce: "", ad: "", tur: "anadolu", mudur: "", baslikSatiri2: "" },
       ogrenci: { ad: "", no: "", sinif: "9", sube: "", yetersizlik: [], yetersizlikMetni: "",
         hizmet: "Tam Zamanlı Kaynaştırma / Bütünleştirme", bepBaslangic: "2026-09-14", bepBitis: "2027-06-25", cihaz: "" },
-      ders: { id: "", planId: "", saat: "", ogretmen: h.ogretmen || "", ozel: { ad: "", sinif: "9", saat: 2, uniteler: [{ ad: "", saat: "", kazanimlar: "" }] } },
+      ders: { id: "", planId: "", saat: "", ogretmen: "", ozel: { ad: "", sinif: "9", saat: 2, uniteler: [{ ad: "", saat: "", kazanimlar: "" }] } },
       performans: { gelisim: "", ders: "", guclu: "", destek: "", davranis: "" },
       ayarlar: { destek: "", olcut: "80", ozne: "ad", sinavHaftalari: [8, 16, 25, 33], duzen: "mufredat", donemSayfa: false, kvkkNotu: true },
       plan: null, izleme: [],
       kurul: { baskan: "", baskanUnvan: "Müdür Yardımcısı", sinifRehber: "", rehberOgretmen: "", veli: "", tarih: "" },
       tasdik: { tarih: "", uygulamaTarihi: "" }
     };
-    if (h.okul) for (var k in h.okul) b.okul[k] = h.okul[k];
-    if (h.kurul) for (var j in h.kurul) if (h.kurul[j] !== undefined) b.kurul[j] = h.kurul[j];
-    if (h.tasdik) for (var t in h.tasdik) if (h.tasdik[t] !== undefined) b.tasdik[t] = h.tasdik[t];
+    if (onceki) {
+      b.okul = JSON.parse(JSON.stringify(onceki.okul || b.okul));
+      b.tasdik = JSON.parse(JSON.stringify(onceki.tasdik || b.tasdik));
+      ["baskan", "baskanUnvan", "rehberOgretmen", "tarih"].forEach(function (k) { if (onceki.kurul && onceki.kurul[k] !== undefined) b.kurul[k] = onceki.kurul[k]; });
+      b.ders.ogretmen = (onceki.ders && onceki.ders.ogretmen) || "";
+      b.ayarlar.kvkkNotu = !onceki.ayarlar || onceki.ayarlar.kvkkNotu !== false;
+    }
     performansOtomatik(b);
     return b;
   }
@@ -3182,7 +3191,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     var b = bep();
     b.guncelleme = new Date().toISOString();
     kaydetGecikmeli();
-    if (/^okul\.|^kurul\.(baskan|baskanUnvan|rehberOgretmen|tarih)$|^tasdik\.|^ders\.ogretmen$/.test(alan)) { okulHafizaKaydet(); ustBaslikGoster(); }
+    if (/^okul\.|^kurul\.(baskan|baskanUnvan|rehberOgretmen|tarih)$|^tasdik\.|^ders\.ogretmen$/.test(alan)) ustBaslikGoster();
     if (alan === "ders.saat") { saatUyarisiGoster(); planEtiketleriniGuncelle(); }
     if (alan === "okul.tur" && b.ders.id && b.ders.id !== "__ozel__") {
       var d = BEP.dersBul(b.ders.id), sinif = (BEP.planBul(d, b.ders.planId) || {}).sinif;
@@ -3372,7 +3381,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     if (!oz.uniteler || !oz.uniteler.length) oz.uniteler = [{ ad: "", saat: "", kazanimlar: "" }];
     $("#ozelUniteler").innerHTML = '<label style="max-width:220px">Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.ozel.saat"></label>' +
       oz.uniteler.map(function (u, i) {
-        return '<div class="ozel-unite"><label>Öğrenme birimi / ünite ' + (i + 1) + '<input data-alan="ders.ozel.uniteler.' + i + '.ad" placeholder="Örn. İş Sağlığı ve Güvenliği"></label>' +
+        return '<div class="ozel-unite"><label>Öğrenme birimi / ünite ' + (i + 1) + '<input data-alan="ders.ozel.uniteler.' + i + '.ad" autocomplete="off" placeholder="Örn. İş Sağlığı ve Güvenliği"></label>' +
           '<label>Ders saati<input type="number" min="1" data-alan="ders.ozel.uniteler.' + i + '.saat" placeholder="Örn. 12"></label>' +
           '<button type="button" class="sil-dugme" data-ozel-sil="' + i + '" title="Üniteyi sil">✕</button>' +
           '<label class="tam">Kazanımlar / öğrenme çıktıları (her satıra bir tane)<textarea rows="4" data-alan="ders.ozel.uniteler.' + i + '.kazanimlar" placeholder="Örn.&#10;İş kazalarının nedenlerini açıklar.&#10;Kişisel koruyucu donanımları kullanır."></textarea></label></div>';
@@ -3599,6 +3608,23 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     setTimeout(function () { window.print(); }, 50);
   });
 
+  /* ------------------------------------------------------------------ yeni BEP / temizle */
+  function bastanBasla(b, mesaj) {
+    durum.kayitlar = {}; durum.kayitlar[b.id] = b; durum.aktifId = b.id;
+    kaydet(); hepsiniCiz(); adimaGit(1);
+    bildir(mesaj);
+  }
+  $("#btnYeniBep").addEventListener("click", function () {
+    if (!confirm("Bu BEP’teki öğrenci, ders ve plan bilgileri silinecek; okul ve BEP birimi bilgileri sıradaki öğrenci için korunacak.\n\nWord belgesini indirdiyseniz devam edin.")) return;
+    bastanBasla(yeniBep(bep()), "Yeni BEP başlatıldı. Okul ve BEP birimi bilgileri korundu.");
+  });
+  $("#btnTemizle").addEventListener("click", function () {
+    if (!confirm("Bu sekmedeki tüm bilgiler (öğrenci, ders, plan, okul ve BEP birimi) silinecek.\n\nWord belgesini indirdiyseniz devam edin.")) return;
+    try { oturumDeposu().removeItem(DEPO); } catch (e) { /* depolama kapalı */ }
+    eskiKaliciVerileriSil();
+    bastanBasla(yeniBep(), "Tüm bilgiler temizlendi.");
+  });
+
   /* ------------------------------------------------------------------ yardım */
   $("#btnYardim").addEventListener("click", function () {
     var m = (window.BEP_VERI && window.BEP_VERI.meta) || { kaynaklar: [] };
@@ -3620,7 +3646,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
       "<h2>Önemli notlar</h2><ul><li>2026-2027’de hazırlık, 9, 10 ve 11. sınıflarda Türkiye Yüzyılı Maarif Modeli programları; 12. sınıflarda önceki programlar uygulanmaktadır (OGM).</li>" +
       "<li>Resmî çerçeve planlar Anadolu/Fen/Sosyal Bilimler liseleri için yayımlanmıştır; MTAL ve diğer okullarda haftalık ders saatinizi 2. adımda düzeltebilirsiniz (MTAL’de Türk Dili ve Edebiyatı 10-12. sınıflarda otomatik olarak 4 saat alınır).</li>" +
       "<li>Üretilen amaçlar birer taslaktır; BEP geliştirme birimi tarafından öğrencinin performansına göre gözden geçirilmelidir.</li>" +
-      "<li>Veriler yalnızca bu tarayıcıda saklanır. BEP özel nitelikli kişisel veri içerir (KVKK).</li></ul>";
+      "<li>Bilgiler yalnızca bu sekmede tutulur; sayfa yenilenince korunur, sekme ya da tarayıcı kapatılınca silinir. Aynı bilgisayarı sonra kullanan kişi önceki BEP’i görmez. İşiniz bitince 5. adımdaki “Tüm bilgileri temizle” düğmesini de kullanabilirsiniz. BEP özel nitelikli kişisel veri içerir (KVKK).</li></ul>";
     $("#yardimDiyalog").showModal();
   });
 
@@ -3637,6 +3663,7 @@ window.BEP_VERI = {"meta":{"egitimYili":"2026-2027","olusturma":"2026-10-04","ka
     var st = document.createElement("style");
     st.textContent = BEP.ONIZLEME_CSS;
     document.head.appendChild(st);
+    eskiKaliciVerileriSil();
     yukle();
     if (!durum.aktifId || !durum.kayitlar[durum.aktifId]) {
       var ids = Object.keys(durum.kayitlar);
