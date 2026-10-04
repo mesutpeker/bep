@@ -158,7 +158,7 @@
     b.guncelleme = new Date().toISOString();
     kaydetGecikmeli();
     if (/^okul\.|^kurul\.(baskan|baskanUnvan|rehberOgretmen|tarih)$|^tasdik\.|^ders\.ogretmen$/.test(alan)) { okulHafizaKaydet(); ustBaslikGoster(); }
-    if (alan === "ders.saat") saatUyarisiGoster();
+    if (alan === "ders.saat") { saatUyarisiGoster(); planEtiketleriniGuncelle(); }
     if (alan === "okul.tur" && b.ders.id && b.ders.id !== "__ozel__") {
       var d = BEP.dersBul(b.ders.id), sinif = (BEP.planBul(d, b.ders.planId) || {}).sinif;
       var oneri = BEP.planOner(d, sinif, b.okul.tur);
@@ -270,8 +270,7 @@
       $("#sinifSec").innerHTML = siniflar.map(function (s) { return '<option value="' + s + '"' + (s === sinif ? " selected" : "") + ">" + (s === "S" ? "Seçmeli ders" : BEP.sinifAdi(s)) + "</option>"; }).join("");
       var planlar = ders.planlar.filter(function (p) { return p.sinif === sinif; });
       $("#planSec").innerHTML = planlar.map(function (p) {
-        var cozulmus = BEP.planBul(ders, p.id);
-        return '<option value="' + p.id + '"' + (p.id === d.planId ? " selected" : "") + ">" + esc(p.etiket + " – " + programEtiketi(cozulmus) + " – haftalık " + cozulmus.saat + " saat") + "</option>";
+        return '<option value="' + p.id + '"' + (p.id === d.planId ? " selected" : "") + ">" + esc(planSecenekEtiketi(b, ders, p)) + "</option>";
       }).join("");
     } else {
       $("#sinifSec").innerHTML = ""; $("#planSec").innerHTML = "";
@@ -281,6 +280,22 @@
     formuDoldur($('[data-panel="2"]'));
     planBilgiCiz(ctx);
     saatUyarisiGoster();
+  }
+  /* Plan seçeneği etiketi: öğrenciye uygulanacak haftalık saati gösterir
+     (elle girilen saat > okul türünün resmî saati > çerçeve planın saati) */
+  function planSecenekEtiketi(b, ders, p) {
+    var cozulmus = BEP.planBul(ders, p.id);
+    var saat = parseInt(b.ders.saat, 10) || BEP.okulTuruSaati({ okul: b.okul, ders: { id: b.ders.id, planId: p.id } }) || cozulmus.saat;
+    return p.etiket + " – " + programEtiketi(cozulmus) + " – haftalık " + saat + " saat" +
+      (saat !== cozulmus.saat ? " (çerçeve plan: " + cozulmus.saat + " saat)" : "");
+  }
+  function planEtiketleriniGuncelle() {
+    var b = bep(), ders = BEP.dersBul(b.ders.id);
+    if (!ders) return;
+    $$("#planSec option").forEach(function (o) {
+      var p = BEP.planBul(ders, o.value);
+      if (p) o.textContent = planSecenekEtiketi(b, ders, p);
+    });
   }
   function saatUyarisiGoster() {
     var b = bep(), kutu = $("#saatUyari");
