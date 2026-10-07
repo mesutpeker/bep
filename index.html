@@ -93,7 +93,9 @@
         <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
         <label class="genis">Plan kaynağı<select id="planSec"></select></label>
         <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir" autocomplete="off"></label>
+        <label class="onay tam" id="hazirlikKutu" hidden><input type="checkbox" data-alan="okul.hazirlikSinifi"> Okulda hazırlık sınıfı var (İngilizce için “hazırlık sınıfı bulunan liseler” planı önerilir)</label>
       </div>
+      <div id="sinifUyari" class="uyari-kutusu" hidden></div>
       <div id="saatUyari" class="uyari-kutusu" hidden></div>
       <div id="planBilgi" class="bilgi-kutusu"></div>
     </div>
@@ -122,9 +124,10 @@
       </div>
       <div id="otomatikAyarlar" class="bilgi-kutusu"></div>
       <div class="izgara">
-        <label class="genis">BEP Yazılı Sınav Haftaları <small>(dönem başına 2 sınav – OKY Md. 45/1-a)</small>
+        <div class="genis sinav-grup" role="group" aria-labelledby="sinavBaslik">
+          <span class="etiket" id="sinavBaslik">BEP Yazılı Sınav Haftaları <small id="sinavAciklama">(dönem başına 2 sınav – OKY Md. 45/1-a)</small></span>
           <span class="sinav-girisleri" id="sinavHaftalari"></span>
-        </label>
+        </div>
         <label class="onay"><input type="checkbox" data-alan="ayarlar.donemSayfa"> 2. dönemi yeni sayfada başlat</label>
       </div>
       <div class="eylem-satiri">

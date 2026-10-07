@@ -20,7 +20,7 @@ Ortaöğretimde kaynaştırma/bütünleştirme yoluyla eğitim alan lise öğren
 
 1. **Öğrenci:** Öğrenci ve tanı bilgileri girilir.
 2. **Ders:** Okul türü, ders ve sınıf seçilir; resmî çerçeve plan otomatik eşleştirilir.
-3. **Yıllık Plan:** 37 haftalık ünitelendirilmiş BEP planı ve hedefleri oluşturulur, düzenlenebilir.
+3. **Yıllık Plan:** 37 haftalık ünitelendirilmiş BEP planı oluşturulur; her UDA'nın cümlesi ilk haftasında yer alır, KDA'lar basamaklı ilerler; tümü düzenlenebilir.
 4. **Okul ve BEP Birimi:** Okul ve kurul üyeleri girilir (bilgiler bir sonraki BEP için otomatik hatırlanır).
 5. **Önizle ve İndir:** Önizleme yapılır, tek tıkla Word (.docx) indirilir veya yazdırılır.
 
@@ -58,5 +58,7 @@ python3 tools/paketle.py
 ```
 
 `paketle.py`, `index.html`'deki CSS/JS bağlantılarının `?v=` sürüm ekini dosya içeriklerine göre de günceller. Böylece web sürümünde tarayıcılar önbellekteki eski dosyaları yeni sayfayla karıştırmaz; yayına almadan önce mutlaka çalıştırın.
+
+Testler: `node tools/toplu_test.js` (tüm planlar × yetersizlik türleri, UDA/KDA yapısı), `node tools/veri_denetle.js` (veri kalitesi) ve `node tools/tarayici_test.js` (Playwright ile gerçek tarayıcıda arayüz, Word ve Yazdır/PDF). GitHub Actions bu testleri her gönderimde çalıştırır; ayrıca veri setinin Excel kaynaklarından birebir üretildiğini ve tek dosyalık paketin güncel olduğunu denetler.
 
 Gereksinimler: Python 3 (`openpyxl`), Node.js (testler için). Ayrıntılı yasal ve teknik bilgi için [BENIOKU.md](BENIOKU.md) dosyasına bakabilirsiniz.

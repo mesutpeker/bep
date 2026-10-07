@@ -65,7 +65,7 @@ main { max-width: 1280px; margin: 0 auto; padding: 1.25rem; }
 .izgara .tam { grid-column: 1 / -1; }
 @media (max-width: 900px) { .izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .izgara { grid-template-columns: 1fr; } .izgara .genis { grid-column: auto; } }
-label { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; font-weight: 600; color: var(--yazi-2); }
+label, .sinav-grup { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; font-weight: 600; color: var(--yazi-2); }
 label.onay { flex-direction: row; align-items: center; gap: .5rem; font-weight: 500; color: var(--yazi); }
 input, select, textarea { font: inherit; font-size: .95rem; color: var(--yazi); background: #fff; border: 1px solid var(--cizgi); border-radius: 8px; padding: .5rem .6rem; width: 100%; min-width: 0; }
 input[type=checkbox], input[type=radio] { width: 18px; height: 18px; accent-color: var(--lacivert); }
@@ -105,24 +105,30 @@ details.ek-ayar label { margin-top: .5rem; }
 
 /* Plan düzenleyici */
 .ayarlar-kart .izgara { align-items: end; }
-.sinav-girisleri { display: flex; gap: .4rem; }
+.sinav-girisleri { display: flex; gap: .4rem 1rem; flex-wrap: wrap; }
+.sinav-donem { display: inline-flex; align-items: center; gap: .35rem; }
+.sinav-donem small { color: var(--yazi-3); font-weight: 500; white-space: nowrap; }
 .sinav-girisleri input { width: 68px; }
 .plan-duzenleyici { background: #fff; border: 1px solid var(--cizgi); border-radius: var(--yaricap); box-shadow: var(--golge); overflow: auto; max-height: 72vh; }
 .plan-duzenleyici:empty { display: none; }
 table.plan { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 1150px; font-size: .82rem; }
-table.plan th { position: sticky; top: 0; z-index: 2; background: var(--lacivert); color: #fff; text-align: left; padding: .45rem .5rem; font-size: .75rem; letter-spacing: .2px; }
-table.plan td { border-bottom: 1px solid var(--cizgi-2); border-right: 1px solid var(--cizgi-2); padding: .3rem; vertical-align: top; }
-table.plan tr.ay-sonu td { border-bottom: 3px solid var(--lacivert); }
-table.plan td.hafta-hucre { width: 98px; background: #f8fafc; font-weight: 700; color: var(--lacivert); font-size: .78rem; }
-table.plan td.hafta-hucre small { display: block; font-weight: 500; color: var(--yazi-2); }
-table.plan td.hafta-hucre .ay { display: inline-block; margin-bottom: .2rem; padding: 0 .35rem; border-radius: 4px; background: var(--mavi-acik); font-size: .68rem; }
-table.plan td.hafta-hucre .sinav-rozet { display: inline-block; margin-top: .25rem; background: #fde68a; color: #7c2d12; font-size: .65rem; padding: 0 .3rem; border-radius: 4px; }
+table.plan thead th { position: sticky; top: 0; z-index: 2; background: var(--lacivert); color: #fff; text-align: left; padding: .45rem .5rem; font-size: .75rem; letter-spacing: .2px; }
+table.plan td, table.plan tbody th { border-bottom: 1px solid var(--cizgi-2); border-right: 1px solid var(--cizgi-2); padding: .3rem; vertical-align: top; text-align: left; }
+table.plan tr.ay-sonu td, table.plan tr.ay-sonu th { border-bottom: 3px solid var(--lacivert); }
+table.plan .hafta-hucre { width: 98px; background: #f8fafc; font-weight: 700; color: var(--lacivert); font-size: .78rem; }
+table.plan .hafta-hucre small { display: block; font-weight: 500; color: var(--yazi-2); }
+table.plan .hafta-hucre .ay { display: inline-block; margin-bottom: .2rem; padding: 0 .35rem; border-radius: 4px; background: var(--mavi-acik); font-size: .68rem; }
+table.plan .hafta-hucre .sinav-rozet { display: inline-block; margin-top: .25rem; background: #fde68a; color: #7c2d12; font-size: .65rem; padding: 0 .3rem; border-radius: 4px; }
 table.plan textarea { font-size: .8rem; padding: .35rem .4rem; border-color: transparent; background: transparent; min-height: 64px; resize: vertical; border-radius: 6px; }
 table.plan textarea:hover { border-color: var(--cizgi); background: #fff; }
 table.plan textarea:focus { background: #fff; }
 table.plan textarea.duzenlendi { background: #fffbea; border-color: #f6d77f; }
 table.plan tr.tatil td { background: var(--amber-acik); color: var(--amber); font-weight: 700; text-align: center; padding: .5rem; }
-table.plan tr.ozel td.hafta-hucre { background: #eef6f1; }
+table.plan tr.ozel .hafta-hucre { background: #eef6f1; }
+table.plan tr.bep-disi td, table.plan tr.bep-disi .hafta-hucre { background: #f1f5f9; color: var(--yazi-3); }
+table.plan .uda-kutu { display: block; margin-bottom: .35rem; padding: .3rem .35rem; border-left: 3px solid var(--mavi); background: var(--mavi-acik); border-radius: 6px; font-size: .74rem; color: var(--lacivert); }
+table.plan .uda-kutu span { font-weight: 700; }
+table.plan .uda-kutu textarea { margin-top: .15rem; min-height: 48px; font-style: italic; color: var(--lacivert); }
 table.plan .kda-araclar { display: flex; gap: .3rem; margin-top: .2rem; }
 table.plan .kda-araclar select { font-size: .74rem; padding: .2rem .3rem; border-radius: 6px; color: var(--yazi-2); }
 .sutun-genislik-unite { width: 15%; } .sutun-genislik-kda { width: 30%; }

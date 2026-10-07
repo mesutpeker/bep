@@ -10,3 +10,6 @@ Thumbs.db
 # Yeniden üretilebilir ara dosyalar
 tools/ara/
 node_modules/
+
+# Python önbelleği
+__pycache__/

@@ -20,12 +20,6 @@
   BEP.RENK = R;
 
   var DUZENLER = {
-    ornek: {
-      ad: "Örnek belge düzeni (araç-gereç ayrı sütun)",
-      genislikler: [850, 680, 1191, 510, 2154, 3798, 1814, 1701, 2154],
-      basliklar: function (prog) { return ["AY", "HAFTA", "TARİH", "SAAT", "ÜNİTE / TEMA VE KONULAR", prog === "2018" ? "BEP KAZANIMLARI (UDA / KDA)" : "BEP AMAÇLARI (UDA / KDA)", "ÖĞRENME-ÖĞRETME YÖNTEM VE TEKNİKLERİ", "EĞİTİM TEKNOLOJİLERİ, ARAÇ VE GEREÇLER", "ÖLÇME-DEĞERLENDİRME VE AÇIKLAMALAR"]; },
-      alanlar: ["ay", "hafta", "tarih", "saat", "unite", "kda", "yontem", "arac", "olcme"]
-    },
     mufredat: {
       ad: "Müfredat çıktısı sütunlu düzen (rehberdeki 9 sütun)",
       genislikler: [850, 624, 1134, 454, 1928, 2665, 3515, 1928, 1754],
@@ -103,6 +97,11 @@
     return ad.join(", ") || "—";
   }
 
+  /* Sayfa üst bilgisi için kısa idare adı: "ERMENEK KAYMAKAMLIĞI", "KARAMAN VALİLİĞİ" ya da elle girilen başlık */
+  function idareKisa(okul) {
+    var s = ustBaslikSatiri(okul);
+    return okul.baslikSatiri2 ? s : s.split(" – ")[0];
+  }
   function ustBaslikSatiri(okul) {
     if (okul.baslikSatiri2) return okul.baslikSatiri2;
     var il = tr.up(okul.il || "");
@@ -156,7 +155,7 @@
   /* ------------------------------------------------------------ BÖLÜM 3: yıllık plan tablosu */
   function planTablosu(bep, ctx, govdeBasYuksekligi) {
     var ayar = bep.ayarlar || {};
-    var duzen = DUZENLER[ayar.duzen] || DUZENLER.ornek;
+    var duzen = DUZENLER.mufredat;
     var G = duzen.genislikler;
     var basliklar = duzen.basliklar(ctx.program);
     var satirlar = (bep.plan && bep.plan.satirlar) || [];
@@ -178,8 +177,14 @@
       g.indeksler.push(i);
     });
 
+    // UDA cümleleri: dönem sonu izleme çizelgesindeki (düzenlenebilir) metin esas alınır
+    var udaMetinleri = {};
+    ((bep.plan && bep.plan.udalar) || []).forEach(function (u) { udaMetinleri[u.no] = u.metin; });
+    (bep.izleme || []).forEach(function (u) { if (tr.bosluk(u.metin)) udaMetinleri[u.no] = u.metin; });
+    function udaOnEki(s) { return (s.udaBasi || []).filter(function (no) { return udaMetinleri[no]; }).map(function (no) { return "UDA " + no + ": " + udaMetinleri[no]; }).join("\n"); }
     function hucreMetni(s, alan) {
       if (alan === "yontemArac") return [s.yontem, s.arac].filter(Boolean).join("\n");
+      if (alan === "kda") return [udaOnEki(s), s.kda].filter(Boolean).join("\n");
       return s[alan] || "";
     }
     function satirYuk(s, aySonu) {
@@ -200,13 +205,15 @@
     // Sayfa kesmeleri: ayları bölmeden, Calibri ölçüleriyle hesaplanan yüksekliklere göre dengeli dağıt
     var kullanilabilir = SAYFA.h - SAYFA.ust - SAYFA.alt - 60;
     var guvenlik = 1.03;
-    var sayfaBasi = {};
+    var sayfaBasi = {}, zorunluSayfaBasi = {};
     var mevcut = govdeBasYuksekligi + baslikYuk, kapasite = kullanilabilir;
     gruplar.forEach(function (g, gi) {
       g.yukseklik = g.indeksler.reduce(function (t, i, k) { return t + satirYuk(satirlar[i], k === g.indeksler.length - 1) * guvenlik; }, 0);
       var donemBasi = ayar.donemSayfa && satirlar[g.indeksler[0]].donem === 2 && gi > 0 && satirlar[gruplar[gi - 1].indeksler[0]].donem === 1;
       if (gi > 0 && (mevcut + g.yukseklik > kapasite || donemBasi)) {
         sayfaBasi[g.indeksler[0]] = true;
+        // Tarayıcı önizlemesi tahmini kesmeleri yeniden ölçer; "2. dönemi yeni sayfada başlat" kesmesi zorunludur
+        if (donemBasi) zorunluSayfaBasi[g.indeksler[0]] = true;
         mevcut = baslikYuk;
       }
       mevcut += g.yukseklik;
@@ -255,8 +262,34 @@
           else if (a === "tarih") { p.jc = "center"; runs = [run(s.tarih, { color: R.gri, sz: 14 })]; }
           else if (a === "saat") { p.jc = "center"; runs = [run(s.saat, { b: true, color: R.yazi, sz: 15 })]; }
           else if (a === "kda") {
-            var m = String(s.kda || "").match(/^(UDA\s*\d+\s*\/\s*KDA\s*[\d.]+\s*:)\s*([\s\S]*)$/);
-            runs = m ? [run(m[1] + " ", { b: true, color: R.lacivert, sz: 14 }), run(m[2], { color: R.yazi, sz: 14 })] : [run(s.kda || "", { color: R.yazi, sz: 14 })];
+            // UDA'nın ilk haftasında UDA cümlesi, ardından KDA'lar (iki üniteli haftada iki KDA)
+            var kdaParlar = [], yazilan = {};
+            runs = [];
+            var udaPar = function (no) {
+              var up = {}; for (var k in p) up[k] = p[k];
+              up.after = 40;
+              yazilan[no] = true;
+              return par([run("UDA " + no + ": ", { b: true, color: R.mavi, sz: 14 }), run(udaMetinleri[no], { i: true, color: R.lacivert, sz: 14 })], up);
+            };
+            String(s.kda || "").split("\n").forEach(function (l) {
+              var m = l.match(/^(UDA\s*(\d+)\s*\/\s*KDA\s*[\d.]+\s*:)\s*([\s\S]*)$/);
+              // UDA cümlesi, o UDA'nın ilk KDA satırının hemen üstüne yazılır
+              if (m && (s.udaBasi || []).indexOf(+m[2]) >= 0 && udaMetinleri[m[2]] && !yazilan[m[2]]) {
+                if (runs.length) { kdaParlar.push(par(runs, p)); runs = []; }
+                kdaParlar.push(udaPar(+m[2]));
+              } else if (runs.length) runs.push(run("\n", { sz: 14 }));
+              if (m) runs.push(run(m[1] + " ", { b: true, color: R.lacivert, sz: 14 }), run(m[3], { color: R.yazi, sz: 14 }));
+              else runs.push(run(l, { color: s.bepDisi ? R.gri : R.yazi, i: !!s.bepDisi, sz: 14 }));
+            });
+            // Elle düzenlenip etiketi silinmiş hücrede UDA cümlesi başa yazılır
+            (s.udaBasi || []).forEach(function (no) { if (udaMetinleri[no] && !yazilan[no]) kdaParlar.unshift(udaPar(no)); });
+            if (kdaParlar.length) {
+              if (runs.length) kdaParlar.push(par(runs, p));
+              // Sayfa kesmesi yalnızca hücrenin ilk paragrafında (aynı hücrede ikinci kesme oluşmasın)
+              kdaParlar.forEach(function (kp, ki) { if (ki) kp.pageBreakBefore = false; });
+              hucreler.push(hucre(kdaParlar, { w: G[i], fill: fill, kenar: kenar }));
+              return;
+            }
           } else if (a === "olcme") {
             runs = [];
             String(s.olcme || "").split("\n").forEach(function (l, li) {
@@ -271,7 +304,7 @@
         tabloSatirlari.push({ cantSplit: true, hucreler: hucreler });
       });
     });
-    return { tip: "tablo", genislikler: G, satirlar: tabloSatirlari, sayfaBasi: sayfaBasi };
+    return { tip: "tablo", genislikler: G, satirlar: tabloSatirlari, sayfaBasi: sayfaBasi, zorunluSayfaBasi: zorunluSayfaBasi };
   }
 
   /* ------------------------------------------------------------ belge modeli */
@@ -348,11 +381,19 @@
     govde.push(sayfaSonu());
     var b3 = "[BÖLÜM 3] " + baslikMetni;
     var alt3 = "MEB " + yil + " Çalışma Takvimi ve " + (ctx.plan ? ctx.plan.kaynak.replace(/\s*\(.*\)\s*$/, "") : "resmî öğretim programı") + " esas alınarak hazırlanmıştır • Aylar gruplandırılmış ve kalın çizgilerle belirginleştirilmiştir (" + ogretimHaftasi + " öğretim haftası / " + toplamSaat + " ders saati)";
+    // Plan tablosunun okunuşu: UDA/KDA yapısı ve UDA'ya bağlı olmayan haftalar (tablonun üstünde, ilk sayfada)
+    var planSatirlari = (bep.plan && bep.plan.satirlar) || [];
+    var notlar = ["Her uzun dönemli amacın (UDA) cümlesi, o UDA'nın ilk haftasında “BEP Amaçları” sütununda yer alır; kısa dönemli amaçlar (KDA) ilgili UDA'nın numarasıyla (UDA n / KDA n.m) haftalara dağıtılmıştır. Aynı kazanımın sürdüğü haftalarda KDA'lar ön koşul beceriden başlayarak ipucunun azaltıldığı ve farklı örneklere genellendiği basamaklarla ilerler."];
+    if (planSatirlari.some(function (s) { return /^(OKUL TEMELLİ|SOSYAL ETKİNLİK)/.test(s.unite || ""); })) notlar.push("Okul temelli planlama ve sosyal etkinlik haftalarındaki amaçlar bir UDA'ya bağlı değildir; bu haftalarda öğrencinin etkinliklere akranlarıyla katılımı hedeflenir.");
+    if (planSatirlari.some(function (s) { return s.bepDisi; })) notlar.push("BEP başlangıç tarihinden önceki ve bitiş tarihinden sonraki haftalarda müfredat içeriği bilgi amacıyla gösterilmiş, BEP amacı yazılmamıştır.");
+    var not3 = "Açıklama: " + notlar.join(" ");
     govde.push(bolumBasligi(3, baslikMetni));
-    govde.push(altBaslik(alt3));
+    govde.push(altBaslik(alt3, { after: 20 }));
+    govde.push(altBaslik(not3));
     var metinGenisligi = SAYFA.w - SAYFA.sol - SAYFA.sag + 140;
     var govdeBas = satirSayisi(b3, metinGenisligi, 19, true) * satirYuksekligiTwip(19) + 40 +
-      satirSayisi(alt3, metinGenisligi, 16, false) * satirYuksekligiTwip(16) + 60 + 110;
+      satirSayisi(alt3, metinGenisligi, 16, false) * satirYuksekligiTwip(16) + 20 +
+      satirSayisi(not3, metinGenisligi, 16, false) * satirYuksekligiTwip(16) + 60 + 110;
     govde.push(planTablosu(bep, ctx, govdeBas));
 
     /* --- BÖLÜM 4 --- */
@@ -414,7 +455,7 @@
     var tarih = ku.tarih ? BEP.tarih.isoToTR(ku.tarih) : "..... / ..... / 20.....";
     var roller = [
       ["BEP Birim Başkanı\n(" + (ku.baskanUnvan || "Müdür Yardımcısı") + ")", ku.baskan],
-      [dersAd + "\nDersi Öğretmeni", (bep.ders && bep.ders.ogretmen) || ku.ogretmen],
+      [dersAd + "\nDersi Öğretmeni", bep.ders && bep.ders.ogretmen],
       ["Sınıf Rehber Öğretmeni\n(" + (ss || "...") + " Şubesi)", ku.sinifRehber],
       ["Rehber Öğretmen /\nPsikolojik Danışman", ku.rehberOgretmen],
       ["Öğrenci Velisi\n(Anne / Baba / Vasi)", ku.veli],
@@ -432,7 +473,8 @@
     govde.push(par([run("UYGUNDUR\n" + (td.tarih ? BEP.tarih.isoToTR(td.tarih) : "..... / ..... / 20.....") + "\n\n" + (okul.mudur ? tr.adSoyadBicim(okul.mudur) : nokta(36)) + "\nOkul Müdürü (İmza – Mühür)", { b: true, color: R.yazi, sz: 16 })], { before: 60, after: 0, jc: "center" }));
 
     /* --- Üst ve alt bilgi --- */
-    var ustBilgi = [par([run("T.C. " + (tr.up(okul.il || "") ? tr.up(okul.il) + " VALİLİĞİ | " : "") + (okulMudurlugu(okul) || "") + "\n" + (sinifIf ? sinifIf + " " : "") + dersAdUp + " DERSİ ÜNİTELENDİRİLMİŞ BEP YILLIK PLANI (" + yil + ")", { color: R.ustGri, sz: 15 })], { jc: "right", before: 0, after: 0, line: 240 })];
+    var idare = idareKisa(okul);
+    var ustBilgi = [par([run("T.C. " + (idare ? idare + " | " : "") + (okulMudurlugu(okul) || "") + "\n" + (sinifIf ? sinifIf + " " : "") + dersAdUp + " DERSİ ÜNİTELENDİRİLMİŞ BEP YILLIK PLANI (" + yil + ")", { color: R.ustGri, sz: 15 })], { jc: "right", before: 0, after: 0, line: 240 })];
     var altBilgi = [par([
       run("Öğrenci: " + (tr.up(o.ad || "") || "—") + " (No: " + (o.no || "—") + " | Sınıf: " + (ss || "—") + ")  •  Tanı: " + tanilar(bep), { i: true, color: R.ustGri, sz: 15 }),
       run("\t", { sz: 15 }),

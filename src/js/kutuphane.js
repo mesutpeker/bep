@@ -106,7 +106,7 @@
     };
     var dar = function () { // -ır/-ir/-ur/-ür
       if ("aıâ".indexOf(v) >= 0) return "ır";
-      if ("ei î".indexOf(v) >= 0) return "ir";
+      if ("eiî".indexOf(v) >= 0) return "ir";
       if ("ouû".indexOf(v) >= 0) return "ur";
       return "ür";
     };
@@ -924,6 +924,8 @@
     "Öğrenme günlüğü": "Kısa öğrenme günlüğü (cümle başlatıcılı)",
     "Deney/uygulama": "Deney/uygulama gözlem formu"
   };
+  /* Özel yetenekli öğrenci için ders alanı performans ifadesi (zenginleştirme ihtiyacı) */
+  BEP.ZENGIN_PERFORMANS = "Sınıf düzeyindeki kazanımları büyük ölçüde bağımsız ve hızlı edinmekte; ileri düzey, soyut ve disiplinler arası görevlerde zenginleştirme ihtiyacı bulunmaktadır.";
   BEP.VARSAYILAN_OLCME = ["Ders içi gözlem formu", "BEP kontrol listesi", "Uyarlanmış çalışma kâğıdı", "Soru-cevap ile değerlendirme", "Eşleştirme etkinliği"];
 
   /* BEP birimi kararları için varsayılanlar (ORGM 2022 EK-9 "IV- BEP Geliştirme Birim Kararları") */
