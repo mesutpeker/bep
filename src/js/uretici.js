@@ -222,9 +222,9 @@
     return /(ır|ir|ur|ür|ar|er)$/.test(son);
   }
   /* "X konusundaki …" şablonlarında kullanılabilecek bir konu adı mı? */
-  function konuKullanilabilir(k) {
+  function konuKullanilabilir(k, sinir) {
     var s = tr.bosluk(k);
-    if (!s || s.length < 3 || s.length > 90) return false;
+    if (!s || s.length < 3 || s.length > (sinir || 90)) return false;
     if (/…|\.\.\./.test(s)) return false;
     if (s.split(" ").length > 12) return false;
     if (!/[A-Za-zÇĞİÖŞÜçğıöşü]/.test(s)) return false;
@@ -233,9 +233,9 @@
   BEP.konuKullanilabilir = konuKullanilabilir;
 
   /* "Gerçek Sayıların Üslü…" gibi başlık biçimli konuları tırnak içinde, cümle biçimlileri küçük harfle ver */
-  function konuIfadesi(k) {
-    var s = tr.bosluk(k).replace(/[.;:…]+$/, "");
-    if (!/[a-zçğıöşü]/.test(s) && /[A-ZÇĞİÖŞÜ]{3}/.test(s)) s = tr.baslikDuzeni(s); // "İSTİKLÂL MARŞI" -> "İstiklâl Marşı"
+  function konuIfadesi(k, dil) {
+    var s = tr.bosluk(k).replace(/[.;:…]+$/, "").replace(/^[“"']+|[”"']+$/g, "");
+    if (!/[a-zçğıöşü]/.test(s) && /[A-ZÇĞİÖŞÜ]{3}/.test(s)) s = tr.baslikDuzeni(s, dil); // "İSTİKLÂL MARŞI" -> "İstiklâl Marşı"
     var kelimeler = s.split(" ").filter(function (w) { return /^[A-Za-zÇĞİÖŞÜçğıöşü]/.test(w) && w.length > 3; });
     var buyuk = kelimeler.filter(function (w) { return /^[A-ZÇĞİÖŞÜ]/.test(w); }).length;
     if (kelimeler.length && buyuk / kelimeler.length >= 0.6) return "“" + s + "”";
@@ -243,16 +243,16 @@
   }
 
   /* Konu listesini UDA metnine uygun biçimde birleştirir: "“A” konusundaki" / "“A”, “B” ve “C” konularındaki" */
-  function konuListesiIfadesi(konular, sinir) {
-    var ifadeler = konular.map(konuIfadesi);
-    if (ifadeler.length === 1) return ifadeler[0] + " konusundaki";
+  function konuListesiIfadesi(konular, sinir, dil, eksik) {
+    var ifadeler = konular.map(function (k) { return konuIfadesi(k, dil); });
+    if (ifadeler.length === 1) return ifadeler[0] + (eksik ? " ve ilgili diğer konulardaki" : " konusundaki");
     var secilen = [], uzunluk = 0;
     for (var i = 0; i < ifadeler.length; i++) {
       if (secilen.length >= 2 && uzunluk + ifadeler[i].length > (sinir || 170)) break;
       secilen.push(ifadeler[i]);
       uzunluk += ifadeler[i].length + 2;
     }
-    if (secilen.length < ifadeler.length) return secilen.join(", ") + " ve ilgili diğer konulardaki";
+    if (secilen.length < ifadeler.length || eksik) return secilen.join(", ") + " ve ilgili diğer konulardaki";
     return listeBirlestir(secilen) + " konularındaki";
   }
 
@@ -349,15 +349,51 @@
     return tr.bosluk(x).replace(/^(?:[A-ZÇĞİÖŞÜ]{2,6}|\d{1,2})(?:\.[A-ZÇĞİÖŞÜ0-9]{1,4})+\.{0,2}\s+(?=\S)/, "")
       .replace(/^\d{1,2}\.(?=[A-ZÇĞİÖŞÜ][a-zçğıöşü])/, "");
   }
-  function haftaAdaylari(hv, uniteSirasi) {
+  /* Kazanım kodunun aile öneki (son bölüm atılır): "12.2.1.6" -> "12.2.1", "MAT.9.1.4" -> "MAT.9.1" */
+  function kodAilesi(kod) { return String(kod || "").replace(/\.?[^.]+\.?$/, ""); }
+  /* Çok üniteli (geçiş) haftasında öğrenme çıktılarını ünitelere paylaştırır: ilk kazanımın kod ailesinden
+     olanlar ilk üniteye, farklı aileden olanlar sırayla sonraki ünitelere (kod yoksa sıra konumuna göre) */
+  function cikilariPaylastir(hv) {
+    var c = hv.c || [], n = (hv.u || []).length || 1, sonuc = [];
+    for (var i = 0; i < n; i++) sonuc.push([]);
+    if (!c.length) return sonuc;
+    var aile = kodAilesi(c[0][0]), j = 0;
+    c.forEach(function (x, i) {
+      if (!x[0] || !aile) { sonuc[Math.min(i, n - 1)].push(x); return; }
+      if (kodAilesi(x[0]) !== aile && j < n - 1) { j++; aile = kodAilesi(x[0]); }
+      sonuc[j].push(x);
+    });
+    return sonuc;
+  }
+  BEP.cikilariPaylastir = cikilariPaylastir;
+  /* Süreç bileşeni/kazanım metnini KDA davranışına hazırlar; davranış olarak kullanılamıyorsa null */
+  function davranisHazirla(x) {
+    var t = tr.bosluk(x).replace(/\s*\.?(Zenginleştirme|Açıklama|Not)\s*\d*\s*:.*$/i, "").replace(/[;:,]+\.?$/, "");
+    if (/(ebilme|abilme)\.?$/.test(t)) t = tr.yeterliliktenGenisZamana(t) || "";
+    t = gozlenebilirYap(adayTemizle(t));
+    if (t.length < 10 || /…$/.test(t)) return null;
+    if (DUYUSSAL_FIIL.test(t)) return null; // gözlemlenemeyen duyuşsal davranış (ORGM)
+    if (!/[a-zçğıöşüâîû](r|z)\)?$/.test(t)) return null; // yüklemi olmayan kesik cümle ("… Hz.")
+    return t;
+  }
+  function haftaAdaylari(hv, uniteSirasi, sonraki) {
     var liste = [];
     var cok = (hv.u || []).length > 1;
-    if (!cok || uniteSirasi === 0) {
-      if (hv.b && hv.b.length) liste = hv.b.slice();
-      else liste = (hv.c || []).slice(0, cok ? 1 : undefined).map(cevir);
-    } else if (hv.c && hv.c[uniteSirasi]) liste = [cevir(hv.c[uniteSirasi])];
-    return benzersiz(liste.filter(Boolean).map(function (x) { return gozlenebilirYap(adayTemizle(x)); })
-      .filter(function (x) { return x.length >= 10 && !/…$/.test(x); }));
+    if (!cok) {
+      liste = hv.b && hv.b.length ? hv.b.slice() : (hv.c || []).map(cevir);
+    } else {
+      var pay = cikilariPaylastir(hv)[uniteSirasi] || [];
+      if (uniteSirasi === 0 && hv.b && hv.b.length) {
+        // Geçiş haftasında süreç bileşenleri iki ünitenin karışımı olabilir: sonraki haftada da süren (yeni üniteye ait) olanlar atılır
+        var sonrakiB = (sonraki && sonraki.b) || [];
+        liste = hv.b.filter(function (x) { return sonrakiB.indexOf(x) < 0; });
+      }
+      if (!liste.length) liste = pay.map(cevir);
+    }
+    var temiz = benzersiz(liste.filter(Boolean).map(davranisHazirla).filter(Boolean));
+    // Hiç kullanılabilir süreç bileşeni kalmadıysa öğrenme çıktısından türetilir
+    if (!temiz.length && !cok && hv.b && hv.b.length) temiz = benzersiz((hv.c || []).map(cevir).filter(Boolean).map(davranisHazirla).filter(Boolean));
+    return temiz;
   }
 
   /* Bir hafta için seçilebilecek KDA davranış seçenekleri (arayüzde "başka öneri" listesi) */
@@ -368,13 +404,25 @@
     ctx.plan.haftalar.forEach(function (h) { if (h.h === haftaNo) hv = h; });
     if (!hv) return [];
     var out = [];
-    (hv.u && hv.u.length > 1 ? hv.u : [0]).forEach(function (u, j) { haftaAdaylari(hv, j).forEach(function (x) { out.push(x); }); });
-    (hv.c || []).forEach(function (c) { var g = cevir(c); if (g) out.push(gozlenebilirYap(adayTemizle(g))); });
+    if (ctx.grup === "ing" || ctx.grup === "arp") {
+      // Dil derslerinde öneriler haftanın temalarına göre dil kalıplarından gelir (İngilizce süreç cümleleri KDA'ya uymaz)
+      (hv.u || []).forEach(function (ui) {
+        var ad = ctx.plan.uniteler[ui] && ctx.plan.uniteler[ui].ad;
+        if (!ad) return;
+        var tur = dilTuru(ad);
+        (tur ? [tur] : DIL_DONGU).forEach(function (bec) { DIL_SABLON[bec].forEach(function (x) { out.push(x.replace("{tema}", uniteSadeAd(ad, ctx.dil))); }); });
+      });
+      return benzersiz(out.map(function (x) { return tr.cumleSonu(tr.ilkHarfBuyuk(tr.bosluk(x))); }));
+    }
+    var sonraki = null;
+    ctx.plan.haftalar.forEach(function (h) { if (h.h === haftaNo + 1) sonraki = h; });
+    (hv.u && hv.u.length > 1 ? hv.u : [0]).forEach(function (u, j) { haftaAdaylari(hv, j, sonraki).forEach(function (x) { out.push(x); }); });
+    (hv.c || []).forEach(function (c) { var g = cevir(c); g = g && davranisHazirla(g); if (g) out.push(g); });
     var konu = konuSade(hv.k);
     if (konuKullanilabilir(konu)) {
       var k = KADEME_SABLON[ctx.grup] || KADEME_SABLON.mes;
       var sablonlar = (SOMUT_SABLON[ctx.grup] || SOMUT_SABLON.mes).concat(ctx.zengin ? [ZENGIN_SABLON.onkosul, ZENGIN_SABLON.ara, ZENGIN_SABLON.genelleme] : [k.onkosul, k.ara, k.genelleme]);
-      sablonlar.filter(function (s) { return s && s.indexOf("{unite}") < 0; }).forEach(function (s) { out.push(s.replace("{konu}", konuIfadesi(konu))); });
+      sablonlar.filter(function (s) { return s && s.indexOf("{unite}") < 0; }).forEach(function (s) { out.push(s.replace("{konu}", konuIfadesi(konu, ctx.dil))); });
     }
     return benzersiz(out.map(function (x) { return tr.cumleSonu(tr.ilkHarfBuyuk(tr.bosluk(x))); }));
   };
@@ -405,6 +453,11 @@
   // Bir kazanım koşusunun son basamağı (genelleme)
   function genellemeKosulu(ctx) { return ctx.zengin ? "farklı kaynakları karşılaştırarak" : ctx.destek === "yogun" ? "farklı örneklerle çalışırken kısa bir ipucu verildiğinde" : "farklı örneklerle çalışırken bağımsız olarak"; }
   var ZENGIN_KOSULLARI = ["bağımsız araştırma sürecinde", "akranlarına sunum hazırlarken", "farklı kaynakları karşılaştırarak"];
+  /* Okuma/dinleme/tecvit gibi metne bağlı derslerde "günlük yaşamla ilişkili bir örnekte" koşulu anlamsız kalır */
+  function bakimKosullari(ctx) {
+    if (ctx.zengin) return ZENGIN_KOSULLARI;
+    return /^(kur|tde|ing|arp)$/.test(ctx.grup) ? BAKIM_KOSULLARI.slice(1) : BAKIM_KOSULLARI;
+  }
   var DEVAM_DAVRANISLARI = [
     "önceki haftalarda çalışılan amaca yönelik pekiştirme etkinliklerini tamamlar",
     "önceki haftalarda öğrendiklerini kısa bir uygulama etkinliğinde kullanır",
@@ -472,14 +525,23 @@
     return gruplar;
   }
 
+  /* Haftanın konu alanını parçalar ("A | B", "A; B") ve çok üniteli haftada ünitelere paylaştırır:
+     ilk parça ilk üniteye, son parça son üniteye; aradakiler ilk üniteye */
+  function haftaKonulari(k, sira, uniteSayisi) {
+    var parcalar = benzersiz(String(k || "").split(/\s\|\s|\s*;\s+/).map(konuSade));
+    if (uniteSayisi <= 1 || parcalar.length <= 1) return uniteSayisi > 1 && sira > 0 && parcalar.length <= 1 ? [] : parcalar;
+    if (sira === uniteSayisi - 1) return parcalar.slice(-1);
+    return sira === 0 ? parcalar.slice(0, -1) : [];
+  }
+
   function udaBolumleri(ogretim) {
     var uniteHaftalari = {};
     ogretim.forEach(function (w, wi) {
       if (w.disi || w.ozel === "OTP" || w.ozel === "SE") return;
-      var konular = String(w.hv.k || "").split(" | ");
       w.uniteler.forEach(function (ui, j) {
-        (uniteHaftalari[ui] = uniteHaftalari[ui] || []).push({ wi: wi, no: w.t.no, ui: ui, konu: konuSade(konular[w.uniteler.length > 1 && konular[j] ? j : 0] || ""),
-          aday: w.ozel === "DEVAM" || w.ozel === "ZEN" ? null : JSON.stringify(haftaAdaylari(w.hv, j)) });
+        var konular = haftaKonulari(w.hv.k, j, w.uniteler.length);
+        (uniteHaftalari[ui] = uniteHaftalari[ui] || []).push({ wi: wi, no: w.t.no, ui: ui, konu: konular[0] || "", konular: konular,
+          aday: w.ozel === "DEVAM" || w.ozel === "ZEN" ? null : JSON.stringify(haftaAdaylari(w.hv, j, w.sonraki)) });
       });
     });
     var bolumler = [];
@@ -516,13 +578,17 @@
       b.kisa = kisa;
       sonuc.push(b);
     });
-    // Tek haftalık ünite bölümü (başka bölümün içine düşen) komşu bölüme katılır: tek KDA'lı UDA oluşmaz
+    // Tek haftalık ünite bölümü komşu bölüme katılır: tek KDA'lı UDA oluşmaz. Komşuluk, bölümlere giren haftaların
+    // sırasına göre belirlenir (aradaki okul temelli planlama / BEP dışı haftalar komşuluğu bozmaz)
+    var sira = {};
+    benzersiz([].concat.apply([], sonuc.map(function (b) { return b.haftalar.map(function (h) { return String(h.wi); }); }))).map(Number)
+      .sort(function (a, b) { return a - b; }).forEach(function (wi, i) { sira[wi] = i; });
     var son2 = [];
     sonuc.forEach(function (b) {
       if (!b.bolunmus && haftaSayisi(b.haftalar) === 1) {
         var wi = b.haftalar[0].wi;
         var hedef = son2.concat(sonuc).filter(function (x) {
-          return x !== b && x.haftalar.some(function (h) { return Math.abs(h.wi - wi) <= 1; });
+          return x !== b && x.haftalar.some(function (h) { return Math.abs(sira[h.wi] - sira[wi]) <= 1; });
         })[0];
         if (hedef) { hedef.uniteler = benzersiz(hedef.uniteler.concat(b.uniteler).map(String)).map(Number); hedef.haftalar = hedef.haftalar.concat(b.haftalar).sort(function (x, y) { return x.wi - y.wi; }); return; }
       }
@@ -549,7 +615,8 @@
       .sort(function (x, y) { return x.i - y.i; }).map(function (x) { return x.a; }); // programdaki sırayla
     var tanimlar = [];
     var ekstra = n - secilen.length;
-    var tabanlar = secilen.length ? secilen : (uygun.length ? uygun : adaylar);
+    // Yoğun/orta destekte elenen zor kazanım geri konmaz (genelleme basamağına da yazılmaz)
+    var tabanlar = secilen.length ? secilen : uygun;
     if (onkosulOlur && (ekstra >= 2 || (!secilen.length && ekstra >= 1))) { tanimlar.push({ sablon: "onkosul" }); durum.sablon.onkosul = true; ekstra--; }
     else if (!secilen.length && ekstra >= 1) {
       // Yeni aday yoksa koşunun ilk basamağı ara basamak ya da kazanımın tanıya özgü koşulla yazımıdır (genelleme değil)
@@ -562,10 +629,12 @@
       var ek = [];
       if (araOlur && ekstra >= 2) ek.push({ sablon: "ara" });
       var ipuclari = ctx.zengin ? ZENGIN_KOSULLARI : (IPUCU_AZALTMA[ctx.destek] || IPUCU_AZALTMA.orta);
-      ipuclari.concat(BAKIM_KOSULLARI).forEach(function (k) { tabanlar.forEach(function (d) { ek.push({ d: d, kosul: k }); }); });
+      ipuclari.concat(bakimKosullari(ctx)).forEach(function (k) { tabanlar.forEach(function (d) { ek.push({ d: d, kosul: k }); }); });
+      if (!tabanlar.length && sablonVar && !durum.sablon.genelleme && !genellemeOlur) ek.push({ sablon: "genelleme" });
       var son = genellemeOlur ? { sablon: "genelleme" } : (tabanlar.length ? { d: tabanlar[0], kosul: genellemeKosulu(ctx) } : null);
       var alinan = ek.slice(0, son ? ekstra - 1 : ekstra);
       if (alinan.some(function (x) { return x.sablon === "ara"; })) durum.sablon.ara = true;
+      if (alinan.some(function (x) { return x.sablon === "genelleme"; })) durum.sablon.genelleme = true;
       if (son && son.sablon) durum.sablon.genelleme = true;
       tanimlar = tanimlar.concat(alinan);
       if (son) tanimlar.push(son);
@@ -598,17 +667,18 @@
       if (!uniteler.length && onceki !== null && hv.x !== "OTP" && hv.x !== "SE") uniteler = [onceki];
       var disi = bepBas && t.cuma < bepBas ? "once" : bepSon && t.pazartesi > bepSon ? "sonra" : "";
       wiNo[t.no] = ogretim.length;
-      ogretim.push({ t: t, hv: hv, uniteler: uniteler, ozel: hv.x, disi: disi });
+      ogretim.push({ t: t, hv: hv, uniteler: uniteler, ozel: hv.x, disi: disi, sonraki: haftaVeri[t.no + 1] || null });
       if (hv.u && hv.u.length) onceki = uniteler[uniteler.length - 1];
     });
 
     // 2) UDA bölümleri ve hafta -> bölüm eşlemesi
     var bolumler = udaBolumleri(ogretim);
     var haftaBolumleri = {};
+    // Aynı bölümde birden çok ünite aynı haftaya düşerse (ör. 36'dan fazla birimli ders) her ünite ayrı KDA alır
     bolumler.forEach(function (b) {
       b.haftalar.forEach(function (h) {
         var l = haftaBolumleri[h.wi] = haftaBolumleri[h.wi] || [];
-        if (!l.some(function (x) { return x.b === b; })) l.push({ b: b, ui: h.ui });
+        if (!l.some(function (x) { return x.b === b && x.ui === h.ui; })) l.push({ b: b, ui: h.ui });
       });
     });
     Object.keys(haftaBolumleri).forEach(function (wi) {
@@ -621,25 +691,26 @@
     bolumler.forEach(function (b) {
       b.tanimlar = {};
       var kosular = [], kosu = null;
-      benzersiz(b.haftalar.map(function (h) { return String(h.wi); })).map(Number).forEach(function (wi) {
+      b.haftalar.slice().sort(function (x, y) { return x.wi - y.wi || ogretim[x.wi].uniteler.indexOf(x.ui) - ogretim[y.wi].uniteler.indexOf(y.ui); }).forEach(function (bh) {
+        var wi = bh.wi, ui = bh.ui, anahtarT = wi + "/" + ui;
         var w = ogretim[wi], hv = w.hv;
-        var ui = (haftaBolumleri[wi].filter(function (x) { return x.b === b; })[0] || {}).ui;
         var sira = Math.max(0, w.uniteler.indexOf(ui));
         var uniteAd = plan.uniteler[ui].ad;
-        if (w.ozel === "DEVAM" || w.ozel === "ZEN") { kosu = null; b.tanimlar[wi] = { ozelHafta: w.ozel }; return; }
+        if (w.ozel === "DEVAM" || w.ozel === "ZEN") { kosu = null; b.tanimlar[anahtarT] = { ozelHafta: w.ozel }; return; }
         if (dilGrubu) {
           kosu = null;
-          var bec = dilTuru(uniteAd, w.ozel);
+          // Değerlendirme haftası türü yalnız tek üniteli haftada geçerli; çok üniteli haftada tema kendi döngüsünü sürdürür
+          var bec = dilTuru(uniteAd, w.uniteler.length > 1 ? "" : w.ozel);
           var anahtar = bec || "u" + ui;
           var k = dilSayac[anahtar] = (dilSayac[anahtar] || 0) + 1;
           if (!bec) bec = DIL_DONGU[(k - 1) % DIL_DONGU.length];
           var varyant = bec === "oryantasyon" || bec === "tekrar" || bec === "degerlendirme" ? k - 1 : Math.floor((k - 1) / DIL_DONGU.length);
-          b.tanimlar[wi] = { d: sec(DIL_SABLON[bec], varyant).replace("{tema}", uniteSadeAd(uniteAd, ctx.dil)) };
+          b.tanimlar[anahtarT] = { d: sec(DIL_SABLON[bec], varyant).replace("{tema}", uniteSadeAd(uniteAd, ctx.dil)) };
           return;
         }
-        var adaylar = haftaAdaylari(hv, sira);
-        var anahtarA = JSON.stringify(adaylar);
-        var konu = konuSade(String(hv.k || "").split(" | ")[w.uniteler.length > 1 ? sira : 0] || "");
+        var adaylar = haftaAdaylari(hv, sira, w.sonraki);
+        var anahtarA = JSON.stringify(adaylar) + "/" + ui;
+        var konu = haftaKonulari(hv.k, sira, w.uniteler.length)[0] || "";
         if (!kosu || kosu.anahtar !== anahtarA) {
           kosu = { anahtar: anahtarA, adaylar: adaylar, haftalar: [], ui: ui };
           kosular.push(kosu);
@@ -654,16 +725,17 @@
         // Ünite/konu adına dayalı kademeli basamaklar kullanılabilir mi?
         k.sablonVar = ctx.grup === "tde" || ctx.zengin || k.haftalar.some(function (h) { return konuKullanilabilir(h.konu); });
         if (!k.adaylar.length) {
-          var ua = plan.uniteler[k.ui].ad;
-          k.adaylar = [ctx.grup === "tde" ? TDE_SABLON.okuma.replace("{unite}", uniteSadeAd(ua)).replace("{tur}", turAdi(ctx, ua))
-            : "“" + uniteSadeAd(ua, ctx.dil) + "” " + turAdi(ctx, ua) + " kapsamındaki temel kavramları örneklerle açıklar"];
+          var ua = plan.uniteler[k.ui].ad, uaIf = "“" + uniteSadeAd(ua, ctx.dil) + "”";
+          k.adaylar = [ctx.zengin ? ZENGIN_SABLON_UNITE.ara.replace("{unite}", uaIf).replace("{tur}", turAdi(ctx, ua))
+            : ctx.grup === "tde" ? TDE_SABLON.okuma.replace("“{unite}”", uaIf).replace("{tur}", turAdi(ctx, ua))
+            : uaIf + " " + turAdi(ctx, ua) + " kapsamındaki temel kavramları örneklerle açıklar"];
         }
         kosuTanimlari(ctx, k, kullanilan, durum).forEach(function (tn, i) {
           var h = k.haftalar[i];
           tn.yedek = k.adaylar[0];
           tn.konu = h.konu;
           tn.ui = h.ui;
-          b.tanimlar[h.wi] = tn;
+          b.tanimlar[h.wi + "/" + h.ui] = tn;
         });
       });
     });
@@ -675,14 +747,15 @@
       if (ctx.zengin) kaynak = konu ? ZENGIN_SABLON : ZENGIN_SABLON_UNITE;
       else kaynak = KADEME_SABLON[ctx.grup] || KADEME_SABLON.mes;
       var s = kaynak[tur];
-      if (!s && tur === "ara" && ctx.grup === "tde") s = TDE_SABLON[tn.beceri] || TDE_SABLON.okuma;
+      // TDE kalıpları tırnağı zaten içerir; {unite} aşağıda tırnaklanacağı için kalıptaki tırnak kaldırılır
+      if (!s && tur === "ara" && ctx.grup === "tde") s = (TDE_SABLON[tn.beceri] || TDE_SABLON.okuma).replace("“{unite}”", "{unite}");
       if (!s) return null;
       if (s.indexOf("{konu}") >= 0 && !konu) {
         if (ctx.grup === "tde") return null;
         s = s.replace("{konu} konusundaki", "{unite} {tur} kapsamındaki").replace("{konu} konusuyla ilgili", "{unite} {tur} kapsamında").replace("{konu} konusunun", "{unite} {tur} kapsamındaki konuların")
           .replace("{konu} konusunda", "{unite} {tur} kapsamında").replace("{konu} konusunu", "{unite} {tur} kapsamında öğrendiklerini").replace("{konu} konusu hakkındaki", "{unite} {tur} hakkındaki");
       }
-      return s.replace("{konu}", konuIfadesi(konu)).replace("{unite}", "“" + uniteSadeAd(ua, ctx.dil) + "”").replace("{tur}", turAdi(ctx, ua));
+      return s.replace("{konu}", konuIfadesi(konu, ctx.dil)).replace("{unite}", "“" + uniteSadeAd(ua, ctx.dil) + "”").replace("{tur}", turAdi(ctx, ua));
     }
 
     // 4) Satırlar
@@ -704,14 +777,16 @@
     var kullanilanSablon = {};
     /* Aynı KDA metni planda ikinci kez kullanılmasın: koşul alternatifleriyle ayırt edilir */
     function benzersizKda(kosul, davranis) {
-      var denenecek = [kosul].concat(ctx.zengin ? ZENGIN_KOSULLARI : BAKIM_KOSULLARI, [genellemeKosulu(ctx)], kosullar, ctx.zengin ? [] : (IPUCU_AZALTMA[ctx.destek] || []));
+      var havuz = benzersiz([].concat(bakimKosullari(ctx), [genellemeKosulu(ctx)], kosullar, ctx.zengin ? [] : (IPUCU_AZALTMA[ctx.destek] || [])));
+      var denenecek = [kosul].concat(havuz);
       for (var i = 0; i < denenecek.length; i++) {
         if (i > 0 && kosulYinelemesi(denenecek[i], davranis)) continue;
         var g = tr.low(kdaGovdesi(denenecek[i], davranis));
         if (!gorulen[g]) { gorulen[g] = 1; return { kosul: denenecek[i], davranis: davranis }; }
       }
-      for (var j = 0; j < DEVAM_DAVRANISLARI.length * Math.max(1, kosullar.length); j++) {
-        var dv = DEVAM_DAVRANISLARI[(devamSayac + j) % DEVAM_DAVRANISLARI.length], kv = sec(kosullar, Math.floor((devamSayac + j) / DEVAM_DAVRANISLARI.length));
+      // Koşul seçenekleri tükenirse pekiştirme davranışları tüm koşul havuzuyla denenir
+      for (var j = 0; j < DEVAM_DAVRANISLARI.length * Math.max(1, havuz.length); j++) {
+        var dv = DEVAM_DAVRANISLARI[(devamSayac + j) % DEVAM_DAVRANISLARI.length], kv = sec(havuz, Math.floor((devamSayac + j) / DEVAM_DAVRANISLARI.length));
         var g2 = tr.low(kdaGovdesi(kv, dv));
         if (!gorulen[g2]) { gorulen[g2] = 1; devamSayac += j + 1; return { kosul: kv, davranis: dv }; }
       }
@@ -752,7 +827,7 @@
           : kdaCumlesi(ctx, "", "sınıf ve okul düzeyindeki sosyal etkinliklere akranlarıyla birlikte katılır");
       } else if (bh.length) {
         satir.kda = bh.map(function (x) {
-          var b = x.b, tn = b.tanimlar[wi] || { devam: true, ui: x.ui };
+          var b = x.b, tn = b.tanimlar[wi + "/" + x.ui] || { devam: true, ui: x.ui };
           if (tn.ui === undefined) tn.ui = x.ui;
           kdaSayac[b.no] = (kdaSayac[b.no] || 0) + 1;
           var kosul = tn.kosul || kosulSec(ctx, haftaIndeks + (x.ui || 0)), davranis;
@@ -762,14 +837,14 @@
             tn.beceri = beceri;
             davranis = sablonDoldur(tn.sablon, tn);
             // Aynı konu basamağı planda bir kez yazılır; tekrarında kazanımın kendisi bakım koşuluyla verilir
-            if (davranis && kullanilanSablon[tr.low(davranis)]) { davranis = tn.yedek; kosul = sec(ctx.zengin ? ZENGIN_KOSULLARI : BAKIM_KOSULLARI, haftaIndeks); }
+            if (davranis && kullanilanSablon[tr.low(davranis)]) { davranis = tn.yedek; kosul = sec(bakimKosullari(ctx), haftaIndeks); }
             if (davranis) kullanilanSablon[tr.low(davranis)] = 1;
           }
           else davranis = tn.d;
           if (!davranis) davranis = sec(DEVAM_DAVRANISLARI, devamSayac++);
           var r = benzersizKda(kosul, davranis);
-          satir.udaNolari.push(b.no);
-          if (b.haftalar[0].wi === wi) satir.udaBasi.push(b.no);
+          if (satir.udaNolari.indexOf(b.no) < 0) satir.udaNolari.push(b.no);
+          if (b.haftalar[0].wi === wi && satir.udaBasi.indexOf(b.no) < 0) satir.udaBasi.push(b.no);
           return "UDA " + b.no + " / KDA " + b.no + "." + kdaSayac[b.no] + ": " + kdaCumlesi(ctx, r.kosul, r.davranis);
         }).join("\n");
       } else {
@@ -779,8 +854,10 @@
 
       // ---- Resmî öğrenme çıktısı / kazanım (müfredat sütunu)
       if (hv.c && hv.c.length) {
-        var gosterilen = bh.length > 1 ? hv.c.slice(0, bh.length) : hv.c.slice(0, 1);
-        satir.cikti = gosterilen.map(function (c) { return (c[0] ? c[0] + ". " : "") + tr.kisalt(c[1], bh.length > 1 ? 100 : 140); }).join("\n") +
+        // Çok üniteli haftada her ünitenin ilk kazanımı gösterilir; kazanıma eklenmiş öğretmen notları atılır
+        var pay = w.uniteler.length > 1 ? cikilariPaylastir(hv) : [hv.c];
+        var gosterilen = pay.map(function (l) { return l[0]; }).filter(Boolean);
+        satir.cikti = gosterilen.map(function (c) { return (c[0] ? c[0] + ". " : "") + tr.kisalt(String(c[1] || "").replace(/\s*\.?(Zenginleştirme|Açıklama|Not)\s*\d*\s*:.*$/i, ""), gosterilen.length > 1 ? 100 : 140); }).join("\n") +
           (hv.c.length > gosterilen.length ? "\n(+" + (hv.c.length - gosterilen.length) + " öğrenme çıktısı/kazanım daha)" : "");
       } else {
         satir.cikti = ozel === "OTP" ? "Okul temelli planlama" : ozel === "SE" ? "—" : (konu || "—");
@@ -816,6 +893,11 @@
       (hv.g || []).forEach(function (g) { satirlarO.push("• " + g); });
       (t.notlar || []).forEach(function (n) { satirlarO.push("• " + n); });
       satir.olcme = satirlarO.join("\n");
+      if (w.disi) {
+        // BEP uygulanmayan haftada BEP'e özgü yöntem/araç/ölçme yazılmaz; yalnız belirli gün ve takvim notları kalır
+        satir.yontem = "—"; satir.arac = "—";
+        satir.olcme = (hv.g || []).concat(t.notlar || []).map(function (x) { return "• " + x; }).join("\n") || "—";
+      }
       satir.sinav = !!sinav;
       satirlar.push(satir);
     });
@@ -848,7 +930,17 @@
     var turEk = tekil ? (tema ? "teması" : "ünitesi") : (tema ? "temaları" : "üniteleri");
     var ozne = ctx.ozne ? ctx.ozne + ", " : "";
     var baslat = function (s) { return ctx.ozne ? ozne + s : tr.ilkHarfBuyuk(s); };
-    var konular = benzersiz(bolum.haftalar.map(function (h) { return h.konu; }).filter(konuKullanilabilir));
+    // Bölümdeki tüm konu parçaları (büyük/küçük harf farkı gözetmeden tekil); yazılamayanlar varsa "ve ilgili diğer konular"
+    var gorulenK = {}, tumKonular = [];
+    bolum.haftalar.forEach(function (h) {
+      (h.konular || [h.konu]).forEach(function (k) {
+        var a = tr.low(tr.bosluk(k));
+        if (a && !gorulenK[a]) { gorulenK[a] = 1; tumKonular.push(k); }
+      });
+    });
+    var konular = tumKonular.filter(function (k) { return konuKullanilabilir(k, 130); });
+    var eksik = konular.length > 0 && konular.length < tumKonular.length;
+    var konuIf = function () { return konuListesiIfadesi(konular, 170, ctx.dil, eksik); };
     if (ctx.grup === "ing" || ctx.grup === "arp") {
       var ozelParcalar = [], temalar = [];
       uniteAdlari.forEach(function (a, i) {
@@ -867,7 +959,7 @@
       return baslat(benzersiz(ozelParcalar).join("; ") + ".");
     }
     if (ctx.zengin) {
-      return baslat(adIf + " " + turEk + " kapsamında" + (konular.length ? " " + konuListesiIfadesi(konular) : "ki") + " kavram ve becerileri ileri düzey kaynaklar, araştırma ve proje görevleriyle derinleştirir.");
+      return baslat(adIf + " " + turEk + " kapsamında" + (konular.length ? " " + konuIf() : "ki") + " kavram ve becerileri ileri düzey kaynaklar, araştırma ve proje görevleriyle derinleştirir.");
     }
     if (ctx.grup === "tde") {
       if (ctx.program === "2018") {
@@ -876,9 +968,11 @@
       }
       return baslat(adIf + " " + (tekil ? "temasındaki" : "temalarındaki") + " sadeleştirilmiş metinleri okur ve dinler; metinlerle ilgili duygu ve düşüncelerini kısa sözlü ve yazılı ifadelerle anlatır.");
     }
-    var kapsam = adIf + " " + turEk + " kapsamında" + (konular.length ? " " + konuListesiIfadesi(konular) : "ki");
-    if (ctx.grup === "bes") return baslat(kapsam + " hareket, oyun ve sağlıklı yaşam becerilerini bireysel düzeyine uygun biçimde uygular.");
-    if (ctx.grup === "gor" || ctx.grup === "muz") return baslat(kapsam + " temel sanat becerilerini model ve uygulama desteğiyle kullanır.");
+    // Beden eğitimi ve sanat derslerinde beceri kalıbına bilgi konuları eklenmez (anlam bozulmasın):
+    // konu listesi varsa genel kalıp, yoksa derse özgü beceri kalıbı kullanılır
+    if (ctx.grup === "bes" && !konular.length) return baslat(adIf + " " + turEk + " kapsamındaki hareket, oyun ve sağlıklı yaşam becerilerini bireysel düzeyine uygun biçimde uygular.");
+    if ((ctx.grup === "gor" || ctx.grup === "muz") && !konular.length) return baslat(adIf + " " + turEk + " kapsamındaki temel sanat becerilerini model ve uygulama desteğiyle kullanır.");
+    var kapsam = adIf + " " + turEk + " kapsamında" + (konular.length ? " " + konuIf() : "ki");
     return baslat(kapsam + " temel kavram ve becerileri bireysel düzeyine uygun destekle kazanır.");
   };
 
@@ -886,7 +980,7 @@
   BEP.izlemeSatirlari = function (udalar) {
     return udalar.map(function (u) {
       var d1 = u.donemler.indexOf(1) >= 0, d2 = u.donemler.indexOf(2) >= 0;
-      return { no: u.no, unite: u.unite, metin: u.metin, d1: d1 ? "[ ] Gerçekleşti\n[ ] Kısmen  [ ] Hayır" : "— (2. Dönem)", d2: d2 ? "[ ] Gerçekleşti\n[ ] Kısmen  [ ] Hayır" : "— (1. Dönem)", karar: "" };
+      return { no: u.no, unite: u.unite, ilkHafta: u.ilkHafta, sonHafta: u.sonHafta, metin: u.metin, d1: d1 ? "[ ] Gerçekleşti\n[ ] Kısmen  [ ] Hayır" : "— (2. Dönem)", d2: d2 ? "[ ] Gerçekleşti\n[ ] Kısmen  [ ] Hayır" : "— (1. Dönem)", karar: "" };
     });
   };
 
@@ -897,14 +991,26 @@
     var profiller = profilleri(bep);
     var o = bep.ogrenci || {};
     function taniAdi(p) { return p.id === "diger" && tr.bosluk(o.yetersizlikMetni) ? tr.bosluk(o.yetersizlikMetni) : tr.ilkHarfBuyuk(p.kisa); }
+    /* Aynı konudaki uyarlamalar tek satırda: "Sınav Süresi ve Ortamı" / "Sınav Süresi ve Mola" / "Sınav Süresi" -> "Sınav Süresi" */
+    function konuAnahtari(baslik) {
+      var b = tr.bosluk(baslik).replace(/\s+ve\s+.*$/, "");
+      return /^(Sınav Süresi|Süre)\b/.test(b) ? "Sınav Süresi" : b;
+    }
     function birlestir(alan) {
       var liste = [], dizin = {};
       profiller.forEach(function (p) {
         (p[alan] || []).forEach(function (u) {
-          var x = dizin[u.baslik];
-          if (!x) { x = dizin[u.baslik] = { baslik: u.baslik, parcalar: [] }; liste.push(x); }
+          var a = konuAnahtari(u.baslik);
+          var x = dizin[a];
+          if (!x) { x = dizin[a] = { baslik: u.baslik, anahtar: a, parcalar: [] }; liste.push(x); }
           if (!x.parcalar.some(function (q) { return q.aciklama === u.aciklama; })) x.parcalar.push({ tani: taniAdi(p), aciklama: u.aciklama });
         });
+      });
+      // Ek süre hükümleri çelişmesin: daha geniş süre (%25-%50 ya da esnek süre) varken dar "%25"/"gerektiğinde ek süre" hükmü yazılmaz
+      liste.forEach(function (x) {
+        if (x.anahtar !== "Sınav Süresi" || x.parcalar.length < 2) return;
+        var genis = x.parcalar.some(function (q) { return /%25-%50|esnek/.test(q.aciklama); });
+        if (genis) x.parcalar = x.parcalar.filter(function (q) { return /%25-%50|esnek|mola|ortam/i.test(q.aciklama) || !/ek süre/.test(q.aciklama); });
       });
       return liste.map(function (x) {
         var aciklama = x.parcalar.length === 1 ? x.parcalar[0].aciklama : x.parcalar.map(function (q) { return q.tani + ": " + q.aciklama; }).join("\n");
@@ -997,16 +1103,23 @@
   /* Planın hangi ders/plan için üretildiği: elle düzenlemeler yalnız aynı ders ve planda korunur */
   BEP.planKaynagi = function (bep) {
     var d = bep.ders || {};
-    return JSON.stringify([d.id || "", d.id === "__ozel__" ? "" : (d.planId || "")]);
+    var pid = d.id === "__ozel__" ? "" : (d.planId || "");
+    // İçeriği başka planla aynı olan varyant (ayni: …) aynı kaynak sayılır: ör. TDE fen-9 = anadolu-9
+    var ders = pid ? BEP.dersBul(d.id) : null;
+    var ham = ders && ders.planlar.filter(function (p) { return p.id === pid; })[0];
+    if (ham && ham.ayni) pid = ham.ayni;
+    return JSON.stringify([d.id || "", pid]);
   };
   /* Korunan KDA hücresindeki "UDA x / KDA y:" etiketlerini yeni plandaki numaralarla günceller */
   function etiketleriGuncelle(eski, yeni) {
-    var yeniEtiketler = String(yeni || "").split("\n").map(function (l) { return (l.match(ETIKET) || [""])[0]; }).filter(Boolean);
+    var yeniSatirlar = String(yeni || "").split("\n").filter(function (l) { return ETIKET.test(l); });
+    var yeniEtiketler = yeniSatirlar.map(function (l) { return l.match(ETIKET)[0]; });
     var satirlar = String(eski || "").split("\n");
-    var eskiSayisi = satirlar.filter(function (l) { return ETIKET.test(l); }).length;
-    if (!yeniEtiketler.length || eskiSayisi !== yeniEtiketler.length) return eski;
+    if (!yeniEtiketler.length) return eski;
+    // Etiketler sırayla güncellenir; fazla eski satırlar son etiketi alır, eksik kalan yeni KDA satırları (ör. yeni UDA'nın ilki) eklenir
     var k = 0;
-    return satirlar.map(function (l) { return ETIKET.test(l) ? l.replace(ETIKET, yeniEtiketler[k++]) : l; }).join("\n");
+    var sonuc = satirlar.map(function (l) { return ETIKET.test(l) ? l.replace(ETIKET, yeniEtiketler[Math.min(k++, yeniEtiketler.length - 1)]) : l; });
+    return sonuc.concat(yeniSatirlar.slice(k)).join("\n");
   }
   BEP.planiHazirla = function (bep, secenek) {
     secenek = secenek || {};
@@ -1024,11 +1137,15 @@
       sonuc.satirlar = sonuc.satirlar.map(function (s) {
         var e = eskiHarita[s.no];
         if (!e || s.tur !== "hafta") return s;
+        var korunan = {};
         Object.keys(e.duzenlendi).forEach(function (alan) {
           if (!e.duzenlendi[alan]) return;
+          // BEP dönemi dışına düşen haftaya elle yazılmış BEP amacı taşınmaz
+          if (s.bepDisi && alan === "kda") { sonuc.duzenlemelerAtildi = true; return; }
           s[alan] = alan === "kda" ? etiketleriGuncelle(e[alan], s.kda) : e[alan];
+          korunan[alan] = true;
         });
-        s.duzenlendi = e.duzenlendi;
+        if (Object.keys(korunan).length) s.duzenlendi = korunan;
         return s;
       });
     }
@@ -1037,8 +1154,11 @@
     (bep.izleme || []).forEach(function (u) { eskiIzleme[u.no] = u; });
     bep.izleme = BEP.izlemeSatirlari(sonuc.udalar).map(function (u) {
       var e = eskiIzleme[u.no];
-      // Elle yazılan UDA cümlesi, aynı numaralı UDA aynı üniteye aitse korunur
-      if (e && koru && e.duzenlendi && (!e.unite || e.unite === u.unite)) { u.metin = e.metin; u.karar = e.karar; u.duzenlendi = true; }
+      // Elle yazılan UDA cümlesi yalnız aynı ünite ve aynı hafta aralığını kapsayan UDA'ya taşınır
+      if (e && koru && e.duzenlendi) {
+        if ((!e.unite || e.unite === u.unite) && (!e.ilkHafta || (e.ilkHafta === u.ilkHafta && e.sonHafta === u.sonHafta))) { u.metin = e.metin; u.karar = e.karar; u.duzenlendi = true; }
+        else sonuc.duzenlemelerAtildi = true;
+      }
       return u;
     });
     return sonuc;

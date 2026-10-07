@@ -431,6 +431,9 @@
     govde.push(bolumBasligi(5, "BEP İZLEME, DÖNEM SONU DEĞERLENDİRME ÇİZELGESİ VE ONAY İMZALARI"));
     var G5 = [1020, 4876, 2154, 2154, 4648];
     var izleme = bep.izleme || [];
+    // Elle boşaltılmış UDA cümlesi yerine (plan tablosundaki gibi) otomatik cümle yazılır: iki bölüm tutarlı kalır
+    var otoUda = {};
+    ((bep.plan && bep.plan.udalar) || []).forEach(function (u) { otoUda[u.no] = u.metin; });
     var t5 = [{ baslik: true, cantSplit: true, hucreler: ["AMAÇ NO", "UZUN DÖNEMLİ AMAÇ (UDA)", "1. DÖNEM SONU", "2. DÖNEM SONU", "BEP BİRİMİ KARARI VE AÇIKLAMA"].map(function (b, i) {
       return hucre([metinPar(b, { b: true, color: R.beyaz, sz: 16 }, { jc: "center" })], { w: G5[i], fill: R.lacivert });
     }) }];
@@ -438,7 +441,7 @@
       var f = i % 2 ? R.beyaz : R.zebra1;
       t5.push({ cantSplit: true, hucreler: [
         hucre([metinPar("UDA " + u.no, { b: true, color: R.lacivert, sz: 16 }, { jc: "center" })], { w: G5[0], fill: R.etiket }),
-        hucre([metinPar(u.metin, { color: R.yazi, sz: 15 })], { w: G5[1], fill: f }),
+        hucre([metinPar(tr.bosluk(u.metin) ? u.metin : (otoUda[u.no] || ""), { color: R.yazi, sz: 15 })], { w: G5[1], fill: f }),
         hucre([metinPar(u.d1, { color: R.yazi, sz: 15 }, { jc: "center" })], { w: G5[2], fill: f }),
         hucre([metinPar(u.d2, { color: R.yazi, sz: 15 }, { jc: "center" })], { w: G5[3], fill: f }),
         hucre([metinPar(u.karar || "", { color: R.yazi, sz: 15 })], { w: G5[4], fill: f })

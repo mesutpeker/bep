@@ -12,7 +12,7 @@ var BEP = globalThis.BEP, tr = BEP.tr;
 var yetler = BEP.YETERSIZLIKLER.map(function (y) { return y.id; });
 var hata = 0, toplam = 0, sayfaDagilimi = {}, uzunKda = 0, enUzun = "";
 var ETIKET = /^UDA (\d+) \/ KDA (\d+)\.(\d+): /;
-var GOZLENEMEZ_SON = /\s(kavrar|fark eder|bilir|anlar|algılar|inceler)\.\s*(\(Ölçüt|$)/;
+var GOZLENEMEZ_SON = /\s(kavrar|fark eder|bilir|anlar|algılar|inceler|benimser|önemser|takdir eder|değer verir|hisseder|istekli olur|merak eder)\.\s*(\(Ölçüt|$)/;
 
 function yeniBep(ders, p, yet, ek) {
   var b = {
@@ -48,7 +48,7 @@ function planiDenetle(bep, sonuc) {
       beklenen(!gorulen[govde], "aynı KDA iki kez: " + l.slice(0, 120));
       gorulen[govde] = 1;
       beklenen(!GOZLENEMEZ_SON.test(l), "gözlemlenemeyen fiille biten KDA: " + l.slice(0, 120));
-      beklenen(!/\{konu\}|\{unite\}|\{tur\}|undefined|null|“”/.test(l), "şablon artığı: " + l.slice(0, 120));
+      beklenen(!/\{konu\}|\{unite\}|\{tur\}|undefined|null|“”|““|””|\sHz\.\s*\(Ölçüt|Zenginleştirme:/.test(l), "şablon/veri artığı: " + l.slice(0, 120));
     });
   });
   sonuc.udalar.forEach(function (u) {
@@ -77,10 +77,14 @@ BEP.dersListesi().forEach(function (ders) {
         if (/T\.C\. Kimlik|Doğum Tarihi|RAM \(ÖEDK\)|Okul Dışı Destek/.test(json)) throw new Error("kaldırılan alan belgede duruyor");
         if (!/Tablo 4\.3/.test(json) || !/Davranış Desteği/.test(json)) throw new Error("Tablo 4.3 kararları eksik");
         s.udalar.forEach(function (u) { beklenen(json.indexOf("UDA " + u.no + ": ") >= 0, "UDA " + u.no + " cümlesi plan tablosunda yok"); });
-        // Çoklu tanıda her tanının uyarlama başlıkları belgede (Tablo 4.1-4.2)
+        // Çoklu tanıda her tanının uyarlamaları belgede (Tablo 4.1-4.2); yalnız daha geniş bir ek süre hükmüyle örtüşen dar süre hükmü yazılmayabilir
+        var genisSure = yet.some(function (id) { return (BEP.yetersizlikBul(id).sinav || []).some(function (u) { return /%25-%50|esnek/.test(u.aciklama); }); });
         yet.forEach(function (id) {
           var pr = BEP.yetersizlikBul(id);
-          (pr.sinif || []).concat(pr.sinav || []).forEach(function (u) { beklenen(json.indexOf(JSON.stringify(u.baslik).slice(1, -1)) >= 0, "uyarlama eksik (" + id + "): " + u.baslik); });
+          (pr.sinif || []).concat(pr.sinav || []).forEach(function (u) {
+            if (genisSure && /ek süre/.test(u.aciklama) && !/%25-%50|esnek|mola|ortam/i.test(u.aciklama)) return;
+            beklenen(json.indexOf(JSON.stringify(u.aciklama).slice(1, -1)) >= 0, "uyarlama eksik (" + id + "): " + u.baslik);
+          });
         });
         // Üst bilgi ilçe idaresini yazar (Çankaya → kaymakamlık)
         beklenen(JSON.stringify(model.ust).indexOf("ÇANKAYA KAYMAKAMLIĞI") >= 0, "üst bilgide kaymakamlık yok");

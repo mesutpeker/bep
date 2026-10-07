@@ -123,6 +123,12 @@
     if (!Array.isArray(b.ayarlar.sinavHaftalari)) b.ayarlar.sinavHaftalari = [8, 16, 25, 33];
     if (!Array.isArray(b.izleme)) b.izleme = [];
     if (b.plan && (typeof b.plan !== "object" || !Array.isArray(b.plan.satirlar))) b.plan = null;
+    // Önceki sürümle üretilmiş plan: kaynağı imzadan türetilir ve imza sıfırlanır; böylece plan (UDA cümleleriyle)
+    // yeniden üretilir ya da elle düzenleme varsa "planı yenile" uyarısı gösterilir
+    if (b.plan && !b.plan.kaynak) {
+      try { var im = JSON.parse(b.plan.imza || "[]"); b.plan.kaynak = JSON.stringify([im[0] || "", im[0] === "__ozel__" ? "" : (im[1] || "")]); } catch (e) { /* bozuk imza */ }
+      b.plan.imza = "";
+    }
     if (!Array.isArray(b.ders.ozel.uniteler)) b.ders.ozel.uniteler = [{ ad: "", saat: "", kazanimlar: "" }];
     delete b.uyarlamalar; delete b.uyarlamaElle; delete b.kararlar;
     // Performans düzeyi artık arayüzde düzenlenmez; her zaman tanı ve derse göre üretilir
@@ -157,8 +163,10 @@
   function olay(e) {
     var el = e.target;
     if (!el || !el.dataset || !el.dataset.alan) return;
-    var eski = al(bep(), el.dataset.alan);
-    ata(bep(), el.dataset.alan, alanDegeri(el));
+    var eski = al(bep(), el.dataset.alan), yeni = alanDegeri(el);
+    // <select> hem input hem change olayı üretir: değer değişmediyse ikinci olay işlenmez
+    if (yeni === eski) return;
+    ata(bep(), el.dataset.alan, yeni);
     degisti(el.dataset.alan, eski);
   }
   document.addEventListener("input", olay);
@@ -604,7 +612,14 @@
     var sh = BEP.sinavHaftalariTemiz(ham, T.sonOgretimHaftasi);
     var ust = ucuncuSinavOlur(b) ? 3 : 2;
     var d1 = sh.filter(function (h) { return h <= T.donemSonHaftasi; }).length, d2 = sh.filter(function (h) { return h > T.donemSonHaftasi; }).length;
-    if (d1 < 2 || d2 < 2 || d1 > ust || d2 > ust) ekle("uyari", "BEP yazılı sınavları: her dönemde " + (ust === 3 ? "2 (bu derste en çok 3)" : "2") + " sınav haftası belirlenmelidir (OKY Md. 45/1-a; 1. dönem 1-" + T.donemSonHaftasi + ", 2. dönem " + (T.donemSonHaftasi + 1) + "-" + T.sonOgretimHaftasi + ". haftalar).", 3);
+    // Yalnız BEP'in uygulandığı dönemlerde sınav aranır (BEP 2. dönemde başlıyorsa 1. dönem sınavı gerekmez)
+    var etkin = { 1: true, 2: true };
+    if (b.plan && b.plan.satirlar.some(function (s) { return s.bepDisi; })) {
+      etkin = {};
+      b.plan.satirlar.forEach(function (s) { if (s.tur === "hafta" && !s.bepDisi && s.no <= T.sonOgretimHaftasi) etkin[s.donem] = true; });
+    }
+    var eksikDonem = (etkin[1] && d1 < 2) || (etkin[2] && d2 < 2);
+    if (eksikDonem || d1 > ust || d2 > ust) ekle("uyari", "BEP yazılı sınavları: BEP'in uygulandığı her dönemde " + (ust === 3 ? "2 (bu derste en çok 3)" : "2") + " sınav haftası belirlenmelidir (OKY Md. 45/1-a; 1. dönem 1-" + T.donemSonHaftasi + ", 2. dönem " + (T.donemSonHaftasi + 1) + "-" + T.sonOgretimHaftasi + ". haftalar).", 3);
     if (ham.length !== sh.length) ekle("uyari", "Aynı sınav haftası birden çok kez girilmiş ya da " + T.sonOgretimHaftasi + ". haftadan sonraki bir hafta yazılmış; sınav haftalarını kontrol edin.", 3);
     // Tarih tutarlılığı
     var o = b.ogrenci, ku = b.kurul, td = b.tasdik;
