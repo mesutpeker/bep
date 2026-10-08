@@ -211,6 +211,25 @@ dene("tek üniteli kazanımsız elle girilen ders (özel yetenek, tüm destek d�
   });
 });
 
+dene("yalnız numaradan oluşan ünite adı (“1. Ünite”) boş tırnak üretmez", function () {
+  var oz = { ad: "Atölye", sinif: "11", saat: 4, uniteler: [{ ad: "1. Ünite", saat: "", kazanimlar: "" }, { ad: "2. Ünite", saat: "", kazanimlar: "" }] };
+  var b = { egitimYili: "2026-2027", okul: { tur: "mtal" }, ogrenci: { ad: "Ece Deneme", sinif: "11", yetersizlik: ["zihinsel_orta"] }, ders: { id: "__ozel__", ozel: oz, saat: "" }, ayarlar: { olcut: "80", ozne: "ad", sinavHaftalari: [8, 16, 25, 33] }, kurul: {} };
+  var s = BEP.planiHazirla(b);
+  planiDenetle(b, s);
+  var metin = s.udalar.map(function (u) { return u.metin; }).concat(b.plan.satirlar.map(function (r) { return r.kda || ""; })).join("\n");
+  beklenen(metin.indexOf("“”") < 0, "boş tırnak var");
+});
+
+dene("karma tanı (özel yetenek + DEHB): DEHB koşulları plana girer, zenginleştirme koşulu destek planına karışmaz", function () {
+  var b = tekBep("fizik", "anadolu-9", ["ozel_yetenek", "dehb"]);
+  var s = BEP.planiHazirla(b), c = BEP.baglam(b);
+  planiDenetle(b, s);
+  var tum = b.plan.satirlar.map(function (r) { return r.kda || ""; }).join("\n");
+  var dk = BEP.yetersizlikBul("dehb").kosul[c.destek];
+  beklenen(!c.zengin && dk.every(function (k) { return tum.indexOf(k) >= 0; }), "DEHB koşulları planda yok");
+  beklenen(!/ileri düzey kaynaklardan|disiplinler arası bir bakışla/.test(tum), "destek planında zenginleştirme koşulu");
+});
+
 dene("haftalık 6 saatlik derste dönem başına 3. BEP sınavı", function () {
   var b = tekBep("matematik", "anadolu-9", ["oog"], function (x) { x.ayarlar.sinavHaftalari = [6, 12, 17, 24, 30, 35]; });
   beklenen(BEP.baglam(b).saat >= 6, "matematik 9 haftalık 6 saat değil");

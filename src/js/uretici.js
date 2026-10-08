@@ -168,7 +168,9 @@
     var ozne = ayar.ozne === "ogrenci" ? "Öğrenci" : ayar.ozne === "yok" ? "" : (ad || "Öğrenci");
     var T = BEP.takvimBilgi(bep.egitimYili);
     return {
-      bep: bep, ders: ders, plan: plan, profil: profiller[0], profiller: profiller,
+      // Karma tanıda (ör. özel yetenek + DEHB) destek odaklı planın yöntem/materyali destek gerektiren ilk tanıdan gelir
+      bep: bep, ders: ders, plan: plan, profiller: profiller,
+      profil: profiller.filter(function (p) { return !p.zenginlestirme; })[0] || profiller[0],
       grup: ozel ? "mes" : BEP.dersGrubu(ders && ders.id),
       program: plan ? plan.program : "TYMM",
       destek: ayar.destek || otomatikDestek(profiller),
@@ -188,7 +190,8 @@
     s = s.replace(/^\d+(\.\d+)?\.?\s*(TEMA|ÜNİTE|Tema|Ünite|THEME|Theme|UNIT|Unit)?\s*\d*\s*[:\-–]?\s*/, "");
     s = s.replace(/^(THEME|Theme|UNIT|Unit)\s*\d+\s*[:\-–]\s*/, "");
     s = s.replace(/\s*\(\d\)\s*$/, "").replace(/[\s\-–:;,]+$/, "");
-    return tr.baslikDuzeni(s, dil);
+    // "1. Ünite" gibi yalnız numaradan oluşan ad boş kalmasın
+    return tr.baslikDuzeni(s || tr.bosluk(ad), dil);
   }
   BEP.uniteSadeAd = uniteSadeAd;
 
@@ -482,14 +485,16 @@
   // Aynı KDA'nın yinelenen uygulamasını adlandırmak için (son çare): "ikinci uygulamada …"
   var SIRA_SOZCUK = ["", "birinci", "ikinci", "üçüncü", "dördüncü", "beşinci", "altıncı", "yedinci", "sekizinci", "dokuzuncu", "onuncu"];
 
-  function kosulSec(ctx, i) {
-    var p = ctx.profil;
-    var liste = (p.kosul && p.kosul[ctx.destek]) || (p.kosul && p.kosul.orta) || [];
-    return sec(liste, i);
-  }
+  function kosulSec(ctx, i) { return sec(kosulListesi(ctx), i); }
+  /* Çoklu tanıda tüm tanıların koşulları sırayla harmanlanır (birincil tanı önce); zenginleştirme odaklı olmayan
+     planda özel yetenek koşulları destek koşullarının yerini almaz */
   function kosulListesi(ctx) {
-    var p = ctx.profil;
-    return (p.kosul && p.kosul[ctx.destek]) || (p.kosul && p.kosul.orta) || [];
+    var listeler = ctx.profiller.filter(function (p) { return ctx.zengin || !p.zenginlestirme; }).map(function (p) {
+      return (p.kosul && p.kosul[ctx.destek]) || (p.kosul && p.kosul.orta) || [];
+    });
+    var out = [], en = Math.max.apply(null, listeler.map(function (l) { return l.length; }).concat([0]));
+    for (var i = 0; i < en; i++) listeler.forEach(function (l) { if (l[i]) out.push(l[i]); });
+    return benzersiz(out);
   }
 
   var DIL_SABLON = {

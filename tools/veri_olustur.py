@@ -1139,9 +1139,9 @@ def plan_derle(p, program, dil="tr"):
         if konular:
             hf["k"] = " | ".join(konular[:2])
         if ciktilar:
-            # İngilizce planlarda beceri başına madde imli kazanımların tümü tutulur (Listening … Writing);
-            # uygulama ilk kazanımı gösterip "(+N … daha)" yazar
-            hf["c"] = ciktilar if dil == "en" else ciktilar[:4]
+            # Haftanın kazanımlarının tümü tutulur (sınır konmaz: Arapça, TDE, İngilizce beceri maddeleri gibi
+            # çok kazanımlı haftalarda kaynak içerik düşmesin); uygulama ilk kazanımı gösterip "(+N … daha)" yazar
+            hf["c"] = ciktilar
         if davranis:
             hf["b"] = [kisalt(d, 190) for d in davranis[:5]]
         if olcme:

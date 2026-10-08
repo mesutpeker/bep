@@ -547,8 +547,14 @@
         // Bu sayfada tamamlanan ilk hücre (ör. hafta) devam satırında soluk "(devam)" etiketiyle yinelenir
         var e0 = hucreler[0], c0 = devam.firstChild;
         var metin = e0 ? e0.textContent.replace(/\s+/g, " ").trim() : "";
-        if (e0 && !kalanlar[0].length && metin && metin.length <= 80) {
-          dizi(e0.childNodes).forEach(function (n) { c0.appendChild(n.cloneNode(true)); });
+        if (e0 && !kalanlar[0].length && metin) {
+          // Uzun etiket (ör. Bölüm 2'deki alan adı) kısaltılarak yinelenir
+          if (metin.length <= 80) dizi(e0.childNodes).forEach(function (n) { c0.appendChild(n.cloneNode(true)); });
+          else {
+            var kopya = e0.cloneNode(true); // <br> ve paragraf sınırları boşluk olsun ("Düzeyi(Sayılar" yazılmasın)
+            dizi(kopya.querySelectorAll("br, p, div, li")).forEach(function (n) { n.parentNode.insertBefore(belge.createTextNode(" "), n); });
+            c0.textContent = kopya.textContent.replace(/\s+/g, " ").trim().slice(0, 70).replace(/\s+\S*$/, "") + "…";
+          }
           if (!e0.hasAttribute("data-etiket")) {
             // Ayrı satırda, küçük ve bölünmeden (dar hafta sütununda "(devam" / ")" olmasın)
             var s = belge.createElement("span"), hedef = c0.lastElementChild || c0;
