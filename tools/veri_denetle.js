@@ -20,6 +20,19 @@
  *   hafta-turu-artigi  davranış/kazanım olarak alınmış hafta türü ("OKUL TEMELLİ PLANLAMA.")
  *   csv-tirnak         hücre başında kalmış CSV kaçış tırnağı ('"ENG.9.2.L1…', '""…""')
  *   birlesik-madde     tek davranışta birleşmiş süreç bileşenleri ("… yapar. c) …", "… seçer.b) …")
+ *   isaretsiz-ozel-hafta  saati 0, içeriği boş ve türü (x) işaretsiz hafta: SAAT sütunundaki "OKUL TEMELLİ PLANLAMA"
+ *                      tanınmamış, uygulama haftayı önceki ünitenin devamı sayar
+ *   imza-satiri        plan sonundaki imza/onay bloğu ("OKUL MÜDÜRÜ", "ARAPÇA ÖĞRETMENİ", "U Y G U N D U R", "…/09/2026")
+ *   gun-disi           belirli gün/hafta listesinde gün adı ya da tarih taşımayan öğe ("Kısa videolar Diyaloglar/soru …")
+ *   zenginlestirme-notu  kazanım/davranış/konuya eklenmiş "Zenginleştirme: …" öğretmen notu
+ *   yeterlilik-b       çekimli fiile çevrilmemiş davranış ("… sürecini değerlendirebilme.")
+ *   yuklemsiz-b        yüklemi olmayan kesik davranış ("Kültürümüzde Hz.", "… değişkenler (P, V, T,.")
+ *   kesik-unite        aynı ünitenin kesik ("… VE SOSYOLOJ") ya da kod önekli ("KK.10.3. …") kopyası
+ *   esik-tirnak        başta/sonda eşi olmayan ya da sayısı tutmayan tırnak ("“Enfal Suresi ve Anlam")
+ *   buyuk-harf-c       tamamı büyük harf kazanım metni (beceri başlığı: "DİNLEME/İZLEME-ANLAMLANDIRMA")
+ *   pua                Symbol yazı tipi özel kullanım alanı karakteri (U+E000–U+F8FF)
+ *   noktalama-sonu     ";." / ":." / ",." ile biten metin
+ *   ingilizce-i        İngilizce planda Türkçe büyük "İ" ile başlayan Latin sözcük ("İdentify")
  */
 "use strict";
 var path = require("path");
@@ -32,7 +45,9 @@ if (!VERI || !VERI.dersler) { console.error("BEP_VERI yüklenemedi: " + yol); pr
 var ORNEK_SAYISI = +process.env.ORNEK || 4;
 var SINIFLAR = [
   "yil-kod-yutma", "numara-oneki", "gomulu-kod", "eksik-bosluk", "tireleme", "birlesik-unite", "oto-konu",
-  "bas-tire", "iki-nokta", "cift-bosluk", "dolgu", "baslik-sizintisi", "hafta-turu-artigi", "csv-tirnak", "birlesik-madde"
+  "bas-tire", "iki-nokta", "cift-bosluk", "dolgu", "baslik-sizintisi", "hafta-turu-artigi", "csv-tirnak", "birlesik-madde",
+  "isaretsiz-ozel-hafta", "imza-satiri", "gun-disi", "zenginlestirme-notu", "yeterlilik-b", "yuklemsiz-b", "kesik-unite", "esik-tirnak",
+  "buyuk-harf-c", "pua", "noktalama-sonu", "ingilizce-i"
 ];
 var bulgular = {};
 SINIFLAR.forEach(function (s) { bulgular[s] = []; });
@@ -87,6 +102,33 @@ function uniteAnahtar(ad) {
   var s = trBuyuk(ad).replace(/^\d+(\.\d+)?\.\s*(TEMA|ÜNİTE)?\s*:?\s*/, "");
   return s.replace(/[^A-ZÇĞİÖŞÜ0-9]/g, "");
 }
+// Plan sonundaki imza / onay bloğu satırları
+var IMZA = /(?:^|\s)(?:OKUL MÜDÜRÜ|MÜDÜR YARDIMCISI|ZÜMRE ÖĞRETMENLERİ|[A-ZÇĞİÖŞÜ]+ ÖĞRETMENİ|U\s?Y\s?G\s?U\s?N\s?D\s?U\s?R|TASDİK OLUNUR)(?:\s|$)|^[….\s/0-9]+$/;
+var BELIRLI_GUN = /Gün[üu](?![a-zçğıöşü])|Haftası|Bayram|Kandili|Zaferi|Fethi|Gecesi|Yılbaşı|Başlangıcı|Anma(?![a-zçğıöşü])|Kabulü|(?:^|[^\d])\d{1,2}\s*(?:-\s*\d{1,2}\s*)?(?:Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)(?![a-zçğıöşü])/;
+var NOT_BASLIGI = /(?:Zenginleştirme|ZENGİNLEŞTİRME|ZENGNİLEŞTİRME)\s*\d*\s*:/;
+// Cümle sonunda kalan kısaltma: yüklem yok ("Kültürümüzde Hz.")
+var KISALTMA_SONU = /(?:^|[\s(])(?:Hz|vb|vd|vs|sav|Dr|Doç|Prof|yy|bkz|örn|M\.Ö|M\.S)\.?$/;
+// İngilizce planlarda "İ" ile başlaması doğal olan Türkçe özel adlar
+var INGILIZCE_I_ISTISNA = ["İstanbul", "İzmir", "İzmit", "İznik", "İskenderun", "İnebolu"];
+function buyukHarfMi(s) {
+  return (String(s).match(/[A-ZÇĞİÖŞÜ]/g) || []).length >= 3 && !/[a-zçğıöşüâîû]/.test(s);
+}
+function esikTirnak(t) {
+  t = String(t);
+  var sonu = t.replace(/[\s.;,]+$/, "");
+  if ((t.charAt(0) === "“" && t.indexOf("”") < 0) || (t.charAt(0) === "\"" && (t.match(/"/g) || []).length === 1)) return "başta eşsiz tırnak";
+  if ((sonu.slice(-1) === "”" && t.indexOf("“") < 0) || (sonu.slice(-1) === "\"" && (t.match(/"/g) || []).length === 1)) return "sonda eşsiz tırnak";
+  // Uzunluk nedeniyle kısaltılmış ("…") metinde kapanış kesilmiş olabilir: sayı denetimi yapılmaz
+  if (!/…$/.test(t) && ((t.match(/“/g) || []).length !== (t.match(/”/g) || []).length || (t.match(/"/g) || []).length % 2)) return "tırnak sayısı tutmuyor";
+  return null;
+}
+// Ünite numarası ("2. ÜNİTE: …" -> 2, "KK.10.3. …" -> 3) ve kod öneki atılmış anahtar
+function uniteNo(ad) {
+  var m = /^(\d+)\./.exec(ad) || /^(?:[A-ZÇĞİÖŞÜ]{1,6}\.)+(?:\d+\.)*(\d+)\.?\s/.exec(ad);
+  return m ? m[1] : null;
+}
+function kodOnekiSil(ad) { return String(ad).replace(/^(?:[A-ZÇĞİÖŞÜ]{1,6}\.)+(?:\d+\.)+\s*/, ""); }
+
 function baslikDuzeniMi(s) {
   var k = String(s).split(/\s+/).filter(function (w) { return new RegExp("^[" + HARF + "]").test(w) && w.length > 3; });
   var b = k.filter(function (w) { return new RegExp("^[" + BUYUK + "]").test(w); }).length;
@@ -107,11 +149,32 @@ planlar(function (d, p) {
     });
   });
 
+  // kesik / kod önekli ünite kopyası: aynı numaralı başka bir ünitenin adı ya da (son sözcükte ≤3 harf eksik) öneki
+  var kodsuz = p.uniteler.map(function (u) { return uniteAnahtar(kodOnekiSil(u.ad)); });
+  kodsuz.forEach(function (ki, i) {
+    kodsuz.forEach(function (kj, j) {
+      var no = uniteNo(p.uniteler[i].ad);
+      if (i === j || !ki || !kj || !no || no !== uniteNo(p.uniteler[j].ad)) return;
+      var kodlu = ki === kj && kodOnekiSil(p.uniteler[i].ad) !== p.uniteler[i].ad;
+      var kesik = kj.indexOf(ki) === 0 && kj.length - ki.length > 0 && kj.length - ki.length <= 3;
+      if (kodlu || kesik) ekle("kesik-unite", pyer, p.uniteler[i].ad + "  ~  " + p.uniteler[j].ad);
+    });
+  });
+  var ingilizce = d.id === "ingilizce";
+  // PUA karakteri: planın tüm metinleri
+  if (/[\uE000-\uF8FF]/.test(JSON.stringify([p.uniteler, p.haftalar]))) {
+    var puaYer = [];
+    p.haftalar.forEach(function (h) { if (/[\uE000-\uF8FF]/.test(JSON.stringify(h))) puaYer.push("h" + h.h); });
+    ekle("pua", pyer, puaYer.join(" ") || "ünite adları");
+  }
+
   var alanlar = p.uniteler.map(function (u) { return ["ünite", u.ad]; });
   p.uniteler.forEach(function (u) { if (u.destek) alanlar.push(["destek", u.destek]); });
   alanlar.forEach(function (m) {
     eksikBosluk(pyer + " " + m[0], m[1]);
     if (/ {2,}/.test(m[1])) ekle("cift-bosluk", pyer + " " + m[0], m[1]);
+    var et = m[0] === "ünite" && esikTirnak(m[1]);
+    if (et) ekle("esik-tirnak", pyer + " " + m[0], m[1] + "  [" + et + "]");
   });
 
   p.haftalar.forEach(function (h) {
@@ -119,9 +182,38 @@ planlar(function (d, p) {
     (h.c || []).forEach(function (c) {
       if (/\d{3,}/.test(c[0])) ekle("yil-kod-yutma", yer, c[0] + " | " + c[1]);
       if (!new RegExp("[" + HARF + "]").test(c[1])) ekle("dolgu", yer, c[1]);
+      if (buyukHarfMi(c[1])) ekle("buyuk-harf-c", yer, c[0] + " | " + c[1]);
+    });
+    // Saati 0, içeriği boş ve türü işaretsiz hafta (otomatik dağıtılan planlarda her hafta içeriklidir)
+    if (h.s === 0 && !h.x && !(h.c && h.c.length) && !h.k && !(h.b && h.b.length)) ekle("isaretsiz-ozel-hafta", yer, JSON.stringify(h));
+    (h.g || []).forEach(function (g) {
+      if (IMZA.test(g)) ekle("imza-satiri", yer + " g", g);
+      else if (!BELIRLI_GUN.test(g)) ekle("gun-disi", yer + " g", g);
+      var et = esikTirnak(g);
+      if (et) ekle("esik-tirnak", yer + " g", g + "  [" + et + "]");
+    });
+    (h.b || []).forEach(function (b) {
+      if (ingilizce) return;
+      if (/(?:ebilme|abilme)\.?$/.test(b)) ekle("yeterlilik-b", yer, b);
+      // Yüklem: sondaki noktalama/parantez atılınca geniş zaman ya da olumsuz çekim eki (-r / -z) kalmalı
+      var govde = b.replace(/[\s.!?)]+$/, "");
+      if (!/…$/.test(b) && (!/[a-zçğıöşüâîû](?:r|z)$/.test(govde) || KISALTMA_SONU.test(govde))) ekle("yuklemsiz-b", yer, b);
     });
     metinler(h).forEach(function (m) {
       var alan = m[0], t = String(m[1]), y = yer + " " + alan;
+      if (IMZA.test(t)) ekle("imza-satiri", y, t);
+      if (NOT_BASLIGI.test(t)) ekle("zenginlestirme-notu", y, t);
+      if (/[;:,]\.$/.test(t)) ekle("noktalama-sonu", y, t);
+      (alan === "k" ? t.split(" | ") : [t]).forEach(function (parca) {
+        var et = esikTirnak(parca);
+        if (et) ekle("esik-tirnak", y, parca + "  [" + et + "]");
+      });
+      if (ingilizce) {
+        (t.match(/(?:^|[^A-Za-zÇĞİÖŞÜçğıöşü])İ[a-z]+/g) || []).forEach(function (w) {
+          w = w.replace(/^[^İ]+/, "");
+          if (INGILIZCE_I_ISTISNA.indexOf(w) < 0) ekle("ingilizce-i", y, w + "  ←  " + t);
+        });
+      }
       // Boşluksuz madde/kod numarası her alanda artıktır: "1.Peygamberi …", "Kötülük Problemi 2.11.Sahte …"
       var bitisikNumara = /(?:^|\s)\d{1,2}(?:\.\d{1,2})*\.[A-ZÇĞİÖŞÜ][a-zçğıöşü]/.test(t);
       if (alan === "k" && bitisikNumara) ekle("numara-oneki", y, t);

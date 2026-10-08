@@ -464,6 +464,23 @@
     "önceki haftalarda öğrendiklerini akranına bir örnekle açıklar",
     "önceki haftalarda öğrendiklerini kısa bir değerlendirme etkinliğinde gösterir"
   ];
+  /* Koşul/pekiştirme seçenekleri tükendiğinde kullanılan ek koşullar (uzun ve konusuz ünitelerde KDA'lar birbirini
+     tekrar etmesin): genelde destek düzeyinden bağımsız çalışma ortamları, özel yetenekte zenginleştirme koşulları
+     (destek/ipucu dili yok) ve derinleştirme davranışları */
+  var EK_KOSULLAR = {
+    genel: ["bireysel çalışma sırasında", "küçük grup çalışmasında", "çalışma kâğıdı üzerinde çalışırken", "sınıf içi bir çalışma istasyonunda"],
+    zengin: ["açık uçlu bir problem durumunda", "dijital üretim araçlarını kullanarak", "kendi belirlediği bir araştırma sorusu üzerinde çalışırken",
+      "küçük bir proje ekibinde görev alırken", "gerçek yaşamdan alınmış bir durum üzerinde çalışırken", "alanla ilgili güncel bir kaynaktan yararlanarak"]
+  };
+  var ZENGIN_DEVAM_DAVRANISLARI = [
+    "önceki haftalarda öğrendiklerini yeni bir problem durumuna uygulayarak çözümünü açıklar",
+    "önceki haftalarda öğrendikleriyle ilgili özgün bir soru hazırlayarak çözümünü sunar",
+    "önceki haftalarda öğrendiği kavramları bir kavram haritasında ilişkilendirerek gösterir",
+    "önceki haftalarda öğrendiklerini farklı bir disiplindeki bir uygulamayla karşılaştırır",
+    "önceki haftalarda yaptığı çalışmanın sonuçlarını kısa bir rapor hâlinde yazar"
+  ];
+  // Aynı KDA'nın yinelenen uygulamasını adlandırmak için (son çare): "ikinci uygulamada …"
+  var SIRA_SOZCUK = ["", "birinci", "ikinci", "üçüncü", "dördüncü", "beşinci", "altıncı", "yedinci", "sekizinci", "dokuzuncu", "onuncu"];
 
   function kosulSec(ctx, i) {
     var p = ctx.profil;
@@ -505,7 +522,8 @@
 
   /* ----------------------------------------------------------------- UDA bölümlemesi */
   /* Öğretim haftalarını ünitelerine göre UDA bölümlerine ayırır.
-     - 10 haftadan uzun ünite (ör. öğrenme alanı olarak verilmiş "Sayılar ve Cebir") konu, gerekirse kazanım sınırlarından 3-6 haftalık bölümlere ayrılır.
+     - 10 haftadan uzun ünite (ör. öğrenme alanı olarak verilmiş "Sayılar ve Cebir") konu, gerekirse kazanım sınırlarından 3-6 haftalık bölümlere ayrılır;
+       bu sınırlar yoksa bir dönemden uzun ünite (ör. elle girilen tek ünitelik ders) dönem sonundan ikiye bölünür.
      - En çok 2 haftalık ardışık kısa üniteler (ör. İngilizce temalar) 4 haftaya kadar birleştirilir. */
   /* Haftaları anahtar değişimlerinden 3-6 haftalık gruplara ayırır (en küçük grup 3 hafta) */
   function gruplaraBol(haftalar, anahtarFn) {
@@ -555,6 +573,14 @@
           else gruplar.push(g);
         });
         if (gruplar.length > 1) { gruplar.forEach(function (gh) { bolumler.push({ uniteler: [ui], haftalar: gh, bolunmus: true }); }); return; }
+        // Konu/kazanım sınırı olmayan ve bir dönemden uzun süren ünite dönem sonundan bölünür (BEP dönem sonunda değerlendirilir)
+        if (W.length > 18) {
+          var donemler = [1, 2].map(function (d) { return W.filter(function (h) { return (ogretim[h.wi].t.donem === 1) === (d === 1); }); });
+          if (donemler[0].length >= 3 && donemler[1].length >= 3) {
+            donemler.forEach(function (gh, i) { bolumler.push({ uniteler: [ui], haftalar: gh, bolunmus: true, donem: i + 1 }); });
+            return;
+          }
+        }
       }
       bolumler.push({ uniteler: [ui], haftalar: W, bolunmus: false });
     });
@@ -765,7 +791,7 @@
     d1.forEach(function (h, i) { sinavSirasi[h] = "1. DÖNEM " + (i + 1) + ". BEP YAZILI SINAVI"; });
     d2.forEach(function (h, i) { sinavSirasi[h] = "2. DÖNEM " + (i + 1) + ". BEP YAZILI SINAVI"; });
 
-    var satirlar = [], kdaSayac = {}, gorulen = {}, devamSayac = 0;
+    var satirlar = [], kdaSayac = {}, gorulen = {}, devamSayac = 0, ekSayac = 0;
     var haftaIndeks = 0;
     var kosullar = kosulListesi(ctx);
 
@@ -787,8 +813,30 @@
       // Koşul seçenekleri tükenirse pekiştirme davranışları tüm koşul havuzuyla denenir
       for (var j = 0; j < DEVAM_DAVRANISLARI.length * Math.max(1, havuz.length); j++) {
         var dv = DEVAM_DAVRANISLARI[(devamSayac + j) % DEVAM_DAVRANISLARI.length], kv = sec(havuz, Math.floor((devamSayac + j) / DEVAM_DAVRANISLARI.length));
+        if (kosulYinelemesi(kv, dv)) continue; // "kısa bir değerlendirme etkinliğinde … değerlendirme etkinliğinde gösterir" yazılmaz
         var g2 = tr.low(kdaGovdesi(kv, dv));
         if (!gorulen[g2]) { gorulen[g2] = 1; devamSayac += j + 1; return { kosul: kv, davranis: dv }; }
+      }
+      // Ek koşullar denenir: önce asıl davranış (pekiştirme değilse), sonra (özel yetenekte derinleştirme ve) pekiştirme
+      // davranışları; koşul ve davranış birlikte döner, ardışık haftalar aynı koşulla başlamaz
+      var ekHavuz = benzersiz(havuz.concat(EK_KOSULLAR[ctx.zengin ? "zengin" : "genel"]));
+      var ekDavranis = ctx.zengin ? ZENGIN_DEVAM_DAVRANISLARI.concat(DEVAM_DAVRANISLARI) : DEVAM_DAVRANISLARI;
+      var adaylar = DEVAM_DAVRANISLARI.indexOf(davranis) < 0 ? ekHavuz.map(function (k) { return { kosul: k, davranis: davranis }; }) : [];
+      var asil = adaylar.length;
+      for (var c = ekSayac; c < ekSayac + ekDavranis.length * ekHavuz.length; c++) {
+        var di = c % ekDavranis.length;
+        adaylar.push({ kosul: ekHavuz[(di + Math.floor(c / ekDavranis.length)) % ekHavuz.length], davranis: ekDavranis[di] });
+      }
+      for (var a = 0; a < adaylar.length; a++) {
+        if (kosulYinelemesi(adaylar[a].kosul, adaylar[a].davranis)) continue;
+        var g3 = tr.low(kdaGovdesi(adaylar[a].kosul, adaylar[a].davranis));
+        if (!gorulen[g3]) { gorulen[g3] = 1; if (a >= asil) ekSayac += a - asil + 1; return adaylar[a]; }
+      }
+      // Son çare: aynı KDA'nın yinelenen uygulaması sırasıyla adlandırılır ("ikinci uygulamada …")
+      for (var n = 2; n < 100; n++) {
+        var ks = (SIRA_SOZCUK[n] || n + ".") + " uygulamada" + (kosul ? " " + kosul : "");
+        var g4 = tr.low(kdaGovdesi(ks, davranis));
+        if (!gorulen[g4]) { gorulen[g4] = 1; return { kosul: ks, davranis: davranis }; }
       }
       return { kosul: kosul, davranis: davranis };
     }
@@ -929,7 +977,9 @@
     var adIf = listeBirlestir(sade.map(function (s) { return "“" + s + "”"; }));
     var turEk = tekil ? (tema ? "teması" : "ünitesi") : (tema ? "temaları" : "üniteleri");
     var ozne = ctx.ozne ? ctx.ozne + ", " : "";
-    var baslat = function (s) { return ctx.ozne ? ozne + s : tr.ilkHarfBuyuk(s); };
+    // Dönem sonundan bölünen ünitenin parçaları dönemle ayırt edilir: "Ece, 1. dönemde “…” ünitesi …"
+    var donemOn = bolum.donem ? bolum.donem + ". dönemde " : "";
+    var baslat = function (s) { return ctx.ozne ? ozne + donemOn + s : tr.ilkHarfBuyuk(donemOn + s); };
     // Bölümdeki tüm konu parçaları (büyük/küçük harf farkı gözetmeden tekil); yazılamayanlar varsa "ve ilgili diğer konular"
     var gorulenK = {}, tumKonular = [];
     bolum.haftalar.forEach(function (h) {

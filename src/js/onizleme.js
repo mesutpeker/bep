@@ -21,6 +21,9 @@
  *                     oluşturulmuş birleşik hücre (ör. AY), data-bas: asıl hücrenin satırı
  *   td[data-sutun]    hücrenin ızgara sütunu
  *   [data-alan]       PAGE / NUMPAGES alanı
+ *   tr[data-devam]    tek başına bir sayfaya sığmadığı için bölünmüş satırın sonraki sayfadaki devamı
+ *                     (değer: satır sırası); td[data-etiket] devam satırındaki "(devam)" etiketi;
+ *                     [data-bol] ikiye bölünmüş paragraf/öğenin ilk parçası (devamı sonraki parçada)
  */
 (function (kok) {
   "use strict";
@@ -269,11 +272,13 @@
 
   function tabloSatirlariniAl(t, tablo, ilkParca) {
     dizi(tablo.rows).forEach(function (tr) {
+      // Bölünmüş satırın devamı: içerik asıl satırın hücrelerine geri eklenir
+      if (tr.hasAttribute("data-devam")) { devamiBirlestir(t.gorulen[tr.getAttribute("data-devam")], tr); return; }
       if (!tr.hasAttribute("data-satir")) { if (ilkParca) t.basliklar.push(tr.cloneNode(true)); return; }
       var r = tr.getAttribute("data-satir");
       if (t.gorulen[r]) return;
-      t.gorulen[r] = true;
       var k = tr.cloneNode(true);
+      t.gorulen[r] = k;
       dizi(k.cells).forEach(function (td) {
         if (td.hasAttribute("data-kopya")) { k.removeChild(td); return; }
         var n = +td.getAttribute("data-rs") || 1;
@@ -281,6 +286,89 @@
       });
       t.satirlar.push(k);
     });
+  }
+
+  /* Devam satırının hücrelerini (kopya ve etiket hücreleri hariç) asıl satırın aynı sütundaki hücrelerine ekler.
+     Eski sayfalar yerleşim bitene kadar bozulmasın diye kopyalanarak alınır. */
+  function devamiBirlestir(asil, devam) {
+    if (!asil) return;
+    dizi(devam.cells).forEach(function (td) {
+      if (td.hasAttribute("data-kopya") || td.hasAttribute("data-etiket")) return;
+      var sutun = td.getAttribute("data-sutun"), hedef = null;
+      dizi(asil.cells).some(function (c) { if (c.getAttribute("data-sutun") === sutun) { hedef = c; return true; } return false; });
+      if (!hedef) return;
+      parcaBirlestir(hedef, td.cloneNode(true));
+      hedef.normalize();
+    });
+  }
+
+  /* b'nin içeriğini a'nın sonuna taşır. Bölmede ikiye ayrılmış öğe (a'nın son öğesi data-bol) b'nin ilk
+     öğesiyle tek öğe olur; b'nin parçası da sonraki parçada sürüyorsa işaret birleşik öğede kalır. */
+  function parcaBirlestir(a, b) {
+    var x = a.lastChild, y = b.firstChild;
+    if (x && y && x.nodeType === 1 && y.nodeType === 1 && x.hasAttribute("data-bol")) {
+      if (!y.hasAttribute("data-bol")) x.removeAttribute("data-bol");
+      parcaBirlestir(x, y);
+      b.removeChild(y);
+    }
+    while (b.firstChild) a.appendChild(b.firstChild);
+  }
+
+  /* Paragraf içindeki bölme noktaları, belge sırasıyla: <br> satır sonlarından sonra; kelime ise ayrıca
+     boşluktan sonraki her kelime başı. Bir öğenin başına/sonuna düşen nokta üst düzeye taşınır (boş parça olmasın). */
+  function bolmeNoktalari(p, kelime) {
+    var l = [];
+    function ekle(d, o) {
+      while (d !== p) {
+        var n = d.nodeType === 3 ? d.data.length : d.childNodes.length;
+        if (o !== 0 && o !== n) break;
+        var i = dizi(d.parentNode.childNodes).indexOf(d);
+        o = o === 0 ? i : i + 1;
+        d = d.parentNode;
+      }
+      if (d === p && (o === 0 || o === p.childNodes.length)) return;
+      var son = l[l.length - 1];
+      if (!son || son.d !== d || son.o !== o) l.push({ d: d, o: o });
+    }
+    (function gez(e) {
+      dizi(e.childNodes).forEach(function (c) {
+        if (c.nodeType === 1) {
+          if (c.tagName === "BR") ekle(c.parentNode, dizi(c.parentNode.childNodes).indexOf(c) + 1);
+          else gez(c);
+        } else if (c.nodeType === 3 && kelime) {
+          for (var j = 1; j <= c.data.length; j++) {
+            if (!/\s/.test(c.data.charAt(j - 1))) continue;
+            if (j < c.data.length ? !/\s/.test(c.data.charAt(j)) : true) ekle(c, j);
+          }
+        }
+      });
+    })(p);
+    return l;
+  }
+
+  /* Paragrafı noktadan ikiye ayırır: [ilk parça, devamı]. İlk parça ve noktada ikiye ayrılan
+     satır içi öğeler data-bol ile işaretlenir (yeniden sayfalamada birleştirilir). */
+  function paragrafiAyir(p, nokta) {
+    var belge = p.ownerDocument, r1 = belge.createRange(), r2 = belge.createRange();
+    r1.setStart(p, 0); r1.setEnd(nokta.d, nokta.o);
+    r2.setStart(nokta.d, nokta.o); r2.setEnd(p, p.childNodes.length);
+    var ilk = p.cloneNode(false), devam = p.cloneNode(false);
+    ilk.appendChild(r1.cloneContents());
+    devam.appendChild(r2.cloneContents());
+    ilk.setAttribute("data-bol", "1");
+    var e = ilk;
+    for (var d = nokta.d; d !== p; d = d.parentNode) {
+      if (d.nodeType !== 1 || !e.lastChild) continue;
+      e = e.lastChild;
+      e.setAttribute("data-bol", "1");
+    }
+    return [ilk, devam];
+  }
+
+  /* Satır sırası; devam satırında bölünen satırın sırası */
+  function satirNo(tr) {
+    var v = tr.getAttribute("data-satir");
+    return v === null ? tr.getAttribute("data-devam") : v;
   }
 
   /* Satır grupları (birlikte kalacak satırlar) ve dikey birleşim kapsamları */
@@ -315,15 +403,15 @@
 
   /* Parçadaki birleşik hücrelerin rowspan değerlerini parçadaki satırlara göre düzeltir */
   function rowspanDuzelt(tbody) {
-    var trler = dizi(tbody.rows).filter(function (tr) { return tr.hasAttribute("data-satir"); });
+    var trler = dizi(tbody.rows).filter(function (tr) { return satirNo(tr) !== null; });
     if (!trler.length) return;
-    var ilk = +trler[0].getAttribute("data-satir"), son = +trler[trler.length - 1].getAttribute("data-satir");
+    var ilk = +satirNo(trler[0]), son = +satirNo(trler[trler.length - 1]);
     trler.forEach(function (tr) {
       dizi(tr.cells).forEach(function (td) {
         var rs = +td.getAttribute("data-rs") || 1;
         if (rs <= 1) return;
         var kopya = td.hasAttribute("data-kopya");
-        var bas = kopya ? +td.getAttribute("data-bas") : +tr.getAttribute("data-satir");
+        var bas = kopya ? +td.getAttribute("data-bas") : +satirNo(tr);
         var adet = Math.min(bas + rs - 1, son) - (kopya ? ilk : bas) + 1;
         if (adet > 1) td.setAttribute("rowspan", adet); else td.removeAttribute("rowspan");
       });
@@ -354,7 +442,8 @@
       return !son || son.getBoundingClientRect().bottom <= sinir;
     }
     function tasma() {
-      // Tek başına bir sayfaya sığmayan öğe: içerik kaybolmasın diye sayfa uzar (yazdırmada da)
+      // Tek başına bir sayfaya sığmayan, bölünemeyen öğe (olağan dışı; uzun tablo satırları bölünür):
+      // içerik kaybolmasın diye sayfa uzar (yazdırmada da)
       sayfa.className += " tasma";
       yeniSayfa();
     }
@@ -396,32 +485,129 @@
         govde.appendChild(parca);
         veri = 0;
       }
+      // i. satırı kapsayan, önceki sayfada (basDahil ise bu satırda) başlamış birleşik hücreleri (ör. AY)
+      // sayfanın ilk satırında yeniden oluştur
+      function kopyalariEkle(tr, i, basDahil) {
+        t.kapsamlar.forEach(function (k) {
+          if (k.son < i || k.bas > i || (k.bas === i && !basDahil)) return;
+          var c = k.td.cloneNode(true);
+          c.setAttribute("data-kopya", "1");
+          c.setAttribute("data-bas", k.bas);
+          var once = null;
+          dizi(tr.cells).some(function (td) { if ((+td.getAttribute("data-sutun") || 0) > k.sutun) { once = td; return true; } return false; });
+          tr.insertBefore(c, once);
+        });
+      }
       function satirEkle(i, devam) {
         var tr = t.satirlar[i].cloneNode(true);
-        if (devam) {
-          // Önceki sayfada başlamış birleşik hücreleri (ör. AY) bu sayfanın ilk satırında yeniden oluştur
-          t.kapsamlar.forEach(function (k) {
-            if (k.bas >= i || k.son < i) return;
-            var c = k.td.cloneNode(true);
-            c.setAttribute("data-kopya", "1");
-            c.setAttribute("data-bas", k.bas);
-            var once = null;
-            dizi(tr.cells).some(function (td) { if ((+td.getAttribute("data-sutun") || 0) > k.sutun) { once = td; return true; } return false; });
-            tr.insertBefore(c, once);
-          });
-        }
+        if (devam) kopyalariEkle(tr, i, false);
         tbody.appendChild(tr);
         veri++;
         rowspanDuzelt(tbody);
         return tr;
       }
       function satirKaldir(tr) { tbody.removeChild(tr); veri--; rowspanDuzelt(tbody); }
+
+      /* Tek başına sayfaya sığmayan satırı böler: her hücrenin sığan kısmı satırda kalır, kalanı i. satırın
+         devam satırına (tr[data-devam]) geçer. Hücrede önce bütün paragraflar, sonra sığmayan paragrafın <br>
+         satırları; hiç paragraf sığmıyorsa son çare olarak kelime sınırı denenir. Birleşik hücreler (ör. AY)
+         bölünmez, devam satırında kopya olarak yeniden oluşur. Dönüş: devam satırı; kalan yoksa false;
+         bölünemiyorsa (ilerleme yok) null. */
+      function satirBol(tr, i) {
+        var hucreler = dizi(tr.cells).filter(function (td) { return !td.hasAttribute("data-kopya") && (+td.getAttribute("data-rs") || 1) <= 1; });
+        var icerikler = hucreler.map(function (td) {
+          var l = dizi(td.childNodes);
+          l.forEach(function (n) { td.removeChild(n); });
+          return l;
+        });
+        function geriAl() {
+          hucreler.forEach(function (td, k) {
+            while (td.firstChild) td.removeChild(td.firstChild);
+            icerikler[k].forEach(function (n) { td.appendChild(n); });
+          });
+          return null;
+        }
+        if (!sigiyor()) return geriAl(); // boş hücrelerle de sığmıyor (birleşik hücre ya da başlık çok uzun)
+        var kalanVar = false, ilerleme = false;
+        var kalanlar = hucreler.map(function (td, k) {
+          var d = hucreDoldur(td, icerikler[k]);
+          if (d.kalan.length) { kalanVar = true; if (d.yerlesen) ilerleme = true; }
+          return d.kalan;
+        });
+        if (!kalanVar) return false;
+        if (!ilerleme) return geriAl();
+        var devam = belge.createElement("tr");
+        devam.setAttribute("data-devam", String(i));
+        hucreler.forEach(function (td, k) {
+          var c = td.cloneNode(false);
+          c.removeAttribute("rowspan");
+          kalanlar[k].forEach(function (n) { c.appendChild(n); });
+          devam.appendChild(c);
+        });
+        // Bu sayfada tamamlanan ilk hücre (ör. hafta) devam satırında soluk "(devam)" etiketiyle yinelenir
+        var e0 = hucreler[0], c0 = devam.firstChild;
+        var metin = e0 ? e0.textContent.replace(/\s+/g, " ").trim() : "";
+        if (e0 && !kalanlar[0].length && metin && metin.length <= 80) {
+          dizi(e0.childNodes).forEach(function (n) { c0.appendChild(n.cloneNode(true)); });
+          if (!e0.hasAttribute("data-etiket")) {
+            // Ayrı satırda, küçük ve bölünmeden (dar hafta sütununda "(devam" / ")" olmasın)
+            var s = belge.createElement("span"), hedef = c0.lastElementChild || c0;
+            s.style.cssText = "font-size:6pt;font-weight:400;font-style:italic;color:#4A5568;white-space:nowrap";
+            s.textContent = "(devam)";
+            hedef.appendChild(belge.createElement("br"));
+            hedef.appendChild(s);
+          }
+          c0.setAttribute("data-etiket", "1");
+        }
+        kopyalariEkle(devam, i, true);
+        return devam;
+      }
+      /* Hücreye içeriğini sığdığı kadar geri ekler; sığmayan kısmı ve yerleşen parça sayısını döndürür */
+      function hucreDoldur(td, dugumler) {
+        var k = 0;
+        for (; k < dugumler.length; k++) {
+          td.appendChild(dugumler[k]);
+          if (!sigiyor()) { td.removeChild(dugumler[k]); break; }
+        }
+        var kalan = dugumler.slice(k), sonuc = { kalan: kalan, yerlesen: k };
+        if (!kalan.length || kalan[0].nodeType !== 1) return sonuc;
+        var p = kalan[0];
+        var devam = enIyiBolme(td, p, bolmeNoktalari(p, false)) || (k === 0 ? enIyiBolme(td, p, bolmeNoktalari(p, true)) : null);
+        if (devam) { kalan[0] = devam; sonuc.yerlesen++; }
+        return sonuc;
+      }
+      /* Paragrafın sığan en uzun ilk parçasını veren nokta (ikili arama). Bulunursa ilk parça hücreye eklenir,
+         devamı döner; bulunamazsa null. */
+      function enIyiBolme(td, p, noktalar) {
+        var alt = 0, ust = noktalar.length - 1, en = -1;
+        while (alt <= ust) {
+          var orta = (alt + ust) >> 1, ikili = paragrafiAyir(p, noktalar[orta]);
+          td.appendChild(ikili[0]);
+          var sigdi = sigiyor();
+          td.removeChild(ikili[0]);
+          if (sigdi) { en = orta; alt = orta + 1; } else ust = orta - 1;
+        }
+        if (en < 0) return null;
+        var sonuc = paragrafiAyir(p, noktalar[en]);
+        td.appendChild(sonuc[0]);
+        return sonuc[1];
+      }
       function grupEkle(g) {
         var eklenen = [];
         for (var i = g.bas; i <= g.son; i++) eklenen.push(satirEkle(i, veri === 0));
         if (sigiyor()) return true;
         eklenen.reverse().forEach(satirKaldir);
         return false;
+      }
+      // Satır boş bir sayfaya da sığmayacaksa (nasılsa bölünecek) ve bu sayfada en az çeyrek sayfa yer varsa
+      // sonraki sayfaya taşınmadan burada bölünür (boş kalan sayfa yarısı ve fazladan kâğıt olmasın)
+      function yerindeBolunur(tr) {
+        var ilkVeri = null;
+        dizi(tbody.rows).some(function (x) { if (satirNo(x) !== null) { ilkVeri = x; return true; } return false; });
+        var pb = parseFloat(belge.defaultView.getComputedStyle(govde).paddingTop) || 0;
+        var kapasite = sinir - (govde.getBoundingClientRect().top + pb) - (ilkVeri.getBoundingClientRect().top - parca.getBoundingClientRect().top);
+        var r = tr.getBoundingClientRect();
+        return r.height > kapasite + PX_MM && sinir - r.top >= kapasite / 4;
       }
       // Parçayı kapatıp yeni sayfada yenisini aç. Parça boşsa (yalnız başlık) önündeki keepNext zinciriyle taşınır.
       function yeniParca() {
@@ -450,16 +636,24 @@
         for (var i = g.bas; i <= g.son; i++) {
           var tr = satirEkle(i, veri === 0);
           if (sigiyor()) continue;
-          if (veri > 1 || oncesiVar(parca)) {
+          if ((veri > 1 || oncesiVar(parca)) && !yerindeBolunur(tr)) {
             satirKaldir(tr);
             yeniParca();
-            satirEkle(i, true);
+            tr = satirEkle(i, true);
             if (sigiyor()) continue;
           }
-          // Tek satır bile sayfaya sığmıyor
-          rowspanDuzelt(tbody);
-          tasma();
-          parcaAc();
+          // Tek satır bile sayfaya sığmıyor: hücre içeriklerinden bölünür, kalanı sonraki sayfalarda başlık
+          // satırı tekrarıyla sürer (her .sayfa tek kâğıt kalır)
+          while (tr) {
+            var devam = satirBol(tr, i);
+            if (devam === null) { rowspanDuzelt(tbody); tasma(); parcaAc(); break; } // bölünemiyor (olağan dışı)
+            if (!devam) break;
+            yeniParca();
+            tbody.appendChild(devam);
+            veri++;
+            rowspanDuzelt(tbody);
+            tr = sigiyor() ? null : devam;
+          }
         }
       });
       if (veri === 0 && parca.parentNode) parca.parentNode.removeChild(parca);

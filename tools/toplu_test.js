@@ -191,6 +191,26 @@ dene("36'dan fazla öğrenme birimi: 36 hafta + sosyal etkinlik", function () {
   planiDenetle(b, s);
 });
 
+dene("tek üniteli kazanımsız elle girilen ders (özel yetenek, tüm destek düzeyleri): KDA tekrarı yok, ünite dönem sonundan bölünür", function () {
+  var donemSonu = BEP.takvimBilgi("2026-2027").donemSonHaftasi;
+  ["", "hafif", "orta", "yogun"].forEach(function (d) {
+    // Koşul havuzu en dar olan genel profil (diğer) ve tek kazanımlı ünite de denenir
+    [["ozel_yetenek"], ["diger"]].forEach(function (yet) {
+      [0, 1].forEach(function (kazSay) {
+        var oz = { ad: "Atölye", sinif: "11", saat: 4, uniteler: [{ ad: "Birim 1", saat: "", kazanimlar: kazSay ? "Birim 1 kapsamında temel işlemi yapar." : "" }] };
+        var b = { egitimYili: "2026-2027", okul: { tur: "mtal" }, ogrenci: { ad: "Ece Deneme", sinif: "11", yetersizlik: yet }, ders: { id: "__ozel__", ozel: oz, saat: "" }, ayarlar: { destek: d, olcut: "80", ozne: "ad", sinavHaftalari: [8, 16, 25, 33] }, kurul: {} };
+        var s = BEP.planiHazirla(b), ad = yet[0] + "/" + (d || "otomatik") + "/" + kazSay + " kazanım: ";
+        try { planiDenetle(b, s); } catch (e) { throw new Error(ad + e.message); }
+        beklenen(s.udalar.length === 2 && s.udalar[0].sonHafta === donemSonu && s.udalar[1].ilkHafta === donemSonu + 1, ad + "ünite dönem sonundan bölünmedi");
+        beklenen(/1\. dönemde/.test(s.udalar[0].metin) && /2\. dönemde/.test(s.udalar[1].metin), ad + "UDA metninde dönem yok");
+        var kda = b.plan.satirlar.map(function (r) { return r.kda || ""; }).join("\n");
+        beklenen(!/ uygulamada /.test(kda), ad + "son çare sıra eki kullanıldı (koşul havuzu yetmedi)");
+        if (yet[0] === "ozel_yetenek") beklenen(!/ipucu|model olduğunda|yardımla|desteklendiğinde|sadeleştirilmiş/.test(kda), ad + "zenginleştirme planında destek dili");
+      });
+    });
+  });
+});
+
 dene("haftalık 6 saatlik derste dönem başına 3. BEP sınavı", function () {
   var b = tekBep("matematik", "anadolu-9", ["oog"], function (x) { x.ayarlar.sinavHaftalari = [6, 12, 17, 24, 30, 35]; });
   beklenen(BEP.baglam(b).saat >= 6, "matematik 9 haftalık 6 saat değil");

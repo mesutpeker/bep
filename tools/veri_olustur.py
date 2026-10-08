@@ -112,14 +112,79 @@ def nokta_duzelt(s):
     return re.sub(r"(?<![.…])\.\.(?![.…])", ".", s)
 
 
-def cumle(s):
-    s = nokta_duzelt(bosluk(s).strip(" -–•*"))
+def cumle(s, dil="tr"):
+    s = bosluk(s).strip(" -–•*")
+    # Sondaki ';', ':' ve ',' nokta eklenmeden silinir ("… experience;" -> "… experience."); "belirler ." -> "belirler."
+    s = re.sub(r"\s*[;:,]+$", "", s)
+    s = nokta_duzelt(re.sub(r"\s+(?=[.!?…]$)", "", s))
     if not s:
         return s
-    s = tr_upper(s[0]) + s[1:]
+    # İngilizce cümlede ilk harf Türkçe kuralla büyütülmez ("identify" -> "Identify", "İdentify" değil)
+    s = (s[0].upper() if dil == "en" else tr_upper(s[0])) + s[1:]
     if s[-1] not in ".!?…":
         s += "."
     return s
+
+
+# Cümle sonu sayılmayan kısaltmalar ("Kültürümüzde Hz. Muhammed …", "… vb. Örnekler …")
+KISALTMA_SONU = re.compile(r"(?:^|[\s(“\"'])(?:Hz|vb|vd|vs|sav|Dr|Doç|Prof|yy|bkz|Bkz|örn|Örn|M\.Ö|M\.S)\.$")
+
+
+def ilk_cumle(s):
+    """Metnin ilk cümlesi; kısaltmadan sonraki büyük harf yeni cümle sayılmaz."""
+    for m in re.finditer(r"(?<=[a-zçğıöşü]\.)\s+(?=[A-ZÇĞİÖŞÜ])", s):
+        if not KISALTMA_SONU.search(s[:m.start()]):
+            return s[:m.start()]
+    return s
+
+
+def tirnak_dengele(s):
+    """Kaynaktaki karışık tırnak çiftlerini “…” yapar ('"X\'\'', '“X"', "''X”") ve başta ya da sonda eşi olmayan
+    tırnağı siler ('“Enfal Suresi ve Anlam' -> 'Enfal Suresi ve Anlam'; kısaltmada kapanışı kesilmiş alıntı)."""
+    if s.count('"') % 2:
+        s = re.sub(r"\"([^\"“”]+?)''", r"“\1”", s, count=1)
+        s = re.sub(r"“([^\"“”]+?)\"", r"“\1”", s, count=1)
+    if s.count("”") > s.count("“"):
+        s = re.sub(r"''(?=\w)([^\"“”]+?)”", r"“\1”", s, count=1)
+    if s[:1] == "“" and "”" not in s or s[:1] == '"' and s.count('"') == 1:
+        s = s[1:].lstrip()
+    if s[-1:] == "”" and "“" not in s or s[-1:] == '"' and s.count('"') == 1:
+        s = s[:-1].rstrip()
+    return s
+
+
+# Yeterlilik ifadesini geniş zamana çevirme (src/js/kutuphane.js fiilCekimle ile aynı kurallar)
+SESLI, KALIN = "aeıioöuüâîû", "aıouâû"
+ISTISNA_IR = {"al", "bil", "bul", "dur", "gel", "gör", "kal", "ol", "öl", "san", "var", "ver", "vur"}
+
+
+def fiil_cekimle(kelime):
+    """'yönetebilme' -> 'yönetir', 'açıklayabilme' -> 'açıklar', 'edebilme' -> 'eder'"""
+    m = re.match(rf"^([{HARF}]+?)(ebilme|abilme)$", kelime)
+    if not m:
+        return None
+    kok = m.group(1)
+    if re.search(r"[aeıioöuüâîû]y$", kok):
+        kok = kok[:-1]  # kaynaştırma y'si
+    if kok.endswith("ed") or kok in ("gid", "güd"):
+        return kok + "er"  # et- > ed-er
+    if kok == "tad":
+        return "tadar"
+    if kok[-1] in SESLI:
+        return kok + "r"
+    v = next((h for h in reversed(kok) if h in SESLI), "e")
+    if sum(h in SESLI for h in kok) <= 1 and kok not in ISTISNA_IR:
+        return kok + ("ar" if v in KALIN else "er")
+    return kok + ("ır" if v in "aıâ" else "ir" if v in "eiî" else "ur" if v in "ouû" else "ür")
+
+
+def yeterlilikten_genis_zamana(s):
+    """'… sürecini değerlendirebilme' -> '… sürecini değerlendirir' (bağlaçla sıralanan fiiller de çekimlenir)."""
+    s = bosluk(s).rstrip(".;:")
+    if not re.search(r"(?:ebilme|abilme)$", s):
+        return None
+    return re.sub(rf"[{HARF}]+(?:ebilme|abilme)(?=$|,|\s+ve\s|\s+ya da\s|\s+veya\s)",
+                  lambda m: fiil_cekimle(m.group(0)) or m.group(0), s)
 
 
 # --------------------------------------------------------------------------- ham hücre onarımı
@@ -224,8 +289,14 @@ def tirnak_onar(s):
     return yeni
 
 
+def pua_onar(s):
+    """Symbol yazı tipinin özel kullanım alanı (PUA, U+F020–U+F07E) karakterlerini ASCII karşılığına çevirir:
+    '\\uf045\\uf031\\uf031\\uf02e\\uf033\\uf02eS2\\uf02e' -> 'E11.3.S2.'"""
+    return re.sub("[\uf020-\uf07e]", lambda m: chr(ord(m.group(0)) - 0xF000), s)
+
+
 def ham_onar(s):
-    s = nfc(s).replace("\xa0", " ")
+    s = pua_onar(nfc(s)).replace("\xa0", " ")
     return bitisik_onar(tire_onar(tirnak_onar(s)))
 
 
@@ -515,6 +586,8 @@ GOMULU_KOD = re.compile(
     r"\s+(?P<kod>(?:[A-ZÇĞİÖŞÜ]\.)?[A-ZÇĞİÖŞÜ]{2,6}\d{0,2}\.?(?:[A-ZÇĞİÖŞÜ]{1,4}\.)*" + SAYI
     + r"(?:\." + SAYI + r"|\.[A-Z]\d{1,2})+|" + SAYI + r"(?:\." + SAYI + r"){2,})\.*\s*(?=[A-ZÇĞİÖŞÜ“\"'])")
 REFERANS = re.compile(r"(KAZANIMLARI|bkz\.|kazanım ve\s+açıklamaları|ünite tablosunda|EK\s?\d)", re.I)
+# Kazanım / süreç bileşeni hücresine eklenmiş öğretmen notu başlığı ("… yürütebilme\n\nZenginleştirme: Öğrencilerden …")
+NOT_BASLIGI = re.compile(r"(?:^|\s|\.)\s*(?:Zenginleştirme|ZENGİNLEŞTİRME|ZENGNİLEŞTİRME|Destekleme|DESTEKLEME)\s*\d*\s*:")
 BECERI_BASLIGI = re.compile(
     r"^(?:Listening|Pronunciation|Speaking|Reading|Writing|Interaction|Production|Vocabulary|Grammar)"
     r"(?:\s*(?:and|&|/)\s*\w+)?:?$", re.I)
@@ -527,7 +600,11 @@ def kod_ayir(satir):
             kod = re.sub(r"\s+", "", m.group("kod")).rstrip(".")
             if "." not in kod and not kod[:1].isdigit():
                 continue  # "COVID 19 …" gibi nokta içermeyen harfli eşleşmeler kod değildir
-            return kod, m.group("metin").strip().lstrip(".;:, ")
+            metin = m.group("metin").strip().lstrip(".;:, ")
+            if re.fullmatch(r"\d{1,2}\.?", metin):
+                # Satır yalnız koddan oluşuyor ("İÇYÇ.3.1"): geri izleme son kod bölümünü metne kaydırmasın
+                return re.sub(r"\s+", "", satir).rstrip("."), ""
+            return kod, metin
     return None, satir
 
 
@@ -571,11 +648,17 @@ def gomulu_bol(kod, metin):
             return parcalar
 
 
+def buyuk_baslik_mi(s):
+    """'DİNLEME/İZLEME-ANLAMLANDIRMA', 'PROCESS COMPONENTS FOR …' gibi tamamı büyük harfli başlık satırı."""
+    return len(re.findall(r"[A-ZÇĞİÖŞÜ]", s)) >= 3 and not re.search(r"[a-zçğıöşüâîû]", s)
+
+
 def ciktilar_ayristir(s):
     s = nfc(s).replace("\xa0", " ")
     # İngilizce eski program: "Listening E11.1.L1.Students ... Speaking E11.1.S1. ..." tek satırda
     s = re.sub(r"\s*(?:Listening|Pronunciation|Speaking|Reading|Writing|Interaction|Production)?\s*(?=\bE\d{1,2}\.\d+\.[A-Z]\d+\.)", "\n", s)
     girdiler = []
+    not_modu = False  # "Zenginleştirme: …" öğretmen notu ve devam satırları kazanıma eklenmez
     for satir in s.split("\n"):
         satir = satir.strip()
         if not satir:
@@ -583,7 +666,21 @@ def ciktilar_ayristir(s):
         if REFERANS.search(satir) and len(satir) < 160:
             continue
         kod, metin = kod_ayir(satir)
+        if not kod and not_modu:
+            continue
+        not_modu = False
+        m = NOT_BASLIGI.search(metin if kod else satir)
+        if m:
+            not_modu = True
+            if kod:
+                metin = metin[:m.start()].rstrip()
+            else:
+                satir = satir[:m.start()].rstrip()
+                if not satir:
+                    continue
         if kod:
+            if buyuk_baslik_mi(metin):
+                continue  # "ARP.10.1.1. DİNLEME/İZLEME-ANLAMLANDIRMA" gibi kodlu beceri başlıkları
             girdiler.append([kod, metin])
         elif (BECERI_BASLIGI.match(re.sub(r"^[•●▪]\s*", "", satir))
               or (satir.isupper() and len(re.findall(r"[A-ZÇĞİÖŞÜ]", satir)) >= 3)):
@@ -597,7 +694,7 @@ def ciktilar_ayristir(s):
     sonuc = []
     for kod0, metin0 in girdiler:
         for kod, metin in gomulu_bol(kod0, bosluk(metin0)):
-            metin = nokta_duzelt(bosluk(metin).strip(" -–"))
+            metin = tirnak_dengele(nokta_duzelt(bosluk(metin).strip(" -–")))
             if len(metin) < 6 or not re.search(rf"[{HARF}]", metin):
                 continue  # "….........." gibi harf içermeyen dolgu satırları
             if [kod, metin] not in sonuc:
@@ -605,12 +702,29 @@ def ciktilar_ayristir(s):
     return sonuc
 
 
-def davranislar_tymm(surec):
+def parantez_icinde(s, i):
+    """s[i] konumu, aynı satırda açılıp kapanmamış bir parantezin içinde mi? ('(P, V, T, n)')"""
+    return re.search(r"\([^)]*$", s[s.rfind("\n", 0, i) + 1:i]) is not None
+
+
+def madde_bol(desen, s):
+    """Metni desenin eşleştiği yerlerden böler; açık parantez içindeki eşleşmeler madde imi sayılmaz
+    ('… değişkenler (P, V, T, n) arasındaki …' bölünmez)."""
+    parcalar, bas = [], 0
+    for m in re.finditer(desen, s):
+        if not parantez_icinde(s, m.start()):
+            parcalar.append(s[bas:m.start()])
+            bas = m.end()
+    parcalar.append(s[bas:])
+    return parcalar
+
+
+def davranislar_tymm(surec, dil="tr"):
     """Süreç bileşenlerinden öğrenci davranışı cümleleri (geniş zaman)."""
     s = nfc(surec).replace("\xa0", " ")
     # Aynı satırda birleşik gelen maddeleri ayır: "… yapar. d) …", "… seçer.b) …", "BİY.10.1.7.b) …",
     # "… BİY.10.1.2. a) …", "… • …"
-    s = re.sub(r"\s+(?=[a-zçğıöşü]\)\s)|(?:\s+|(?<=[.!?;]))(?=[a-zçğıöşü]\)\s?[A-ZÇĞİÖŞÜa-zçğıöşü])", "\n", s)
+    s = "\n".join(madde_bol(r"\s+(?=[a-zçğıöşü]\)\s)|(?:\s+|(?<=[.!?;]))(?=[a-zçğıöşü]\)\s?[A-ZÇĞİÖŞÜa-zçğıöşü])", s))
     s = re.sub(r"\s+(?=(?:[A-ZÇĞİÖŞÜ]\.)?[A-ZÇĞİÖŞÜ]{2,6}\.(?:[A-ZÇĞİÖŞÜ]{1,4}\.)*" + SAYI
                + r"\." + SAYI + r"(?:\." + SAYI + r")*\.?\s)", "\n", s)
     s = re.sub(r"(?<=\S)\s+(?=•)", "\n", s)
@@ -619,10 +733,21 @@ def davranislar_tymm(surec):
         s = re.sub(r"(?m)^(\s*)([A-ZÇĞİÖŞÜ])\)\s*", lambda m: m.group(1) + tr_lower(m.group(2)) + ") ", s)
     madde, baslik = [], []
     cur = None
+    not_modu = False  # "Zenginleştirme: …" notu: yeni madde imine kadarki satırlar atılır
     for satir in s.split("\n"):
         satir = satir.strip()
         if not satir:
             continue
+        yeni_madde = re.match(r"^(?:[•●▪\-–]|[a-zçğıöşü]\))", satir)
+        if not_modu and not yeni_madde:
+            continue
+        not_modu = False
+        m = NOT_BASLIGI.search(satir)
+        if m:
+            not_modu = True
+            satir = satir[:m.start()].rstrip()
+            if not satir:
+                continue
         if re.match(r"^[•●▪\-–]\s*", satir):
             cur = ["m", re.sub(r"^[•●▪\-–]\s*", "", satir)]
             madde.append(cur)
@@ -642,11 +767,13 @@ def davranislar_tymm(surec):
     for a in adaylar:
         a = bosluk(a)
         a = re.split(r"\s\*\s?|\s\(\*\)", a)[0]  # "*" ile başlayan zenginleştirme notlarını ayır
-        a = re.split(r"(?<=[a-zçğıöşü]\.)\s+(?=[A-ZÇĞİÖŞÜ])", a)[0]  # yalnız ilk cümle
+        a = ilk_cumle(a)  # yalnız ilk cümle ("Hz.", "vb." gibi kısaltmalarda kesilmez)
         a = re.sub(r"^[a-zçğıöşü]\)\s*", "", kod_sil(a))
-        if len(a) < 8:
-            continue
-        a = cumle(a)
+        if len(a) < 8 or buyuk_baslik_mi(a):
+            continue  # "PROCESS COMPONENTS FOR THE RELEVANT OUTCOMES …" gibi bölüm başlıkları
+        if dil == "tr":
+            a = yeterlilikten_genis_zamana(a) or a  # "… değerlendirebilme" -> "… değerlendirir"
+        a = cumle(tirnak_dengele(a), dil)
         if a not in sonuc:
             sonuc.append(a)
     return sonuc
@@ -704,6 +831,12 @@ def olcme_araclari(s):
 
 
 # --------------------------------------------------------------------------- belirli gün ve haftalar
+# Belirli gün/hafta adı ya da tarihi: "ETKİNLİK" sütununa yazılmış etkinlik listeleri ("Kısa videolar Diyaloglar/soru
+# cevap …", "Özdeğerlendirme (öğrenci için)") ve imza satırları ("OKUL MÜDÜRÜ") belirli gün sayılmaz
+BELIRLI_GUN = re.compile(r"Gün[üu]\b|Haftası|Bayram|Kandili|Zaferi|Fethi|Gecesi|Yılbaşı|Başlangıcı|Anma\b|Kabulü"
+                         r"|\b\d{1,2}\s*(?:-\s*\d{1,2}\s*)?(?:Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\b")
+
+
 def gunler_ayristir(s):
     t = bosluk(nfc(s).replace("\n", " "))
     if not t:
@@ -714,9 +847,11 @@ def gunler_ayristir(s):
     out = []
     for p in parcalar:
         p = p.strip(" ,;/")
-        if len(p) < 6 or not re.search(r"[A-Za-zÇĞİÖŞÜçğıöşü]{3}", p):
+        if len(p) < 6 or not re.search(r"[A-Za-zÇĞİÖŞÜçğıöşü]{3}", p) or not BELIRLI_GUN.search(p):
             continue
         p = p.replace("Milli ", "Millî ").replace("Istiklal", "İstiklal")
+        if "“" not in p:
+            p = re.sub(r"(?<=\w)”[ıiuü](?=\s|$)", "", p)  # "Spor Bayramı”ı (19 Mayıs)" -> "Spor Bayramı (19 Mayıs)"
         if p not in out:
             out.append(p)
     return out
@@ -895,7 +1030,17 @@ def tipik_saat(saatler):
     return sayac.most_common(1)[0][0]
 
 
-def plan_derle(p, program):
+# Plan sonundaki imza / onay bloğu satırları ("ARAPÇA ÖĞRETMENİ", "U Y G U N D U R", "... / 09 / 2026", "OKUL MÜDÜRÜ",
+# "…........" dolgu): hiçbir alana (konu, kazanım, belirli gün …) alınmaz
+IMZA_SATIRI = re.compile(r"^(?:[….\s/0-9]*|.*\bÖĞRETMEN(?:İ|LERİ)|.*\bMÜDÜRÜ|ZÜMRE\b.*|U\s?Y\s?G\s?U\s?N\s?D\s?U\s?R|TASDİK OLUNUR)$")
+
+
+def imza_satiri_mi(r):
+    degerler = [v for k, v in r.items() if k in ("unite", "konu", "cikti", "surec", "olcme", "gunler")]
+    return bool(degerler) and all(IMZA_SATIRI.match(tr_upper(bosluk(v))) for v in degerler)
+
+
+def plan_derle(p, program, dil="tr"):
     uniteler, unite_idx = [], {}
     haftalar = []
     son_unite = None
@@ -911,11 +1056,15 @@ def plan_derle(p, program):
         u_list, konular, ciktilar, davranis, olcme, gunler = [], [], [], [], [], []
         ozel = None
         for r in satirlar:
+            if imza_satiri_mi(r):
+                continue
             devam = set(r.get("_devam", []))
             sv = (r.get("saat") or "").strip()
             if re.fullmatch(r"[\d\s+]+", sv):
                 if "saat" not in devam:
                     saat += sum(int(x) for x in re.findall(r"\d+", sv))
+            elif ozel_hafta_turu(sv.rstrip("* ")) in ("OTP", "SE", "ZEN"):
+                ozel = ozel or ozel_hafta_turu(sv.rstrip("* "))  # SAAT sütununda "OKUL TEMELLİ PLANLAMA*"
             elif "SOSYAL" in tr_upper(sv):
                 ozel = "SE"
             # Hafta türü işareti ünite dışındaki bir sütuna yazılmış olabilir (ör. coğrafya 10. sınıf 18. hafta
@@ -947,7 +1096,13 @@ def plan_derle(p, program):
                 if unite_idx[key] not in u_list:
                     u_list.append(unite_idx[key])
             if r.get("konu"):
-                kk = kisa_konu(r["konu"])
+                # Konu hücresindeki "ZENGİNLEŞTİRME:* …" öğretmen notu konu sayılmaz
+                konu = r["konu"]
+                m = NOT_BASLIGI.search(konu)
+                kk = tirnak_dengele(kisa_konu(konu[:m.start()] if m else konu))
+                if re.search(r"\bSuresi ve Anlam$", kk):  # kaynakta kesik: "“Enfal Suresi ve Anlam"
+                    ONARIM_KAYDI[("kesik konu", kk, kk + "ı")] += 1
+                    kk += "ı"
                 if kk and kk not in konular:
                     konular.append(kk)
             if r.get("cikti"):
@@ -955,7 +1110,7 @@ def plan_derle(p, program):
                     if c not in ciktilar:
                         ciktilar.append(c)
             if program == "TYMM" and r.get("surec"):
-                for d in davranislar_tymm(r["surec"]):
+                for d in davranislar_tymm(r["surec"], dil):
                     if d not in davranis:
                         davranis.append(d)
             if r.get("olcme") and "olcme" not in devam:
@@ -967,14 +1122,15 @@ def plan_derle(p, program):
                     if g not in gunler:
                         gunler.append(g)
         if program != "TYMM":
-            davranis = davranislar_eski(ciktilar)
+            # davranislar_eski Türkçe "-r." sezgisine dayanır; İngilizce kazanımlara uygulanmaz
+            davranis = davranislar_eski(ciktilar) if dil == "tr" else []
         bos = not satirlar
         if not u_list and son_unite is not None and ozel in (None, "ZEN", "DEG"):
             u_list = [son_unite]
         if u_list:
             son_unite = u_list[-1]
-        if w["hafta"] == HAFTA_SAYISI and not (ciktilar or konular):
-            ozel = "SE"
+        if w["hafta"] == HAFTA_SAYISI and not (ciktilar or konular) and ozel != "OTP":
+            ozel = "SE"  # kaynakta açıkça OTP yazılmamışsa 37. hafta sosyal etkinlik haftasıdır
         if bos and not ozel:
             ozel = "DEVAM"  # kaynak planda bu hafta için satır yok: önceki haftanın devamı
         hf = {"h": w["hafta"], "s": saat}
@@ -983,7 +1139,9 @@ def plan_derle(p, program):
         if konular:
             hf["k"] = " | ".join(konular[:2])
         if ciktilar:
-            hf["c"] = ciktilar[:4]
+            # İngilizce planlarda beceri başına madde imli kazanımların tümü tutulur (Listening … Writing);
+            # uygulama ilk kazanımı gösterip "(+N … daha)" yazar
+            hf["c"] = ciktilar if dil == "en" else ciktilar[:4]
         if davranis:
             hf["b"] = [kisalt(d, 190) for d in davranis[:5]]
         if olcme:
@@ -993,7 +1151,7 @@ def plan_derle(p, program):
         if ozel:
             hf["x"] = ozel
         haftalar.append(hf)
-    return birlesik_uniteleri_ayir(uniteler, haftalar)
+    return kesik_uniteleri_birlestir(*birlesik_uniteleri_ayir(uniteler, haftalar))
 
 
 def birlesik_uniteleri_ayir(uniteler, haftalar):
@@ -1025,6 +1183,58 @@ def birlesik_uniteleri_ayir(uniteler, haftalar):
             hf["u"] = ul
     for i, (a, b) in eslem.items():
         ONARIM_KAYDI[("birleşik ünite adı", uniteler[i]["ad"], uniteler[a]["ad"] + " + " + uniteler[b]["ad"])] += 1
+    return yeni_uniteler, haftalar
+
+
+def _unite_no(ad):
+    """'2. ÜNİTE: …' -> '2', 'KK.10.3. …' -> '3' (kod önekinin son bölümü)."""
+    m = re.match(r"^(\d+)\.", ad) or re.match(r"^(?:[A-ZÇĞİÖŞÜ]{1,6}\.)+(?:\d+\.)*(\d+)\.?\s", ad)
+    return m.group(1) if m else None
+
+
+def _kod_onekini_sil(ad):
+    return re.sub(r"^(?:[A-ZÇĞİÖŞÜ]{1,6}\.)+(?:\d+\.)+\s*", "", ad)
+
+
+def kesik_uniteleri_birlestir(uniteler, haftalar):
+    """Kaynakta aynı ünitenin kesik ("… VE SOSYOLOJ", "… ÇÖZÜLM", "GÖÇ OLGUSUNU ANLAMA") ya da kod önekli
+    ("KK.10.3. YÜZÜNDEN …") yazılmış kopyaları ayrı ünite olmasın: aynı numaralı asıl üniteye eşlenir. Asıl ünite
+    adı, kod öneki atılınca kopyanın adıyla aynı olan ya da kopyanın adı kendisinin (son sözcükte en çok 3 harf
+    eksik) öneki olan ünitedir. Birleşen ünite ilk göründüğü sırada, asıl adıyla kalır."""
+    anahtarlar = [unite_anahtar(_kod_onekini_sil(u["ad"])) for u in uniteler]
+    eslem = {}  # kopya -> asıl
+    for i, ki in enumerate(anahtarlar):
+        for j, kj in enumerate(anahtarlar):
+            if i == j or i in eslem or j in eslem or not ki or not kj:
+                continue
+            no_i, no_j = _unite_no(uniteler[i]["ad"]), _unite_no(uniteler[j]["ad"])
+            if not no_i or no_i != no_j:
+                continue
+            kodlu = ki == kj and _kod_onekini_sil(uniteler[i]["ad"]) != uniteler[i]["ad"]
+            kesik = kj.startswith(ki) and 0 < len(kj) - len(ki) <= 3
+            if kodlu or kesik:
+                eslem[i] = j
+    if not eslem:
+        return uniteler, haftalar
+    hedef = {}  # her ünitenin kalacağı eski indeks (çiftin küçük indeksi)
+    for i, j in eslem.items():
+        k = min(i, j)
+        ONARIM_KAYDI[("kesik/kodlu ünite kopyası", uniteler[i]["ad"], uniteler[j]["ad"])] += 1
+        uniteler[k] = dict(uniteler[k], ad=uniteler[j]["ad"])
+        hedef[i], hedef[j] = k, k
+    yeni_idx, yeni_uniteler = {}, []
+    for i, u in enumerate(uniteler):
+        if hedef.get(i, i) == i:
+            yeni_idx[i] = len(yeni_uniteler)
+            yeni_uniteler.append(u)
+    for hf in haftalar:
+        if "u" in hf:
+            ul = []
+            for i in hf["u"]:
+                j = yeni_idx[hedef.get(i, i)]
+                if j not in ul:
+                    ul.append(j)
+            hf["u"] = ul
     return yeni_uniteler, haftalar
 
 
@@ -1162,7 +1372,7 @@ def tymm_dagit(kayit, gun_haritasi):
                         metin = surec.pop(0)  # çıktı metni <strong> dışında kalmış
                     hf["c"].append([(kod or "").rstrip("."), bosluk(metin).strip(" .;:,")])
                     # Kaynakta tek maddede birleşmiş süreç bileşenleri: "… dönüştürür. c) Bilim insanları …"
-                    surec = [p for s in surec for p in re.split(r"\s+(?=[a-zçğıöşü]\)\s)", s) if p.strip()]
+                    surec = [p for s in surec for p in madde_bol(r"\s+(?=[a-zçğıöşü]\)\s)", s) if p.strip()]
                     for s in surec:
                         s2 = re.sub(r"^[a-zçğıöşü]\)\s*", "", s)
                         s2 = cumle(s2)
@@ -1212,7 +1422,7 @@ def main():
             return [tymm_onar(v) for v in o]
         return ham_onar(o) if isinstance(o, str) else o
 
-    sozluk_kur(nfc(s) for s in hucreler + tymm_metinleri(tymm))
+    sozluk_kur(pua_onar(nfc(s)) for s in hucreler + tymm_metinleri(tymm))
     for p in ham:
         for w in p["haftalar"]:
             w["satirlar"] = [{k: (v if k == "_devam" else ham_onar(v)) for k, v in r.items()} for r in w["satirlar"]]
@@ -1232,7 +1442,7 @@ def main():
             atlanan.append((p["dosya"], p["sayfa"], "hafta yok"))
             continue
         program = program_turu(p, did, sinif, ek)
-        uniteler, haftalar = plan_derle(p, program)
+        uniteler, haftalar = plan_derle(p, program, "en" if did == "ingilizce" else "tr")
         ad, grup, slug = DERSLER[did]
         if did == "ingilizce" and okul == "hazirlikli":
             slug = "ingilizce-dersi-hazirlik-12"
