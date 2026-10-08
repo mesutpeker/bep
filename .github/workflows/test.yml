@@ -1,0 +1,42 @@
+name: Testler
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Plan üretimi toplu testi (tüm dersler × yetersizlik türleri)
+        run: node tools/toplu_test.js
+
+      - name: Veri kalitesi denetimi (ayrıştırma artıkları)
+        run: node tools/veri_denetle.js
+
+      - name: Veri seti Excel kaynaklarından birebir yeniden üretilebiliyor mu?
+        run: |
+          pip install openpyxl
+          python3 tools/plan_ayristir.py > /dev/null
+          python3 tools/veri_olustur.py > /dev/null
+          git diff --exit-code -- data/dersler.js
+
+      - name: Tek dosyalık paket ve index.html güncel mi?
+        run: |
+          python3 tools/paketle.py
+          git diff --exit-code -- index.html BEP_Hazirlama_Uygulamasi.html
+
+      - name: Tarayıcı testi (arayüz akışı, Word indirme, Yazdır/PDF sayfalama)
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y poppler-utils fonts-crosextra-carlito
+          node tools/tarayici_test.js

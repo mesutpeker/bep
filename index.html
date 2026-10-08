@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BEP Hazırlama Aracı – Lise (2026-2027)</title>
-<link rel="stylesheet" href="src/css/app.css?v=602a5f7332">
+<link rel="stylesheet" href="src/css/app.css?v=082d6ede88">
 </head>
 <body>
 <!--GOVDE-BASI-->
@@ -93,7 +93,9 @@
         <label>Sınıf Düzeyi<select id="sinifSec"></select></label>
         <label class="genis">Plan kaynağı<select id="planSec"></select></label>
         <label>Haftalık Ders Saati<input type="number" min="1" max="40" data-alan="ders.saat" id="saatGir" autocomplete="off"></label>
+        <label class="onay tam" id="hazirlikKutu" hidden><input type="checkbox" data-alan="okul.hazirlikSinifi"> Okulda hazırlık sınıfı var (İngilizce için “hazırlık sınıfı bulunan liseler” planı önerilir)</label>
       </div>
+      <div id="sinifUyari" class="uyari-kutusu" hidden></div>
       <div id="saatUyari" class="uyari-kutusu" hidden></div>
       <div id="planBilgi" class="bilgi-kutusu"></div>
     </div>
@@ -122,9 +124,10 @@
       </div>
       <div id="otomatikAyarlar" class="bilgi-kutusu"></div>
       <div class="izgara">
-        <label class="genis">BEP Yazılı Sınav Haftaları <small>(dönem başına 2 sınav – OKY Md. 45/1-a)</small>
+        <div class="genis sinav-grup" role="group" aria-labelledby="sinavBaslik">
+          <span class="etiket" id="sinavBaslik">BEP Yazılı Sınav Haftaları <small id="sinavAciklama">(dönem başına 2 sınav – OKY Md. 45/1-a)</small></span>
           <span class="sinav-girisleri" id="sinavHaftalari"></span>
-        </label>
+        </div>
         <label class="onay"><input type="checkbox" data-alan="ayarlar.donemSayfa"> 2. dönemi yeni sayfada başlat</label>
       </div>
       <div class="eylem-satiri">
@@ -214,15 +217,15 @@
 <div id="bildirim" class="bildirim" role="status" aria-live="polite"></div>
 <div id="yazdirma-alani"></div>
 <!--GOVDE-SONU-->
-<script src="data/dersler.js?v=602a5f7332"></script>
-<script src="src/js/kutuphane.js?v=602a5f7332"></script>
-<script src="src/js/takvim.js?v=602a5f7332"></script>
-<script src="src/js/uretici.js?v=602a5f7332"></script>
-<script src="src/js/zip.js?v=602a5f7332"></script>
-<script src="src/js/yazitipi.js?v=602a5f7332"></script>
-<script src="src/js/belge.js?v=602a5f7332"></script>
-<script src="src/js/docx.js?v=602a5f7332"></script>
-<script src="src/js/onizleme.js?v=602a5f7332"></script>
-<script src="src/js/app.js?v=602a5f7332"></script>
+<script src="data/dersler.js?v=082d6ede88"></script>
+<script src="src/js/kutuphane.js?v=082d6ede88"></script>
+<script src="src/js/takvim.js?v=082d6ede88"></script>
+<script src="src/js/uretici.js?v=082d6ede88"></script>
+<script src="src/js/zip.js?v=082d6ede88"></script>
+<script src="src/js/yazitipi.js?v=082d6ede88"></script>
+<script src="src/js/belge.js?v=082d6ede88"></script>
+<script src="src/js/docx.js?v=082d6ede88"></script>
+<script src="src/js/onizleme.js?v=082d6ede88"></script>
+<script src="src/js/app.js?v=082d6ede88"></script>
 </body>
 </html>

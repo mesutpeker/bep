@@ -14,20 +14,21 @@ Tek dosya yeterlidir; dosyayı USB bellekle ya da e-postayla başka bilgisayara 
 
 | Adım | Ne yapılır? |
 |---|---|
-| 1. Öğrenci | Ad soyad, okul no, sınıf, şube, yetersizlik türü (RAM raporuna göre; birden fazla seçilebilir), önerilen hizmet, BEP tarihleri ve varsa kullandığı cihaz. |
-| 2. Ders | Okul türü, ders ve sınıf düzeyi seçilir; uygun resmî plan otomatik önerilir. Haftalık ders saati okulunuza göre değiştirilebilir. Meslek dersleri için **Meslek Dersi / Listede Olmayan Ders** bölümünden öğrenme birimleri elle girilir. |
-| 3. Yıllık Plan | Destek düzeyi, KDA ölçütü (%80 – 4/5), KDA öznesi (öğrencinin adı) ve tablo düzeni (müfredat çıktısı sütunlu) **otomatik belirlenir**; birden fazla tanıda en yoğun destek düzeyi esas alınır. **Destek düzeyi** ve **KDA ölçütü** öğrenciye göre elle değiştirilebilir; değişince plan yeniden oluşturulur. BEP sınav haftaları değiştirilebilir. 37 haftalık plan otomatik oluşur; her hücre düzenlenebilir, KDA için başka öneriler seçilebilir. Elle düzenlenen hücreler sarı görünür. |
+| 1. Öğrenci | Ad soyad, okul no, sınıf, şube, yetersizlik türü (RAM raporuna göre; birden fazla seçilebilir), önerilen hizmet, BEP tarihleri ve varsa kullandığı cihaz. BEP yıl içinde başlıyor ya da erken bitiyorsa bu tarihlerin dışındaki haftalara BEP amacı yazılmaz. Öğrencinin sınıfı değişince seçili ders planı da yeni sınıfa taşınır. |
+| 2. Ders | Okul türü, ders ve sınıf düzeyi seçilir; uygun resmî plan otomatik önerilir. Haftalık ders saati okulunuza göre değiştirilebilir. Meslek dersleri için **Meslek Dersi / Listede Olmayan Ders** bölümünden öğrenme birimleri elle girilir. İngilizce için okulda hazırlık sınıfı varsa “Okulda hazırlık sınıfı var” işaretlenir. Öğrencinin sınıfı ile seçilen planın sınıf düzeyi farklıysa uyarı gösterilir (bilinçli alt/üst sınıf programı seçimi için). |
+| 3. Yıllık Plan | Destek düzeyi, KDA ölçütü (%80 – 4/5), KDA öznesi (öğrencinin adı) ve tablo düzeni (müfredat çıktısı sütunlu) **otomatik belirlenir**; birden fazla tanıda en yoğun destek düzeyi esas alınır. **Destek düzeyi** ve **KDA ölçütü** öğrenciye göre elle değiştirilebilir; değişince plan yeniden oluşturulur. Her ünite/tema için bir **UDA** oluşturulur; 10 haftadan uzun üniteler (ör. “Sayılar ve Cebir”) konularına göre bölünür, 1-2 haftalık kısa temalar birleştirilir. **UDA cümlesi** o UDA'nın ilk haftasında görünür ve düzenlenebilir. **KDA'lar** basamaklıdır: aynı kazanım birkaç hafta sürdüğünde ön koşul beceri → kazanım (tanıya özgü koşulla) → ara basamak → ipucunun azaltılması → genelleme sırası izlenir; aynı KDA iki kez yazılmaz. BEP sınav haftaları dönemlere göre girilir (dönem başına 2; haftalık 6+ saatlik derslerde 3. sınav – OKY Md. 45/1-a). Her hücre düzenlenebilir, KDA için başka öneriler seçilebilir. Elle düzenlenen hücreler sarı görünür; ders veya plan değişirse eski düzenlemeler yeni plana taşınmaz. |
 | 4. Okul ve BEP Birimi | Okul bilgileri ile BEP geliştirme birimi üyeleri (birim başkanı, ders öğretmeni, rehber öğretmen, sınıf rehber öğretmeni, veli) ve toplantı/onay tarihleri girilir. Okul ve birim bilgileri aynı oturumda **Sıradaki öğrenci için yeni BEP** ile korunur; veli ve sınıf rehber öğretmeni her öğrenci için yazılır. Boş bırakılan ad ve tarihler belgede noktalı satır olur. |
-| 5. Önizle ve İndir | Kontrol listesi, A4 yatay sayfa önizlemesi, Word ve PDF çıktısı. Mevcut performans düzeyi (gelişim özellikleri, ders alanı performansı, güçlü yönler, desteklenmesi gereken yönler ve davranış özellikleri) **tanıya ve derse göre otomatik doldurulur**. Sınıf içi ve sınav uyarlamaları (Tablo 4.1–4.2), BEP birimi kararları (Tablo 4.3: destek eğitim odası, aile bilgilendirme, davranış desteği, sonraki toplantı) ve izleme çizelgesi **tanıya ve hizmet türüne göre otomatik** eklenir. |
+| 5. Önizle ve İndir | Kontrol listesi, A4 yatay sayfa önizlemesi, Word ve PDF çıktısı. Mevcut performans düzeyi (gelişim özellikleri, ders alanı performansı, güçlü yönler, desteklenmesi gereken yönler ve davranış özellikleri) **tanıya ve derse göre otomatik doldurulur**. Sınıf içi ve sınav uyarlamaları (Tablo 4.1–4.2; birden fazla tanıda tüm tanıların düzenlemeleri, aynı başlıkta tanı adıyla ayrı paragraflar), BEP birimi kararları (Tablo 4.3: destek eğitim odası, aile bilgilendirme, davranış desteği, sonraki toplantı) ve izleme çizelgesi **tanıya ve hizmet türüne göre otomatik** eklenir. Kontrol listesi sınav haftalarını, tarih tutarlılığını (BEP başlangıç/bitiş, toplantı ve onay tarihleri) ve sınıf–plan uyumunu da denetler. Özel yetenekli öğrencinin planı sadeleştirme yerine zenginleştirme odaklıdır (ÖEHY Md. 19/2). |
 
 **Kayıt:** Girilen bilgiler yalnızca açık sekmede tutulur. Sayfa yenilenince kaldığınız yerden devam edilir; sekme ya da tarayıcı kapatılınca bilgiler silinir, böylece aynı bilgisayarı sonra kullanan kişi önceki BEP'i görmez. Word belgesini indirdikten sonra 5. adımdaki **Sıradaki öğrenci için yeni BEP** ile okul ve BEP birimi bilgilerini koruyarak yeni öğrenciye geçebilir, **Tüm bilgileri temizle** ile her şeyi silebilirsiniz.
 
 ## Word çıktısı
 
-- A4 yatay; Calibri; MEB laciverti başlıklar; üst bilgi (okul ve plan adı) ve alt bilgide öğrenci, tanı ve "Sayfa X / Y".
+- A4 yatay; Calibri; MEB laciverti başlıklar; üst bilgi (valilik/kaymakamlık, okul ve plan adı) ve alt bilgide öğrenci, tanı ve "Sayfa X / Y".
 - **[BÖLÜM 1]** Öğrenci ve eğitsel tanılama bilgileri · **[BÖLÜM 2]** Mevcut performans düzeyi · **[BÖLÜM 3]** Ünitelendirilmiş BEP yıllık planı · **[BÖLÜM 4]** Eğitsel ve sınav uyarlamaları (Tablo 4.1–4.3) · **[BÖLÜM 5]** İzleme, dönem sonu değerlendirme ve onay · **[BÖLÜM 6]** BEP geliştirme birimi imza sirküsü.
 - Plan tablosunda başlık satırı her sayfada tekrarlanır, bir ayın haftaları iki sayfaya bölünmez, satırlar sayfa sonunda kesilmez; tatil haftaları sarı satırlarla gösterilir.
-- Plan tablosu **müfredat çıktısı sütunlu düzende** oluşturulur: resmî öğrenme çıktısı/kazanım metni ile BEP amacı (UDA/KDA) yan yana yer alır.
+- Plan tablosu **müfredat çıktısı sütunlu düzende** oluşturulur: resmî öğrenme çıktısı/kazanım metni ile BEP amacı (UDA/KDA) yan yana yer alır. Her UDA'nın cümlesi ilk haftasında, KDA'ların üstünde yazılır; tablonun altındaki açıklama UDA/KDA yapısını ve UDA'ya bağlı olmayan (okul temelli planlama, sosyal etkinlik, BEP dönemi dışı) haftaları açıklar.
+- **Yazdır / PDF** çıktısı tarayıcıda gerçek ölçümle sayfalanır: taşan satırlar bir sonraki sayfaya akar, tablo başlıkları tekrarlanır, hiçbir bölüm kesilmez.
 - Örnek çıktılar: [ornek_cikti/](ornek_cikti/) klasöründe (öğrenci bilgileri kurgusaldır).
 
 ## Kapsam ve resmî kaynaklar
@@ -74,7 +75,10 @@ tools/plan_ayristir.py           Excel planlarını ayrıştırır → tools/ara
 tools/veri_olustur.py            ham planlar + TYMM ünite verisi → data/dersler.js
 tools/paketle.py                 index.html + src + data → BEP_Hazirlama_Uygulamasi.html
 tools/ornek_uret.js              komut satırından örnek .docx üretir
-tools/toplu_test.js              tüm planları tüm yetersizlik türleriyle üretip denetler
+tools/toplu_test.js              tüm planları tüm yetersizlik türleriyle üretip denetler (UDA/KDA yapısı, uyarlamalar, özel senaryolar)
+tools/veri_denetle.js            veri setinde ayrıştırma artıklarını arar (yıl-kod, madde numarası, birleşik kazanım vb.)
+tools/tarayici_test.js           gerçek tarayıcıda (Playwright) arayüz akışı, Word indirme ve Yazdır/PDF sayfalaması
+.github/workflows/test.yml       her gönderimde testler, veri yeniden üretimi ve paket güncelliği denetimi
 ornek_cikti/                     örnek Word çıktıları
 ```
 
@@ -89,7 +93,7 @@ python3 tools/veri_olustur.py
 ```
 
 ```bash
-node tools/toplu_test.js
+node tools/toplu_test.js && node tools/veri_denetle.js
 ```
 
 ```bash

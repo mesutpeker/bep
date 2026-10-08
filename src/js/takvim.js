@@ -18,6 +18,9 @@
   var AY_UZUN = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
   var AY_KISA = ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"];
 
+  /* Uygulamanın varsayılan eğitim yılı. Yeni yıl için TAKVIMLER'e kayıt ekleyip bu değeri güncelleyin. */
+  BEP.VARSAYILAN_YIL = "2026-2027";
+
   BEP.TAKVIMLER = {
     "2026-2027": {
       egitimYili: "2026-2027",
@@ -71,8 +74,11 @@
    *   { tur: "hafta", no, pazartesi, cuma, ay, donem, tarih, notlar: [] }
    *   { tur: "tatil", ad, aciklama, ay, tarih, bas, son }
    */
+  function takvim(yil) { return BEP.TAKVIMLER[yil] || BEP.TAKVIMLER[BEP.VARSAYILAN_YIL]; }
+  BEP.takvim = takvim;
+
   BEP.takvimHaftalari = function (yil) {
-    var T = BEP.TAKVIMLER[yil || "2026-2027"];
+    var T = takvim(yil);
     var bas = tarihOku(T.dersBasi), son = tarihOku(T.dersSonu), d1Son = tarihOku(T.birinciDonemSonu);
     var sonuc = [], no = 0;
     var tatiller = T.tatiller.map(function (t) { return { t: t, b: tarihOku(t.bas), s: tarihOku(t.son) }; });
@@ -112,28 +118,28 @@
   };
 
   BEP.takvimBilgi = function (yil) {
-    var T = BEP.TAKVIMLER[yil || "2026-2027"];
+    var T = takvim(yil);
+    var haftalar = BEP.takvimHaftalari(T.egitimYili);
+    var donemSonHaftasi = 0;
+    haftalar.forEach(function (h) { if (h.tur === "hafta" && h.donem === 1) donemSonHaftasi = h.no; });
     return {
       egitimYili: T.egitimYili, kaynak: T.kaynak,
       dersBasi: tarihTR(tarihOku(T.dersBasi)), dersSonu: tarihTR(tarihOku(T.dersSonu)),
-      birinciDonemSonu: tarihTR(tarihOku(T.birinciDonemSonu)), ikinciDonemBasi: tarihTR(tarihOku(T.ikinciDonemBasi))
+      dersBasiIso: T.dersBasi, dersSonuIso: T.dersSonu,
+      birinciDonemSonu: tarihTR(tarihOku(T.birinciDonemSonu)), ikinciDonemBasi: tarihTR(tarihOku(T.ikinciDonemBasi)),
+      // 1. dönemin son öğretim haftası (2026-2027: 18) ve son öğretim haftası (36; 37. hafta sosyal etkinlik)
+      donemSonHaftasi: donemSonHaftasi,
+      sonOgretimHaftasi: haftalar.filter(function (h) { return h.tur === "hafta"; }).length - 1,
+      tatiller: T.tatiller.map(function (t) { return { ad: t.ad, aciklama: t.aciklama, tarih: aralikMetni(tarihOku(t.bas), tarihOku(t.son), true) }; })
     };
   };
 
   BEP.tarih = {
-    bugun: function () {
-      var d = new Date();
-      return iki(d.getDate()) + "." + iki(d.getMonth() + 1) + "." + d.getFullYear();
-    },
     isoToTR: function (s) {
       if (!s) return "";
       if (/^\d{2}\.\d{2}\.\d{4}$/.test(s)) return s;
       var p = String(s).split("-");
       return p.length === 3 ? p[2] + "." + p[1] + "." + p[0] : s;
-    },
-    trToIso: function (s) {
-      var m = String(s || "").match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/);
-      return m ? m[3] + "-" + iki(+m[2]) + "-" + iki(+m[1]) : s;
     },
     AY_ADLARI: AY_ADLARI
   };
