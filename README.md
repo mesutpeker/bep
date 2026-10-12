@@ -8,7 +8,7 @@ Ortaöğretimde kaynaştırma/bütünleştirme yoluyla eğitim alan lise öğren
 
 ## Öne Çıkan Özellikler
 
-- **Resmî Müfredat Entegrasyonu:** MEB'in 2026-2027 çerçeve yıllık planlarındaki (TYMM Hazırlık, 9, 10, 11 ve 12. sınıf programları; 42 ders, 162 plan) haftalık konu ve kazanımları otomatik çeker.
+- **Resmî Müfredat Entegrasyonu:** MEB'in 2026-2027 çerçeve yıllık planlarındaki (TYMM Hazırlık, 9, 10, 11 ve 12. sınıf programları; 53 ders, 203 plan) haftalık konu ve kazanımları otomatik çeker.
 - **Otomatik Doldurma:** RAM raporundaki yetersizlik türü ve seçilen derse göre mevcut performans düzeyi, eğitsel uyarlamalar, sınav uyarlamaları, BEP birimi kararları ve UDA/KDA hedefleri otomatik oluşturulur.
 - **Resmî Standartlarda Word (.docx) Çıktısı:** A4 yatay sayfa düzeninde, MEB formatına birebir uygun, tabloları bölünmeyen ve sayfalandırması hazır Word ve PDF/yazdırma çıktısı.
 - **Tek Dosyada Çevrim Dışı Kullanım:** `BEP_Hazirlama_Uygulamasi.html` tek başına açılabilir; internet veya sunucu gerektirmez, USB ile taşınabilir.
@@ -34,7 +34,7 @@ Mevcut performans düzeyi (gelişim, ders alanı performansı, güçlü yönler,
 BEP_Hazirlama_Uygulamasi.html   # Tek dosyalık taşınabilir uygulama (çevrim dışı)
 index.html                       # Web sürümü ana giriş sayfası (GitHub Pages)
 src/                             # Stil (CSS) ve iş mantığı / modüller (JS)
-data/dersler.js                  # 42 ders ve 162 resmî yıllık plan veri seti
+data/dersler.js                  # 53 ders ve 203 resmî yıllık plan veri seti
 ornek_cikti/                     # Örnek üretilmiş Word (.docx) çıktıları
 tools/                           # Plan ayrıştırma, paketleme ve doğrulama araçları
 BENIOKU.md                       # Ayrıntılı kullanım kılavuzu ve resmî dayanaklar

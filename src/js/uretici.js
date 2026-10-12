@@ -272,6 +272,8 @@
     gor: ["{konu} konusuyla ilgili basit bir çalışmayı model ve şablon desteğiyle yapar", "{konu} konusundaki temel kavramları örnek görsellerle eşleştirir"],
     muz: ["{konu} konusuyla ilgili kısa bir ezgi veya ritmi model eşliğinde uygular", "{konu} konusundaki temel kavramları örneklerle eşleştirir"],
     mes: ["{konu} konusundaki temel bilgileri kısa cümlelerle açıklar", "{konu} konusuyla ilgili uygulamayı adım kartlarıyla yapar", "{konu} konusunda iş güvenliği kurallarına uyarak basit bir uygulama yapar"],
+    sag: ["{konu} konusundaki temel bilgileri kısa cümlelerle açıklar", "{konu} konusuyla ilgili kavramları görselleriyle eşleştirir", "{konu} konusuyla ilgili doğru davranışı bir canlandırma etkinliğinde gösterir"],
+    bil: ["{konu} konusundaki temel kavramları örnekleriyle eşleştirir", "{konu} konusuyla ilgili uygulamayı görsel adım kartlarıyla yapar", "{konu} konusuyla ilgili basit bir görevi dijital bir araçla tamamlar"],
     tde: ["{konu} konusuyla ilgili sadeleştirilmiş bir metni okuyarak konusunu ve ana fikrini söyler"]
   };
 
@@ -289,6 +291,8 @@
     gor: { onkosul: "{konu} konusundaki temel kavramları örnek görsellerle eşleştirir", ara: "{konu} konusuyla ilgili basit bir çalışmayı model ve şablon desteğiyle yapar", genelleme: "{konu} konusuyla ilgili yaptığı çalışmayı kısaca tanıtır" },
     muz: { onkosul: "{konu} konusundaki temel kavramları örneklerle eşleştirir", ara: "{konu} konusuyla ilgili kısa bir ezgi veya ritmi model eşliğinde uygular", genelleme: "{konu} konusuyla ilgili dinlediği bir müzik örneğini kısaca anlatır" },
     mes: { onkosul: "{konu} konusundaki temel kavram ve araçları görselleriyle eşleştirir", ara: "{konu} konusuyla ilgili uygulamayı adım kartlarıyla yapar", genelleme: "{konu} konusunda iş güvenliği kurallarına uyarak basit bir uygulama yapar" },
+    sag: { onkosul: "{konu} konusundaki temel kavramları görselleriyle eşleştirir", ara: "{konu} konusundaki temel bilgileri kısa cümlelerle açıklar", genelleme: "{konu} konusunda öğrendiği doğru davranışı günlük yaşamdan bir örnek durumda gösterir" },
+    bil: { onkosul: "{konu} konusundaki temel kavramları örnekleriyle eşleştirir", ara: "{konu} konusuyla ilgili uygulamayı görsel adım kartlarıyla yapar", genelleme: "{konu} konusunda öğrendiklerini yeni bir dijital görevde kullanır" },
     // Türk Dili ve Edebiyatı: konu alanları çoğunlukla kazanım cümlesidir; tema adı kullanılır
     tde: { onkosul: "{unite} {tur} kapsamındaki metinlerde geçen anahtar kelimelerin anlamlarını örnek cümlelerle eşleştirir", ara: null, genelleme: "{unite} {tur} kapsamında öğrendiklerini kısa bir sözlü ya da yazılı anlatımla paylaşır" }
   };

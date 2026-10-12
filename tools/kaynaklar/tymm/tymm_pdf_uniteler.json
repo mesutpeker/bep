@@ -1,0 +1,256 @@
+{
+ "saglik-bilgisi-ve-trafik-kulturu-dersi|S": {
+  "ders": "Sağlık Bilgisi ve Trafik Kültürü Dersi",
+  "slug": "saglik-bilgisi-ve-trafik-kulturu-dersi",
+  "sinif": "S",
+  "kademe": 3,
+  "pdf": "saglik-bilgisi-ve-trafik-kulturu-dersi_20260908_183434_364.pdf",
+  "ders_id": null,
+  "uniteler": [
+   {
+    "id": null,
+    "baslik": "1. TEMA: SAĞLIKLI İNSAN VE TOPLUM",
+    "aciklama": "Bu temada sağlık ve sağlığın toplum üzerindeki etkileri, halk sağlığı ve sağlık hizmetleri, kişisel hijyen, hastalıklar, engellilik , ilaçlar ve sağlıkta biyopsikososyal yaklaşım ele alınacaktır. Bu temanın sonunda öğrencilerin bu konularla ilgili gerekli bilgi, beceri ve değerleri kazanmaları amaçlanmaktadır.",
+    "olcme": "Öğrenme çıktıları; poster, afiş, çalışma kâğıdı, broşür, bilgi görseli (infografik), öğrenme günlüğü, yansıtma notu, grup değerlendirme formu, performans görevi, bütüncül dereceli puanlama anahtarı, analitik dereceli puanlama anahtarı kullanılarak değerlendirilebilir. Performans görevi olarak öğrencilerden toplum sağlığına faydalı olabilmek için ilaçların doğru kullanımının önemini ve akılcı ilaç kullanımını kapsayan bir broşür hazırlamaları istenebilir. Broşür, analitik veya bütüncül dereceli puanlama anahtarı ile değerlendirilebilir. Dereceli puanlama anahtarında “içerik doğruluğu, hedefe uygunluk, özgünlük, görsel tasarım ve düzen ” gibi ölçütlere yer verilebilir.",
+    "destekleme": "Öğrencilere sağlığın tanımı, sağlığı etkileyen faktörler, toplum sağlığı ve halk sağlığı hakkında temel bilgiler sunmak amacıyla basit ve anlaşılır yazılı kaynaklar verilebilir. Kişisel hijyen ve temizliğin önemi ile ilgili enfeksiyonları önleme, hastalıklardan korunma, toplum sağlığına katkı, diş sağlığının önemi, çocuklar ve yaşlılar için hijyen hakkında açıklayıcı örnekler verilebilir. Öğrencilere ilaçlar ve ilaçların etkileri hakkında temel bilgiler verilebilir. İşitme engelli öğrenciler için eşleştirme kartları veya infografikler de kullanılabilir.",
+    "duzey": null,
+    "Ders Saati": "8",
+    "Öğrenme Çıktıları ve Süreç Bileşenleri": [
+     {
+      "cikti": "SBTK.1.1. Sağlığı etkileyen faktörlerin toplum sağlığı üzerindeki etkilerini sorgulayabilme",
+      "surec": [
+       "a) Sağlığa ve sağlığı etkileyen faktörlere ilişkin merak ettiği konuyu tanımlar.",
+       "b) Sağlığı etkileyen faktörlerin toplum sağlığı üzerindeki etkileriyle ilgili sorular sorar.",
+       "c) Sağlığı etkileyen faktörlerin toplum sağlığı üzerindeki etkileri hakkında bilgi toplar.",
+       "ç) Sağlığı etkileyen faktörlerin toplum sağlığı üzerindeki etkileri hakkında toplanan bilgilerin doğruluğunu değerlendirir.",
+       "d) Sağlığı etkileyen faktörlerin toplum sağlığı üzerindeki etkileri hakkında toplanan bilgiler üzerinden çıkarım yapar."
+      ]
+     },
+     {
+      "cikti": "SBTK.1.2. Halk sağlığı ve sağlık hizmetleri ile ilgili bilgi toplayabilme",
+      "surec": [
+       "a) Halk sağlığı ve sağlık hizmetleri ile ilgili istenen bilgiye ulaşmak için kullanacağı araçları belirler.",
+       "b) Belirlediği aracı kullanarak halk sağlığı ve sağlık hizmetleri ile ilgili bilgileri bulur.",
+       "c) Halk sağlığı ve sağlık hizmetleri ile ilgili ulaşılan bilgileri doğrular.",
+       "ç) Halk sağlığı ve sağlık hizmetleri ile ilgili ulaşılan bilgileri kaydeder."
+      ]
+     },
+     {
+      "cikti": "SBTK.1.3. Kişisel hijyen ve temizliğin sağlığa etkileri ile ilgili eleştirel düşünebilme",
+      "surec": [
+       "a) Kişisel hijyen ve temizliğin sağlığa etkilerini sorgular.",
+       "b) Kişisel hijyen ve temizliğin sağlığa etkileri hakkında akıl yürütür.",
+       "c) Kişisel hijyen ve temizliğin sağlığa etkileri ile ilgili akıl yürütmeyle ulaştığı çıkarımları yansıtır."
+      ]
+     },
+     {
+      "cikti": "SBTK.1.4. Hastalıklar ve engellilik ile ilgili güvenli ortam oluşturabilme",
+      "surec": [
+       "a) Hastalıklar ve engellilik ile ilgili riskleri tanımlar.",
+       "b) Hastalık ve engellilik ile ilgili riskleri önleyici tedbirler alır."
+      ]
+     },
+     {
+      "cikti": "SBTK.1.5. İlaçlar ve ilaçların etkileri ile ilgili bilgi toplayabilme",
+      "surec": [
+       "a) İlaçlar ve ilaçların etkileri ile ilgili istenen bilgiye ulaşmak için kullanacağı araçları belirler.",
+       "b) Belirlediği aracı kullanarak ilaçlar ve ilaçların etkileri ile ilgili bilgileri bulur.",
+       "c) İlaçlar ilaçların etkileri ile ilgili ulaşılan bilgileri doğrular.",
+       "ç) İlaçlar ve ilaçların etkileri ile ilgili ulaşılan bilgileri kaydeder."
+      ]
+     },
+     {
+      "cikti": "SBTK.1.6. Psikolojinin biyopsikososyal yaklaşımı doğrultusunda, bireyin zihinsel, duygusal ve davranışsal süreçlerinin sağlık üzerindeki etkilerini değerler ve maneviyat çerçevesinde yorumlayabilme",
+      "surec": [
+       "a) Psikoloji ile sağlık arasındaki ilişkiyi, bireyin zihinsel, duygusal ve davranışsal süreçlerinin sağlık üzerindeki etkilerine değerler ve maneviyat çerçevesinde odaklanarak inceler.",
+       "b) Bireyin zihinsel, duygusal ve davranışsal süreçlerinin sağlık üzerindeki etkilerini değerler ve maneviyat çerçevesiyle ilişkilendirerek biyopsikososyal yaklaşım doğrultusunda bağlamdan kopmadan dönüştürür.",
+       "c) Bireyin zihinsel, duygusal ve davranışsal süreçlerinin sağlık üzerindeki etkilerini değerler ve maneviyat çerçevesinde nesnel, doğru ve anlamı değişmeyecek biçimde yeniden ifade eder."
+      ]
+     }
+    ],
+    "İçerik Çerçevesi": "Sağlık ve Sağlığın Toplum Üzerindeki Etkileri\nHalk Sağlığı ve Sağlık Hizmetleri\nKişisel Hijyen ve Temizlik\nHastalıklar ve Engellilik\nİlaçlar\nSağlıkta Biyopsikososyal Yaklaşım",
+    "Anahtar Kavramlar": "toplum sağlığı, otoimmün hastalıklar, enfeksiyon"
+   },
+   {
+    "id": null,
+    "baslik": "2. TEMA: SAĞLIKLI YAŞAM ALIŞKANLIKLARI",
+    "aciklama": "Bu temada fiziksel aktivite ve sağlık, uyku düzeni, sağlıklı beslenme, gıda kaynaklı hastalıkları önleme konuları ele alınacaktır. Tema sonunda öğrencilerin bu konularla ilgili gerekli bilgi, beceri ve değerleri kazanmaları amaçlanmaktadır.",
+    "olcme": "Öğrenme çıktıları; öğrenme günlüğü, açık uçlu sorular, performans görevi, bütüncül dereceli puanlama anahtarı kullanılarak değerlendirilebilir. Performans görevi olarak öğrencilerden gıda kaynaklı hastalıkların sebeplerini ve bu hastalıkları önlemek için etkili çözümler geliştirebilecekleri bir rapor hazırlamaları istenebilir. Hazırlanan raporda araştırma yapma, gıda kaynaklı hastalıkların sebepleri, gıda kaynaklı hastalıkları önleme yöntemleri, öneriler ve çözüm planı hazırlama gibi bölümlere yer verilebilir. Performans görevi analitik dereceli puanlama anahtarı ile değerlendirilebilir. Analitik dereceli puanlama anahtarında “araştırma derinliği, sebep-sonuç ilişkisi, çözüm önerileri ve rapor düzeni” gibi ölçütlere yer verilebilir.",
+    "destekleme": "Öğrencilere uyku, uyku hijyeni ve uyku döngüsü ile ilgili temel bilgiler verilebilir. Sağlıklı beslenme alışkanlıkları, ağırlık yönetimi farkındalığı ve doğru yeme davranışlarının yaşam boyu sürdürülebilmesi ile ilgili içerikler, video ve görsel araçlarla desteklenebilir.",
+    "duzey": null,
+    "Ders Saati": "6",
+    "Öğrenme Çıktıları ve Süreç Bileşenleri": [
+     {
+      "cikti": "SBTK.2.1. Fiziksel aktivitenin sağlık üzerindeki etkilerine yönelik eleştirel düşünebilme",
+      "surec": [
+       "a) Fiziksel aktivitenin sağlık üzerindeki etkilerini sorgular.",
+       "b) Fiziksel aktivitenin sağlık üzerindeki etkileri hakkında akıl yürütür.",
+       "c) Fiziksel aktivitenin sağlık üzerindeki etkilerine dair akıl yürütmeyle ulaştığı çıkarımları yansıtır."
+      ]
+     },
+     {
+      "cikti": "SBTK.2.2. Uykunun sağlık üzerindeki etkilerini sorgulayabilme",
+      "surec": [
+       "a) Uyku döngüsünü, uyku kalitesini ve uyku kalitesine etki eden faktörleri kendi ifadeleri ile tanımlar.",
+       "b) Uyku döngüsü ve kalitesinin sağlık üzerindeki etkileriyle ilgili soru sorar.",
+       "c) Uyku döngüsü ve kalitesinin sağlık üzerindeki etkileri hakkında bilgi toplar.",
+       "ç) Uyku döngüsü ve kalitesinin sağlık üzerindeki etkileri hakkında toplanan bilgileri değerlendirir.",
+       "d) Uyku döngüsü ve kalitesinin sağlık üzerindeki etkileri hakkında toplanan bilgilerle ilgili çıkarım yapar."
+      ]
+     },
+     {
+      "cikti": "SBTK.2.3. Beslenme davranışlarını yapılandırabilme",
+      "surec": [
+       "a) Beslenme davranışlarını inceleyerek nedensel ya da mantıksal ilişkiler ortaya koyar.",
+       "b) Tespit ettiği ilişkilerle ilgili ön bilgilerden yararlanarak uyumlu bir beslenme düzeni bütünü oluşturur."
+      ]
+     },
+     {
+      "cikti": "SBTK.2.4. Gıda kaynaklı hastalıklara ilişkin problemleri çözebilme",
+      "surec": [
+       "a) Besin güvenliğini, gıda kaynaklı hastalıkları, gıda katkı maddelerini, alerji ve intoleransları tanımlayarak bunların sağlık üzerindeki etkilerine yönelik problemleri yapılandırır.",
+       "b) Besin güvenliğini, gıda kaynaklı hastalıkları, gıda katkı maddelerini, alerji ve intoleransları tanımlayarak bunların sağlık üzerindeki etkilerine yönelik problemleri özetler.",
+       "c) Besin güvenliğini, gıda kaynaklı hastalıkları, gıda katkı maddelerini, alerji ve intoleransları tanımlayarak bunların sağlık üzerindeki etkilerine yönelik problemlerin çözümü için mevcut bilgiye dayalı tahminde bulunur.",
+       "ç) Besin güvenliğini, gıda kaynaklı hastalıkları, gıda katkı maddelerini, alerji ve intoleransları tanımlayarak bunların sağlık üzerindeki etkilerine yönelik problemlerin çözümü için önermeler üzerinden akıl yürütür.",
+       "d) Besin güvenliğini, gıda kaynaklı hastalıkları, gıda katkı maddelerini, alerji ve intoleransları tanımlayarak bunların sağlık üzerindeki etkilerine yönelik problemlerin çözümüne ilişkin değerlendirmede bulunur."
+      ]
+     }
+    ],
+    "İçerik Çerçevesi": "Fiziksel Aktivite ve Sağlık\nUyku Düzeni ve Sağlık\nBeslenme\nGıda Kaynaklı Hastalıkları Önleme",
+    "Anahtar Kavramlar": "egzersiz, uyku, obezite, beslenme planı, besin alerjisi, gıda intoleransı"
+   },
+   {
+    "id": null,
+    "baslik": "3. TEMA: ERGENLİK VE SOSYAL YAŞAM",
+    "aciklama": "Bu temada ergenlik, stres yönetimi ve bağımlılıklar ele alınacaktır. Tema sonunda öğrencilerin bu konularla ilgili gerekli bilgi, beceri ve değerleri kazanmaları amaçlanmaktadır.",
+    "olcme": "Öğrenme çıktıları; ilişki diyagramı, çalışma kâğıdı, açık uçlu sorular, rapor, sunu, performans görevi, analitik dereceli puanlama anahtarı, bütüncül dereceli puanlama anahtarı kullanılarak değerlendirilebilir. Performans görevi olarak öğrencilerden bağımlılık ve bağımlılığın birey, aile ve toplum üzerindeki olumsuz etkilerini ile bu etkilerin önlenmesine yönelik çözüm önerilerini içeren bir rapor ya da sunu hazırlamaları istenebilir. Bu performans görevi, analitik dereceli puanlama anahtarı ile değerlendirilebilir. Dereceli puanlama anahtarında ‘içerik doğruluğu, kaynak kullanımı, dil ve anlatım, özgünlük’ gibi ölçütlere yer verilebilir.",
+    "destekleme": "Ergenlik döneminde meydana gelen hormonal değişiklikler ve biyolojik süreçler ile ilgili basit ve anlaşılır görseller, videolar ve bilgi görselleri kullanılabilir. Stres yönetimi ve zorluklarla mücadele etme konusunda eğitsel film veya belgeseller izletilebilir. Öğrenciler tarafından etkili iletişimin unsurları konusunda basit düzeyde zihin haritası hazırlanabilir. Bağımlılık ve bağımlılık türleri konusunda dijital kaynaklardan belgesel veya eğitsel film izletilebilir. Bu öğrenme-öğretme uygulamalarında işitme engelli öğrenciler için alt yazılı görsel araçlara, görme engelli öğrenciler için ise daha çok işitsel araçlara yer verilebilir.",
+    "duzey": null,
+    "Ders Saati": "5",
+    "Öğrenme Çıktıları ve Süreç Bileşenleri": [
+     {
+      "cikti": "SBTK.3.1. Ergenlik döneminde gerçekleşen fiziksel ve sosyal-duygusal değişimleri çözümleyebilme",
+      "surec": [
+       "a) Ergenlik döneminde gerçekleşen fiziksel ve sosyal-duygusal değişimleri belirler.",
+       "b) Ergenlik döneminde gerçekleşen fiziksel ve sosyal-duygusal değişimler arasındaki ilişkileri belirler."
+      ]
+     },
+     {
+      "cikti": "SBTK.3.2. Stres ve stres kaynaklarına ilişkin problem çözebilme",
+      "surec": [
+       "a) Stres ve stres kaynaklarına ilişkin problemleri yapılandırır.",
+       "b) Stres ve stres kaynaklarına ilişkin problemleri özetler.",
+       "c) Stres ve stres kaynaklarına ilişkin problemlerin çözümüne yönelik mevcut bilgiye dayalı tahminde bulunur.",
+       "ç) Stres ve stres kaynaklarına ilişkin problemlerin çözümüne yönelik önermeler üzerinden akıl yürütür.",
+       "d) Stres ve stres kaynaklarına ilişkin problemlerin çözümüne yönelik değerlendirmede bulunur."
+      ]
+     },
+     {
+      "cikti": "SBTK.3.3. Bağımlılığın birey, aile ve toplum üzerindeki etkilerine yönelik eleştirel düşünebilme",
+      "surec": [
+       "a) Bağımlılığın birey, aile ve toplum üzerindeki etkilerini sorgular.",
+       "b) Bağımlılığın birey, aile ve toplum üzerindeki etkileri hakkında akıl yürütür.",
+       "c) Bağımlılığın birey, aile ve toplum üzerindeki etkilerine yönelik akıl yürüterek ulaştığı çıkarımları yansıtır."
+      ]
+     }
+    ],
+    "İçerik Çerçevesi": "Ergenlik\nStres Yönetimi\nBağımlılıklar",
+    "Anahtar Kavramlar": "akran zorbalığı, siber zorbalık, stres kaynakları, teknolojik stres, stres yönetimi, kimyasal bağımlılıklar, davranışsal bağımlılıklar"
+   },
+   {
+    "id": null,
+    "baslik": "4. TEMA: HAYAT KURTARAN BİLGİLER",
+    "aciklama": "Bu temada ilk yardım, sağlık ve güvenli yaşamla ilgili konular ele alınacaktır. Tema sonunda öğrencilerin bu konulara ilişkin gerekli bilgi, beceri ve değerleri kazanmaları amaçlanmaktadır.",
+    "olcme": "Öğrenme çıktıları; açık uçlu sorular, afiş/broşür, performans görevi, analitik dereceli puanlama anahtarı kullanılarak değerlendirilebilir. Performans görevi olarak öğrencilerden ilk yardım konusundaki bilgilerini, deneyimlerini ve bu alanda karşılaştıkları olaylara verdikleri tepkileri analiz etmeleri ve elde ettikleri bilgileri yazılı veya görsel materyallerle destekleyerek sunmaları istenebilir. Çalışmada ilk yardımın tanımı ve önemi, kişisel ilk yardım deneyimleri, temel ilk yardım, ilk yardım uygulamaları, ilk yardım bilgilerini geliştirme yolları gibi konulara yer verilebilir. Performans görevi analitik dereceli puanlama anahtarı ile değerlendirilebilir. Dereceli puanlama anahtarında “ ilk yardım bilgilerinin doğruluğu ve kapsamı, kişisel deneyim, tepki analizi, sunumun biçimi ve materyal kullanımı, eleştirel düşünme ve yorumlama ve özgünlük” gibi ölçütlere yer verilebilir.",
+    "destekleme": "Öğrencilere ilk yardım uygulamaları ile ilgili videolar izletilebilir. Öğrencilerden tehlike, risk, önleyici tedbir ve koruyucu donanım ilişkisini gösteren kavram haritası hazırlamaları istenebilir.",
+    "duzey": null,
+    "Ders Saati": "6",
+    "Öğrenme Çıktıları ve Süreç Bileşenleri": [
+     {
+      "cikti": "SBTK.4.1. İlk yardım bilgilerine dair deneyimleri yansıtabilme",
+      "surec": [
+       "a) İlk yardım bilgilerine dair deneyimleri gözden geçirir.",
+       "b) İlk yardım bilgilerine dair deneyimlerden hareketle çıkarımlar yapar.",
+       "c) İlk yardım bilgilerine yönelik çıkarımları değerlendirir."
+      ]
+     },
+     {
+      "cikti": "SBTK.4.2. Sağlıklı ve güvenli yaşam için güvenli ortam oluşturabilme",
+      "surec": [
+       "a) Çevresindeki tehlikeleri ve riskleri belirler.",
+       "b) Belirlediği tehlike ve risklere yönelik uygun koruyucu ve kontrol tedbirleri alır."
+      ]
+     }
+    ],
+    "İçerik Çerçevesi": "İlk Yardım\nSağlıklı ve Güvenli Yaşam",
+    "Anahtar Kavramlar": "yapay solunum, CPR (kardiyopulmoner resüsitasyon), iş sağlığı ve güvenliği"
+   },
+   {
+    "id": null,
+    "baslik": "5. TEMA: GÜVENLİ ULAŞIM VE TRAFİK BİLİNCİ",
+    "aciklama": "Bu temada trafik kültürü, trafikte güvenlik, yaya, yolcu ve sürücü olarak uyulması gereken kurallar, trafik ve çevre içeriği ele alınacaktır. Tema sonunda öğrencilerin bu konularla ilgili gerekli bilgi, beceri ve değerleri kazanmaları amaçlanmaktadır.",
+    "olcme": "Öğrenme çıktıları; poster, broşür, rapor, zihin haritası, açık uçlu sorular, vaka analizi, grup değerlendirme formu, performans görevi, bütüncül dereceli puanlama anahtarı, analitik dereceli puanlama anahtarı kullanılarak değerlendirilebilir. Performans görevi olarak öğrencilerden sürücü güvenliği ile ilgili bilgilerin yer aldığı bir broşür hazırlamaları istenebilir. Performans görevi, analitik dereceli puanlama anahtarıyla değerlendirilebilir. Dereceli puanlama anahtarında “içerik doğruluğu, hedef kitleye uygunluk, özgünlük, görsel tasarım ve düzen ” gibi ölçütlere yer verilebilir.",
+    "destekleme": "Trafikteki iletişimi olumsuz yönde etkileyen tutum ve davranışlar ile bunların topluma etkileri hakkında bilgiler verilebilir. Öğrencilere trafikteki tutum ve davranışlarla ilgili kamu spotları izletilebilir. Gerçek yaşamdan örnek olaylar verilerek emniyet kemeri takmanın, kask kullanmanın veya can yeleği giymenin ne kadar basit ve yaşamsal öneme sahip davranışlar oldukları kavratılabilir. Öğrencilerden okul çevresindeki yaya geçitlerini ve trafik ışıklarını gözlemlemeleri istenir, sınıf ortamında burada uyulması gereken kurallarla ilgili duygu ve düşüncelerini paylaşmaları için ortam oluşturulur. Öğrencilerle yaya olarak uyulması gereken kurallar ve güvenli yolculukta yolcu olarak uyulması gereken kurallarla ilgili “Yaya ve Yolcu Olarak Sorumluluklarım” adlı kartın hazırlanması sağlanır. Bu kartta öğrencilerin güvenli yaya geçitleri, trafik ışıklarının kullanımı, emniyet kemeri takma, kask takma ve can yeleği kullanma gibi konuların yer almasına dikkat edilir. Öğrencilere trafik yoğunluğunun doğaya etkilerini gösteren eğitsel film veya belgeseller izletilebilir.",
+    "duzey": null,
+    "Ders Saati": "9",
+    "Öğrenme Çıktıları ve Süreç Bileşenleri": [
+     {
+      "cikti": "SBTK.5.1. Trafikteki tutum ve davranışlarda etkili iletişimin toplum üzerindeki etkisine yönelik eleştirel düşünebilme",
+      "surec": [
+       "a) Trafikteki tutum ve davranışlarda etkili iletişim durumlarını sorgular.",
+       "b) Trafikteki tutum ve davranışlarda etkili iletişimin toplum üzerindeki etkileri hakkında akıl yürütür.",
+       "c) Trafikteki tutum ve davranışlarda etkili iletişimin toplum üzerindeki etkileri hakkında akıl yürütmeyle ulaştığı çıkarımları davranışlarına yansıtır."
+      ]
+     },
+     {
+      "cikti": "SBTK.5.2. Trafik güvenliği bilincinin insan hayatına etkilerini sorgulayabilme",
+      "surec": [
+       "a) Trafik güvenliği bilincinin insan hayatına etkilerini kendi ifadeleri ile tanımlar.",
+       "b) Trafik güvenliği bilincinin insan hayatına etkileri ile ilgili sorular sorar.",
+       "c) Trafik güvenliği bilincinin insan hayatına etkileri ile ilgili bilgi toplar.",
+       "ç) Trafik güvenliği bilincinin insan hayatına etkileriyle ilgili topladığı bilgilerin doğruluğunu değerlendirir.",
+       "d) Trafik güvenliği bilincinin insan hayatına etkileriyle ile ilgili topladığı bilgiler üzerinden çıkarım yapar."
+      ]
+     },
+     {
+      "cikti": "SBTK.5.3. Yaya güvenliği ile ilgili bilgi toplayabilme",
+      "surec": [
+       "a) Yaya güvenliği ile ilgili bilgilere ulaşmak için kullanacağı araçları belirler.",
+       "b) Belirlediği araçları kullanarak yaya güvenliği hakkındaki bilgileri bulur.",
+       "c) Yaya güvenliği ile ilgili ulaşılan bilgileri doğrular.",
+       "ç) Yaya güvenliği ile ilgili ulaşılan bilgileri kaydeder."
+      ]
+     },
+     {
+      "cikti": "SBTK.5.4. Yolcu güvenliği ile ilgili bilgi toplayabilme",
+      "surec": [
+       "a) Yolcu güvenliği ile ilgili bilgilere ulaşmak için kullanacağı araçları belirler.",
+       "b) Belirlediği araçları kullanarak yolcu güvenliği hakkındaki bilgileri bulur.",
+       "c) Yolcu güvenliği ile ilgili ulaşılan bilgileri doğrular.",
+       "ç) Yolcu güvenliği ile ilgili ulaşılan bilgileri kaydeder."
+      ]
+     },
+     {
+      "cikti": "SBTK.5.5. Sürücü güvenliği ile ilgili bilgi toplayabilme",
+      "surec": [
+       "a) Sürücü güvenliği ile ilgili bilgiye ulaşmak için kullanacağı araçları belirler.",
+       "b) Belirlediği araçları kullanarak sürücü güvenliği hakkındaki bilgileri bulur.",
+       "c) Sürücü güvenliği ile ilgili ulaşılan bilgileri doğrular.",
+       "ç) Sürücü güvenliği ile ilgili ulaşılan bilgileri kaydeder."
+      ]
+     },
+     {
+      "cikti": "SBTK.5.6. Trafiğin çevre üzerindeki etkileri ile ilgili tümevarımsal akıl yürütebilme",
+      "surec": [
+       "a) Trafiğin çevre üzerindeki etkileri ile ilgili gözlem yapar.",
+       "b) Trafiğin çevre üzerindeki etkileri ile ilgili örüntüler bulur.",
+       "c) Trafiğin çevre üzerindeki etkileri ile ilgili genellemeler yapar."
+      ]
+     }
+    ],
+    "İçerik Çerçevesi": "Trafik Kültürü\nTrafik Güvenliği\nYaya Güvenliği\nYolcu Güvenliği\nSürücü Güvenliği\nTrafik ve Çevre",
+    "Anahtar Kavramlar": "trafikte etkili iletişim, mikromobilite, trafik yoğunluğu, hava kirliliği, gürültü kirliliği"
+   }
+  ]
+ }
+}

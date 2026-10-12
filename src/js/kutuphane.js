@@ -689,7 +689,11 @@
     "din-kulturu": "din", "peygamberimizin-hayati": "din", "kuran-i-kerim": "kur", "temel-dini-bilgiler": "din",
     "aihl-kuran": "kur", "aihl-temel-dini-bilgiler": "din", "aihl-fikih": "din", "aihl-hadis": "din", "aihl-siyer": "din",
     "aihl-akaid": "din", "aihl-tefsir": "din", "aihl-hitabet": "din", "aihl-dinler-tarihi": "din", "aihl-kelam": "din", "aihl-islam-kultur": "din",
-    "beden-egitimi-ve-spor": "bes", "gorsel-sanatlar": "gor", "muzik": "muz"
+    "beden-egitimi-ve-spor": "bes", "gorsel-sanatlar": "gor", "muzik": "muz",
+    "saglik-bilgisi-trafik-kulturu": "sag",
+    "adabimuaseret": "din", "islam-kultur-medeniyeti": "din", "klasik-ahlak-metinleri": "din", "ahilik-girisimcilik": "din",
+    "dusunme-egitimi": "fel", "ortak-turk-tarihi": "sos", "turk-dunyasi-cografyasi": "cog", "spor-egitimi": "bes",
+    "bilisim-teknolojileri-yazilim": "bil", "sosyal-medya": "bil"
   };
   var TEMA_KULLANAN = { "turk-dili-ve-edebiyati": 1, "matematik": 1, "temel-matematik": 1, "kimya": 1, "biyoloji": 1, "beden-egitimi-ve-spor": 1, "muzik": 1, "gorsel-sanatlar": 1, "ingilizce": 1, "sosyal-bilim-calismalari": 1, "kuran-i-kerim": 1 };
 
@@ -891,6 +895,28 @@
       performans: [
         { etiket: "DİNLEME-SÖYLEME", yogun: "Kısa ezgileri model eşliğinde tekrar edebilmektedir.", orta: "Şarkıları toplu söylemelere katılarak seslendirebilmektedir.", hafif: "Şarkıları doğru ezgi ve ritimle söyleyebilmektedir." },
         { etiket: "MÜZİKAL ALGI", yogun: "Basit ritimleri model eşliğinde tekrar edebilmektedir.", orta: "Temel ritim kalıplarını vurmalı çalgılarla uygulayabilmektedir.", hafif: "Müzikal öğeleri (ritim, tempo, gürlük) ayırt edebilmektedir." }
+      ]
+    },
+    sag: {
+      ad: "Sağlık Bilgisi ve Trafik Kültürü",
+      alanEtiketi: "(Sağlıklı Yaşam, İlk Yardım ve Güvenlik, Trafik Kuralları)",
+      yontem: { genel: ["Doğrudan Öğretim", "Gösterip Yaptırma", "Örnek Olay", "Rol Oynama (Canlandırma)", "Video ile Öğretim", "Sosyal Öykü", "Soru-Cevap", "Akranla Eşli Çalışma"] },
+      materyal: { genel: ["Görsel Kavram Kartları", "Trafik İşaret ve Levha Kartları", "İlk Yardım Adım Kartları", "Kamu Spotu / Eğitsel Video (EBA)", "Bilgi Görseli (İnfografik)", "Uyarlanmış Çalışma Kâğıdı", "Akıllı Tahta"] },
+      performans: [
+        { etiket: "SAĞLIKLI YAŞAM", yogun: "Temel hijyen, beslenme ve uyku alışkanlıklarını resimli kartlarla tanıyabilmekte; bunları günlük yaşamda hatırlatmalarla uygulayabilmektedir.", orta: "Sağlıklı yaşam alışkanlıklarını (hijyen, beslenme, uyku, fiziksel aktivite) örneklerle açıklayabilmekte; sağlığı etkileyen etkenleri yönlendirici sorularla ilişkilendirebilmektedir.", hafif: "Sağlıklı yaşam alışkanlıklarını büyük ölçüde açıklayıp uygulayabilmekte; sağlık bilgilerinin güvenilirliğini değerlendirmede kısa ipuçlarına ihtiyaç duymaktadır." },
+        { etiket: "İLK YARDIM VE GÜVENLİK", yogun: "Tehlikeli durumları görsellerle tanıyabilmekte; acil durumda bir yetişkinden yardım istemeyi ve 112’yi aramayı model eşliğinde gösterebilmektedir.", orta: "Temel ilk yardım adımlarını adım kartlarıyla sıralayabilmekte; çevresindeki tehlike ve riskleri yönlendirmeyle belirleyebilmektedir.", hafif: "Temel ilk yardım uygulamalarını ve güvenlik önlemlerini büyük ölçüde doğru açıklayabilmekte, canlandırmalarda kısa geri bildirimle uygulayabilmektedir." },
+        { etiket: "TRAFİK KURALLARI", yogun: "Temel trafik işaretlerini ve ışıklarını görsellerle tanıyabilmekte; yaya olarak güvenli geçiş davranışlarını yetişkin rehberliğinde uygulayabilmektedir.", orta: "Yaya ve yolcu olarak uyulması gereken kuralları görsel ipuçlarıyla açıklayabilmekte, emniyet kemeri ve kask kullanımının önemini örneklerle ifade edebilmektedir.", hafif: "Yaya, yolcu ve sürücü güvenliğine ilişkin kuralları büyük ölçüde açıklayabilmekte; trafikte etkili iletişim ve trafiğin çevreye etkilerini değerlendirmede kısa ipuçlarına ihtiyaç duymaktadır." }
+      ]
+    },
+    bil: {
+      ad: "Bilişim ve Dijital Teknolojiler",
+      alanEtiketi: "(Temel Kavramlar, Dijital Araç Kullanımı, Problem Çözme ve Üretim)",
+      yontem: { genel: ["Gösterip Yaptırma", "Görev Analizi", "Adım Adım Uygulama", "Örnek Çözüm Modellemesi", "Akranla Eşli Çalışma (Eşli Programlama)", "Proje Tabanlı Öğrenme", "Soru-Cevap"] },
+      materyal: { genel: ["Bilgisayar / Tablet", "Görsel Adım Kartları", "Blok Tabanlı Kodlama Ortamı", "Akış Diyagramı Şablonu", "Örnek Kod ve Ekran Görüntüleri", "Uyarlanmış Çalışma Kâğıdı", "Akıllı Tahta"] },
+      performans: [
+        { etiket: "TEMEL KAVRAMLAR", yogun: "Alanla ilgili temel kavram ve araçları görsel kartlar ve örneklerle tanıyabilmektedir.", orta: "Temel kavramları sadeleştirilmiş açıklamalar ve örneklerle ifade edebilmekte; soyut kavramlarda somut örneklere ihtiyaç duymaktadır.", hafif: "Kavramları büyük ölçüde doğru açıklayabilmekte, kavramlar arası ilişki kurmada kısa ipuçlarına ihtiyaç duymaktadır." },
+        { etiket: "DİJİTAL ARAÇ KULLANIMI", yogun: "Bilgisayar ve uygulamalarda temel işlemleri model eşliğinde ve adım kartlarıyla yapabilmektedir.", orta: "Uygulama adımlarını görsel yönergelerle büyük ölçüde bağımsız izleyebilmekte; yeni bir araca geçişte desteğe ihtiyaç duymaktadır.", hafif: "Dijital araçları amaca uygun ve büyük ölçüde bağımsız kullanabilmektedir." },
+        { etiket: "PROBLEM ÇÖZME VE ÜRETİM", yogun: "Basit bir problemin adımlarını öğretmen rehberliğinde sıralayabilmektedir.", orta: "Bir-iki adımlı problemler için çözüm adımlarını şablon desteğiyle oluşturabilmekte, hatalarını yönlendirmeyle düzeltebilmektedir.", hafif: "Çok adımlı görevlerde çözüm planı oluşturup basit bir ürün geliştirebilmekte; hata ayıklamada kısa ipuçlarına ihtiyaç duymaktadır." }
       ]
     },
     mes: {

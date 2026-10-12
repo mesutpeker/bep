@@ -367,8 +367,8 @@
     var uniteler = p.uniteler.map(function (u) { return "<li>" + esc(u.ad) + (u.saat ? " <small>(" + u.saat + " ders saati)</small>" : "") + "</li>"; }).join("");
     var destekler = p.uniteler.filter(function (u) { return u.destek; }).map(function (u) { return "<li><b>" + esc(BEP.uniteSadeAd(u.ad, ctx.dil)) + ":</b> " + esc(u.destek) + "</li>"; }).join("");
     kutu.innerHTML = "<b>Kaynak:</b> " + esc(p.kaynak) + "<br><b>Program:</b> " + esc(programEtiketi(p)) +
-      (p.program === "2018" ? " <small>(" + esc(ctx.yil) + "’de 12. sınıflarda önceki öğretim programları uygulanmaya devam etmektedir.)</small>" : "") +
-      (p.dagitim === "otomatik" ? "<br><small>Bu seçmeli ders için MEB haftalık plan yayımlamadığından üniteler, resmî ünite ders saatlerine göre haftalara orantılı dağıtılmıştır.</small>" : "") +
+      (p.programNotu ? " <small>(" + esc(p.programNotu) + ")</small>" : p.program === "2018" ? " <small>(" + esc(ctx.yil) + "’de 12. sınıflarda önceki öğretim programları uygulanmaya devam etmektedir.)</small>" : "") +
+      (p.dagitim === "otomatik" ? "<br><small>Bu " + (p.ortak ? "ders" : "seçmeli ders") + " için MEB haftalık plan yayımlamadığından üniteler, resmî ünite ders saatlerine göre haftalara orantılı dağıtılmıştır.</small>" : "") +
       "<br><b>Üniteler / temalar:</b><ul>" + uniteler + "</ul>" +
       (destekler ? '<details class="ek-ayar"><summary>Öğretim programındaki “Destekleme” önerileri (TYMM)</summary><ul>' + destekler + "</ul></details>" : "");
   }
