@@ -5,6 +5,8 @@ BEP uygulamasının ders verilerini resmî kaynaklardan derler.
 Girdi:
   tools/ara/planlar_ham.json              (plan_ayristir.py çıktısı)
   tools/kaynaklar/tymm/tymm_uniteler.json  (tymm.meb.gov.tr ünite sayfaları)
+  tools/kaynaklar/tymm/tymm_pdf_uniteler.json  (ünite sayfası yayımlanmamış derslerin program PDF'leri; tymm_pdf_ayristir.py)
+  tools/kaynaklar/programlar/kazanim_programlari.json  (çerçeve planı olmayan kazanım temelli seçmeli dersler; program_pdf_ayristir.py)
 Çıktı:
   data/dersler.js   -> window.BEP_VERI = { meta, dersler: [...] }
 
@@ -880,15 +882,26 @@ DERSLER = {
     "peygamberimizin-hayati": ("Peygamberimizin Hayatı (Seçmeli)", "Din Kültürü ve Değerler", "peygamberimizin-hayati-dersi-2-ortaogretim"),
     "kuran-i-kerim": ("Kur'an-ı Kerim (Seçmeli)", "Din Kültürü ve Değerler", None),
     "temel-dini-bilgiler": ("Temel Dinî Bilgiler (Seçmeli)", "Din Kültürü ve Değerler", None),
+    "islam-kultur-medeniyeti": ("İslam Kültür ve Medeniyeti (Seçmeli)", "Din Kültürü ve Değerler", None),
+    "klasik-ahlak-metinleri": ("Klasik Ahlak Metinleri (Seçmeli)", "Din Kültürü ve Değerler", None),
     "beden-egitimi-ve-spor": ("Beden Eğitimi ve Spor", "Sanat ve Spor", "beden-egitimi-ve-spor-dersi"),
     "gorsel-sanatlar": ("Görsel Sanatlar", "Sanat ve Spor", "gorsel-sanatlar-dersi"),
     "muzik": ("Müzik", "Sanat ve Spor", "muzik-dersi"),
+    "saglik-bilgisi-trafik-kulturu": ("Sağlık Bilgisi ve Trafik Kültürü", "Sağlık ve Trafik", "saglik-bilgisi-ve-trafik-kulturu-dersi"),
     "astronomi": ("Astronomi ve Uzay Bilimleri (Seçmeli)", "Seçmeli Dersler", "astronomi-ve-uzay-bilimleri-dersi"),
     "cagdas-turk-dunya-tarihi": ("Çağdaş Türk ve Dünya Tarihi (Seçmeli)", "Seçmeli Dersler", "cagdas-turk-ve-dunya-tarihi-dersi"),
     "demokrasi-insan-haklari": ("Demokrasi ve İnsan Hakları (Seçmeli)", "Seçmeli Dersler", "demokrasi-ve-insan-haklari-dersi"),
     "iklim-cevre": ("İklim, Çevre ve Yenilikçi Çözümler (Seçmeli)", "Seçmeli Dersler", "iklim-cevre-ve-yenilikci-cozumler-dersi"),
     "islam-bilim-tarihi": ("İslam Bilim Tarihi (Seçmeli)", "Seçmeli Dersler", "islam-bilim-tarihi-dersi"),
     "turk-kultur-medeniyet-tarihi": ("Türk Kültür ve Medeniyet Tarihi (Seçmeli)", "Seçmeli Dersler", "turk-kultur-ve-medeniyet-tarihi-dersi"),
+    "adabimuaseret": ("Adabımuaşeret (Seçmeli)", "Seçmeli Dersler", None),
+    "dusunme-egitimi": ("Düşünme Eğitimi (Seçmeli)", "Seçmeli Dersler", None),
+    "ahilik-girisimcilik": ("Ahilik Kültürü ve Girişimcilik (Seçmeli)", "Seçmeli Dersler", None),
+    "ortak-turk-tarihi": ("Ortak Türk Tarihi (Seçmeli)", "Seçmeli Dersler", None),
+    "turk-dunyasi-cografyasi": ("Türk Dünyası Coğrafyası (Seçmeli)", "Seçmeli Dersler", None),
+    "spor-egitimi": ("Spor Eğitimi (Seçmeli)", "Seçmeli Dersler", None),
+    "bilisim-teknolojileri-yazilim": ("Bilişim Teknolojileri ve Yazılım (Seçmeli)", "Seçmeli Dersler", None),
+    "sosyal-medya": ("Sosyal Medya (MTAL Seçmeli Meslek Dersi)", "Mesleki ve Teknik Anadolu Lisesi Seçmeli Dersleri", None),
     "aihl-kuran": ("Kur'an-ı Kerim (AİHL)", "Anadolu İmam Hatip Lisesi Meslek Dersleri", None),
     "aihl-temel-dini-bilgiler": ("Temel Dinî Bilgiler (AİHL)", "Anadolu İmam Hatip Lisesi Meslek Dersleri", None),
     "aihl-arapca": ("Arapça (AİHL)", "Anadolu İmam Hatip Lisesi Meslek Dersleri", None),
@@ -1401,6 +1414,60 @@ def tymm_dagit(kayit, gun_haritasi):
     return uniteler, haftalar, haftalik
 
 
+def kazanim_dagit(plan_kaydi, gun_haritasi, haftalik):
+    """Kazanım temelli programı (çerçeve planı yok) 36 öğretim haftasına dağıtır. Haftalar ünitelere ünite ders
+    saatleriyle orantılı paylaştırılır; ünite içinde her kazanıma (varsa konusunun saatini konunun kazanımlarına,
+    yoksa ünite saatini ünite kazanımlarına eşit bölerek) bir süre aralığı verilir ve kazanım, aralığının ortası
+    hangi haftaya düşüyorsa o haftada yer alır. Kazanımı düşmeyen haftalar süren kazanımla devam eder."""
+    uniteler = plan_kaydi["uniteler"]
+    n = len(uniteler)
+    toplam = sum(u["saat"] for u in uniteler) or n
+    paylar = [u["saat"] / toplam * 36 for u in uniteler]
+    tam = [max(1, int(x)) for x in paylar]
+    while sum(tam) < 36:
+        i = max(range(n), key=lambda j: paylar[j] - tam[j])
+        tam[i] += 1
+    while sum(tam) > 36:
+        i = max(range(n), key=lambda j: (tam[j] - paylar[j]) if tam[j] > 1 else -99)
+        tam[i] -= 1
+    haftalar = []
+    h = 1
+    for ui, (u, adet) in enumerate(zip(uniteler, tam)):
+        kz = u["kazanimlar"]
+        konular = u.get("konular") or []
+        # Her kazanımın ünite içindeki süre aralığı [bas, son) (ünite süresine göre 0..1)
+        araliklar = []
+        if konular and all(k.get("saat") for k in konular):
+            ks = sum(k["saat"] for k in konular)
+            bas = 0.0
+            for ki, k in enumerate(konular):
+                grup = [z for z in kz if z.get("konu") == ki]
+                for gi, z in enumerate(grup):
+                    araliklar.append((z, (bas + k["saat"] * gi / len(grup)) / ks, (bas + k["saat"] * (gi + 1) / len(grup)) / ks))
+                bas += k["saat"]
+        else:
+            araliklar = [(z, i / len(kz), (i + 1) / len(kz)) for i, z in enumerate(kz)]
+        for j in range(adet):
+            a, b = j / adet, (j + 1) / adet
+            secilen = [z for z, x, y in araliklar if a <= (x + y) / 2 < b]
+            if not secilen:
+                secilen = [z for z, x, y in araliklar if x <= (a + b) / 2 < y][:1]
+            hf = {"h": h, "s": haftalik, "u": [ui]}
+            if secilen:
+                hf["c"] = [[z["kod"], z["metin"]] for z in secilen]
+                davr = davranislar_eski(hf["c"])
+                if davr:
+                    hf["b"] = [kisalt(d, 190) for d in davr[:5]]
+                if konular and secilen[0].get("konu") is not None:
+                    hf["k"] = konular[secilen[0]["konu"]]["ad"]
+            if gun_haritasi.get(h):
+                hf["g"] = gun_haritasi[h]
+            haftalar.append(hf)
+            h += 1
+    haftalar.append({"h": HAFTA_SAYISI, "s": 0, "x": "SE", **({"g": gun_haritasi[HAFTA_SAYISI]} if gun_haritasi.get(HAFTA_SAYISI) else {})})
+    return [{"ad": u["baslik"], "saat": u["saat"]} for u in uniteler], haftalar
+
+
 # --------------------------------------------------------------------------- ana akış
 def main():
     ham = json.load(open(os.path.join(ARA, "planlar_ham.json"), encoding="utf-8"))
@@ -1427,6 +1494,12 @@ def main():
         for w in p["haftalar"]:
             w["satirlar"] = [{k: (v if k == "_devam" else ham_onar(v)) for k, v in r.items()} for r in w["satirlar"]]
     tymm = {k: dict(v, uniteler=tymm_onar(v["uniteler"])) for k, v in tymm.items()}
+    # Program PDF'lerinden ayrıştırılan dersler (portalda ünite sayfası yok). Onarım sözlüğü yukarıda kurulduğu için
+    # bu metinler sözlüğü etkilemez; mevcut derslerin verisi bu eklemeden bağımsız kalır.
+    pdf_yolu = os.path.join(KOK, "kaynaklar", "tymm", "tymm_pdf_uniteler.json")
+    if os.path.exists(pdf_yolu):
+        for k, v in json.load(open(pdf_yolu, encoding="utf-8")).items():
+            tymm.setdefault(k, dict(v, uniteler=tymm_onar(v["uniteler"])))
     dersler = {}
     atlanan = []
     for p in ham:
@@ -1481,7 +1554,11 @@ def main():
         ("islam-bilim-tarihi", "islam-bilim-tarihi-dersi|S", "S"),
         ("turk-kultur-medeniyet-tarihi", "turk-kultur-ve-medeniyet-tarihi-dersi|S", "S"),
         ("matematik-uygulamalari", "matematik-uygulamalari-dersi|11", "11"),
+        # TYMM portalı "ortaöğretim seçmeli dersler" altında listeler; haftalık ders çizelgelerinde (TTKB 08.05.2025/5)
+        # Anadolu, Fen ve Sosyal Bilimler liselerinde 9. sınıf ortak dersidir (haftada 1 saat).
+        ("saglik-bilgisi-trafik-kulturu", "saglik-bilgisi-ve-trafik-kulturu-dersi|S", "9"),
     ]
+    ortak_dersler = {"saglik-bilgisi-trafik-kulturu"}
     for did, anahtar, sinif in ekler:
         kayit = tymm.get(anahtar)
         if not kayit:
@@ -1498,7 +1575,58 @@ def main():
             "kaynak": f"MEB TYMM Öğretim Programı (tymm.meb.gov.tr/ogretim-programlari/ders/{slug} – haftalık dağılım ünite ders saatlerine göre orantılı yapılmıştır)",
             "uniteler": [u for u, _, _ in uniteler], "haftalar": haftalar,
         }
+        if did in ortak_dersler:
+            plan["ortak"] = True  # seçmeli değil: arayüzdeki dağıtım notu buna göre yazılır
         dersler.setdefault(did, {"id": did, "ad": ad, "grup": grup, "planlar": []})["planlar"].append(plan)
+
+    # Çerçeve planı yayımlanmamış, kazanım temelli (TYMM öncesi) programı olan seçmeli dersler. Haftalık saat, haftalık
+    # ders çizelgelerinde seçenekli verilen saatlerden okulun uyguladığıdır; arayüzde değiştirilebilir.
+    program_notu = ("Bu seçmeli ders için Maarif Modeli programı ve çerçeve yıllık plan yayımlanmadığından "
+                    "yürürlükteki kazanım temelli öğretim programı uygulanır.")
+    kp_yolu = os.path.join(KOK, "kaynaklar", "programlar", "kazanim_programlari.json")
+    kazanim_programlari = json.load(open(kp_yolu, encoding="utf-8")) if os.path.exists(kp_yolu) else {}
+    kazanim_saatleri = {
+        "adabimuaseret": 1, "dusunme-egitimi": 2, "ahilik-girisimcilik": 1, "ortak-turk-tarihi": 1,
+        "turk-dunyasi-cografyasi": 2, "klasik-ahlak-metinleri": 1, "spor-egitimi": 1,
+        "bilisim-teknolojileri-yazilim": 1, "sosyal-medya": 2,
+    }
+    for did, haftalik in kazanim_saatleri.items():
+        kayit = kazanim_programlari.get(did)
+        if not kayit:
+            print("Kazanım programı yok:", did)
+            continue
+        ad, grup, _ = DERSLER[did]
+        for pk in kayit["planlar"]:
+            pk = {**pk, "uniteler": [{**u, "baslik": ham_onar(u["baslik"]), "kazanimlar": [
+                {**z, "metin": ham_onar(z["metin"])} for z in u["kazanimlar"]]} for u in pk["uniteler"]]}
+            uniteler, haftalar = kazanim_dagit(pk, gun_haritasi, haftalik)
+            program_saati = sum(u["saat"] for u in pk["uniteler"])
+            plan = {
+                "id": "genel-S" + (f"-{pk['ek']}" if pk.get("ek") else ""), "sinif": "S", "okul": "genel",
+                "etiket": OKUL_ETIKET["genel"] + (f" – {pk['etiket']}" if pk.get("etiket") else ""),
+                "program": "2018", "saat": haftalik, "dagitim": "otomatik", "programNotu": program_notu,
+                "kaynak": f"MEB {kayit['ad']} ({kayit['url']} – program {program_saati} ders saatidir; haftalık dağılım "
+                          f"ünite ders saatlerine göre orantılı yapılmıştır)",
+                "uniteler": uniteler, "haftalar": haftalar,
+            }
+            dersler.setdefault(did, {"id": did, "ad": ad, "grup": grup, "planlar": []})["planlar"].append(plan)
+
+    # İslam Kültür ve Medeniyeti (seçmeli, haftada 1 saat): AİHL 12. sınıfta da okutulan aynı öğretim programı
+    # (DÖGM 2015, mufredat.meb.gov.tr PID=1107) uygulanır; DÖGM çerçeve yıllık planının konu ve kazanımları kullanılır.
+    aihl_ikm = next((p for p in dersler.get("aihl-islam-kultur", {}).get("planlar", []) if p["id"] == "aihl-12"), None)
+    if aihl_ikm:
+        ad, grup, _ = DERSLER["islam-kultur-medeniyeti"]
+        plan = json.loads(json.dumps(aihl_ikm))
+        for hf in plan["haftalar"]:
+            if hf.get("s"):
+                hf["s"] = 1
+        plan.update({
+            "id": "genel-S", "sinif": "S", "okul": "genel", "etiket": OKUL_ETIKET["genel"], "saat": 1,
+            "programNotu": program_notu,
+            "kaynak": plan["kaynak"].replace("Çerçeve Yıllık Planı (", "Çerçeve Yıllık Planı (İslam Kültür ve Medeniyeti Dersi Öğretim "
+                                             "Programı – mufredat.meb.gov.tr/ProgramDetay.aspx?PID=1107; plan haftada 2 saate göredir; "),
+        })
+        dersler.setdefault("islam-kultur-medeniyeti", {"id": "islam-kultur-medeniyeti", "ad": ad, "grup": grup, "planlar": []})["planlar"].append(plan)
 
     # sıralama
     sira = list(DERSLER.keys())
@@ -1528,6 +1656,9 @@ def main():
             {"ad": "MEB OGM – TYMM 2026-2027 Ortaöğretim Taslak Çerçeve Yıllık Planları", "url": "https://tymm.meb.gov.tr/taslak-cerceve-planlari/ortaogretim"},
             {"ad": "MEB DÖGM – 2026-2027 Çerçeve Yıllık Planlar", "url": "https://dogm.meb.gov.tr/www/cerceve-yillik-planlar/icerik/2257"},
             {"ad": "MEB TYMM Öğretim Programları (ünite sayfaları)", "url": "https://tymm.meb.gov.tr/ogretim-programlari"},
+            {"ad": "MEB TTKB – Anadolu, Fen ve Sosyal Bilimler Liseleri Haftalık Ders Çizelgeleri (08.05.2025 tarihli ve 5 sayılı Kurul kararı)", "url": "https://ttkb.meb.gov.tr/meb_iys_dosyalar/2025_05/20144001_202505.pdf"},
+            {"ad": "MEB TTKB – Öğretim Programları (seçmeli derslerin kazanım temelli programları)", "url": "https://mufredat.meb.gov.tr/Programlar.aspx"},
+            {"ad": "MEB MTEGM – Seçmeli ders programları, çerçeve öğretim programları ve ders bilgi formları", "url": "https://meslek.meb.gov.tr/kararlar"},
         ],
     }
     os.makedirs(CIKTI, exist_ok=True)

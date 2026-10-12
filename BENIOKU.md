@@ -33,13 +33,19 @@ Tek dosya yeterlidir; dosyayı USB bellekle ya da e-postayla başka bilgisayara 
 
 ## Kapsam ve resmî kaynaklar
 
-42 ders, 162 plan (Hazırlık, 9, 10, 11, 12 ve seçmeli dersler; Anadolu, Fen, Sosyal Bilimler, Anadolu İmam Hatip). 2026-2027'de Hazırlık, 9, 10 ve 11. sınıflarda Türkiye Yüzyılı Maarif Modeli (TYMM) programları, 12. sınıfta 2018 programları uygulanır; uygulama bu ayrımı plan başlıklarına (BEP amaçları / BEP kazanımları) yansıtır.
+53 ders, 203 plan (Hazırlık, 9, 10, 11, 12 ve seçmeli dersler; Anadolu, Fen, Sosyal Bilimler, Anadolu İmam Hatip). 2026-2027'de Hazırlık, 9, 10 ve 11. sınıflarda Türkiye Yüzyılı Maarif Modeli (TYMM) programları, 12. sınıfta 2018 programları uygulanır; uygulama bu ayrımı plan başlıklarına (BEP amaçları / BEP kazanımları) yansıtır.
 
 | Veri | Kaynak |
 |---|---|
 | Haftalık konu, kazanım/öğrenme çıktısı, ölçme, belirli gün ve haftalar (124 plan) | [MEB OGM – 2026-2027 Ortaöğretim Taslak Çerçeve Yıllık Planları](https://tymm.meb.gov.tr/taslak-cerceve-planlari/ortaogretim) |
 | Din Kültürü, Kur'an-ı Kerim, Peygamberimizin Hayatı, Temel Dinî Bilgiler ve AİHL meslek dersleri (31 plan) | [MEB DÖGM – 2026-2027 Çerçeve Yıllık Planlar](https://dogm.meb.gov.tr/www/cerceve-yillik-planlar/icerik/2257) |
 | Çerçeve planı yayımlanmamış TYMM seçmeli dersleri (7 plan; ünite saatlerine göre haftalara dağıtılır) | [MEB TYMM Öğretim Programları](https://tymm.meb.gov.tr/ogretim-programlari) |
+| Sağlık Bilgisi ve Trafik Kültürü (1 plan; 9. sınıf, haftada 1 saat; çerçeve planı ve tema sayfaları yayımlanmadığından 2026 TYMM öğretim programı PDF'inden alınır, tema saatlerine göre haftalara dağıtılır) | [MEB TYMM – Sağlık Bilgisi ve Trafik Kültürü Dersi Öğretim Programı](https://tymm.meb.gov.tr/ogretim-programlari/ders/saglik-bilgisi-ve-trafik-kulturu-dersi) |
+| Sağlık Bilgisi ve Trafik Kültürü'nün sınıf düzeyi ve haftalık ders saati | [TTKB – Anadolu, Fen ve Sosyal Bilimler Liseleri Haftalık Ders Çizelgeleri (08.05.2025/5)](https://ttkb.meb.gov.tr/meb_iys_dosyalar/2025_05/20144001_202505.pdf) |
+| Maarif Modeli programı ve çerçeve planı olmayan seçmeli dersler (39 plan; kazanım temelli programın ünite/konu saatlerine göre haftalara dağıtılır): Adabımuaşeret, Düşünme Eğitimi, Ortak Türk Tarihi, Türk Dünyası Coğrafyası, Klasik Ahlak Metinleri I-II-III, Spor Eğitimi (19 branş), Bilişim Teknolojileri ve Yazılım (11 modül) | [TTKB Öğretim Programları](https://mufredat.meb.gov.tr/Programlar.aspx) |
+| Ahilik Kültürü ve Girişimcilik (TTKK 2023/68) ve MTAL seçmeli ders tablosu | [MTEGM Kurul Kararları](https://meslek.meb.gov.tr/kararlar) |
+| Sosyal Medya (MTAL seçmeli meslek dersi, 11-12. sınıf): kazanımlar 11. sınıf çerçeve öğretim programından, birim süreleri ve açıklamalar ders bilgi formundan | [MTEGM Çerçeve Öğretim Programları](https://meslek.meb.gov.tr/upload/cop11/buro_11.pdf) · [Ders Bilgi Formları](https://meslek.meb.gov.tr/dbflistele.aspx?sinif_kodu=11&kurum_id=1) |
+| İslam Kültür ve Medeniyeti (seçmeli, 1 plan): AİHL'de de okutulan aynı program (DÖGM 2015); DÖGM çerçeve yıllık planı haftada 1 saate uyarlanır | [TTKB – İslam Kültür ve Medeniyeti Dersi Öğretim Programı](https://mufredat.meb.gov.tr/ProgramDetay.aspx?PID=1107) |
 | Çalışma takvimi: 14.09.2026 – 25.06.2027, 1. dönem ara tatili 16–20 Kasım 2026, yarıyıl tatili 25 Ocak – 5 Şubat 2027, 2. dönem ara tatili 8–12 Mart 2027, 37. hafta sosyal etkinlik | [MEB 2026-2027 Eğitim Öğretim Yılı Takvimi](https://www.meb.gov.tr/2026-2027-egitim-ogretim-yili-takvimi-aciklandi/haber/41057/tr) |
 | BEP içeriği ve uyarlamalar (Md. 20, 22, 23, 24, 47, 48) | [Özel Eğitim Hizmetleri Yönetmeliği](https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=24736&MevzuatTur=7&MevzuatTertip=5) |
 | BEP'e göre değerlendirme, sınav ve muafiyetler (Md. 10/1-f, 43/1-g, 45/1-ğ, 51/6) | [Ortaöğretim Kurumları Yönetmeliği](https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=18812&MevzuatTur=7&MevzuatTertip=5) |
@@ -72,6 +78,8 @@ index.html, src/css, src/js      kaynak kod (kutuphane, takvim, uretici, belge, 
 data/dersler.js                  ders/plan veri seti (veri_olustur.py üretir)
 tools/kaynaklar/                 MEB'den indirilen resmî dosyalar (ogm, dogm, tymm, mevzuat)
 tools/plan_ayristir.py           Excel planlarını ayrıştırır → tools/ara/planlar_ham.json
+tools/tymm_pdf_ayristir.py       tema sayfası yayımlanmamış TYMM program PDF'lerini ayrıştırır → tools/kaynaklar/tymm/tymm_pdf_uniteler.json (PyMuPDF; yalnız PDF güncellenince)
+tools/program_pdf_ayristir.py    çerçeve planı olmayan kazanım temelli seçmeli ders programlarını ayrıştırır → tools/kaynaklar/programlar/kazanim_programlari.json (PyMuPDF; yalnız PDF güncellenince)
 tools/veri_olustur.py            ham planlar + TYMM ünite verisi → data/dersler.js
 tools/paketle.py                 index.html + src + data → BEP_Hazirlama_Uygulamasi.html
 tools/ornek_uret.js              komut satırından örnek .docx üretir
